@@ -10,18 +10,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
 :root{
---cream:#FBF6EC;
---ivory:#F2EADA;
---sand:#E9DFC9;
---ink:#2B2118;
---ink-soft:#5C4F40;
---gold:#B08A47;
---gold-deep:#8C6A2F;
---umber:#241B12;
---line:rgba(43,33,24,.14);
---shadow:0 18px 50px rgba(43,33,24,.14);
---display:'Cormorant Garamond',Georgia,serif;
---ui:'Jost','Helvetica Neue',Arial,sans-serif;
+  --cream:#FBF6EC;
+  --ivory:#F2EADA;
+  --sand:#E9DFC9;
+  --ink:#2B2118;
+  --ink-soft:#5C4F40;
+  --gold:#B08A47;
+  --gold-deep:#8C6A2F;
+  --umber:#241B12;
+  --line:rgba(43,33,24,.14);
+  --shadow:0 18px 50px rgba(43,33,24,.14);
+  --display:'Cormorant Garamond',Georgia,serif;
+  --ui:'Jost','Helvetica Neue',Arial,sans-serif;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
@@ -313,72 +313,72 @@ details p{font-size:13px;color:var(--ink-soft);padding-bottom:16px}
 
 /* ---------- responsive ---------- */
 @media(max-width:1024px){
-.foot-top{grid-template-columns:1fr 1fr}
+  .foot-top{grid-template-columns:1fr 1fr}
 }
 @media(max-width:880px){
-nav.main{display:none}
-.burger{display:grid}
-.split,.split.rev{grid-template-columns:1fr}
-.split.rev .split-media{order:0}
-.ovals{grid-template-columns:1fr;max-width:380px}
-.services-in{grid-template-columns:1fr 1fr;gap:36px 20px}
-.modal-card{grid-template-columns:1fr;max-height:94vh}
-.modal-media{min-height:340px;aspect-ratio:4/3}
-.header-in{height:72px}
-.brand .name{font-size:24px}
+  nav.main{display:none}
+  .burger{display:grid}
+  .split,.split.rev{grid-template-columns:1fr}
+  .split.rev .split-media{order:0}
+  .ovals{grid-template-columns:1fr;max-width:380px}
+  .services-in{grid-template-columns:1fr 1fr;gap:36px 20px}
+  .modal-card{grid-template-columns:1fr;max-height:94vh}
+  .modal-media{min-height:340px;aspect-ratio:4/3}
+  .header-in{height:72px}
+  .brand .name{font-size:24px}
 }
 @media(max-width:560px){
-.announce{font-size:9px;letter-spacing:.2em;padding:9px 12px}
-.hide-sm{display:none}
-.grid{grid-template-columns:repeat(2,1fr);gap:14px}
-.quick-add{transform:none}
-.card-info h3{font-size:16px}
-.news-form{flex-direction:column;border:none;gap:10px}
-.news-form input{border:1px solid var(--ink);padding:15px 18px}
-.news-form button{padding:16px}
-.foot-bottom{justify-content:center;text-align:center}
-.hero h1{font-size:40px}
-.f-row{grid-template-columns:1fr}
-.wa-float{width:50px;height:50px;right:16px;bottom:16px}
+  .announce{font-size:9px;letter-spacing:.2em;padding:9px 12px}
+  .hide-sm{display:none}
+  .grid{grid-template-columns:repeat(2,1fr);gap:14px}
+  .quick-add{transform:none}
+  .card-info h3{font-size:16px}
+  .news-form{flex-direction:column;border:none;gap:10px}
+  .news-form input{border:1px solid var(--ink);padding:15px 18px}
+  .news-form button{padding:16px}
+  .foot-bottom{justify-content:center;text-align:center}
+  .hero h1{font-size:40px}
+  .f-row{grid-template-columns:1fr}
+  .wa-float{width:50px;height:50px;right:16px;bottom:16px}
 
-/* impede o iOS de dar zoom automático ao focar campos (exige 16px) */
-.field input,.frag-input,.news-form input,.search-field input{font-size:16px}
+  /* impede o iOS de dar zoom automático ao focar campos (exige 16px) */
+  .field input,.frag-input,.news-form input,.search-field input{font-size:16px}
 
-/* alvos de toque maiores no carrinho e no checkout */
-.qty button{width:38px;height:38px;font-size:17px}
-.qty span{width:36px}
-.pay-opt{padding:16px}
-.cart-item{grid-template-columns:72px 1fr auto;gap:12px}
-.cart-item img{width:72px;height:88px}
+  /* alvos de toque maiores no carrinho e no checkout */
+  .qty button{width:38px;height:38px;font-size:17px}
+  .qty span{width:36px}
+  .pay-opt{padding:16px}
+  .cart-item{grid-template-columns:72px 1fr auto;gap:12px}
+  .cart-item img{width:72px;height:88px}
 
-/* ações do quick-view empilhadas, mais fáceis de tocar */
-.m-actions{flex-direction:column}
-.m-actions .btn{width:100%}
+  /* ações do quick-view empilhadas, mais fáceis de tocar */
+  .m-actions{flex-direction:column}
+  .m-actions .btn{width:100%}
 
-/* CTAs do hero em coluna, ocupando a largura toda */
-.hero-cta{flex-direction:column}
-.hero-cta .btn{width:100%}
+  /* CTAs do hero em coluna, ocupando a largura toda */
+  .hero-cta{flex-direction:column}
+  .hero-cta .btn{width:100%}
 
-/* respeita a área segura em iPhones com notch/home indicator */
-.wa-float{bottom:calc(16px + env(safe-area-inset-bottom))}
-.toast{bottom:calc(28px + env(safe-area-inset-bottom))}
-.drawer-foot{padding-bottom:calc(22px + env(safe-area-inset-bottom))}
+  /* respeita a área segura em iPhones com notch/home indicator */
+  .wa-float{bottom:calc(16px + env(safe-area-inset-bottom))}
+  .toast{bottom:calc(28px + env(safe-area-inset-bottom))}
+  .drawer-foot{padding-bottom:calc(22px + env(safe-area-inset-bottom))}
 }
 @media(max-width:380px){
-.brand .name{font-size:22px;letter-spacing:.28em;margin-right:-.28em}
-.brand .tag{display:none}
-.h-actions{gap:2px}
-.icon-btn{width:38px;height:38px}
-.header-in{gap:4px}
+  .brand .name{font-size:22px;letter-spacing:.28em;margin-right:-.28em}
+  .brand .tag{display:none}
+  .h-actions{gap:2px}
+  .icon-btn{width:38px;height:38px}
+  .header-in{gap:4px}
 }
 /* dispositivos sem hover (touch): garante que o "adicionar rápido" do
-produto sempre apareça, já que :hover nunca acontece no toque */
+   produto sempre apareça, já que :hover nunca acontece no toque */
 @media(hover:none){
-.quick-add{transform:none}
+  .quick-add{transform:none}
 }
 @media(prefers-reduced-motion:reduce){
-*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
-.reveal{opacity:1;transform:none}
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+  .reveal{opacity:1;transform:none}
 }
 html,body{overflow-x:hidden}
 button,a{-webkit-tap-highlight-color:transparent}
@@ -389,190 +389,190 @@ button,a{-webkit-tap-highlight-color:transparent}
 <div class="announce">Frete grátis acima de <b>R$ 250</b><span class="hide-sm"> &nbsp;·&nbsp; Pagamento no Pix: <b>5% de desconto extra</b></span></div>
 
 <header id="header">
-<div class="wrap header-in">
-<div class="h-left">
-<button class="icon-btn burger" aria-label="Abrir menu" onclick="openMenu()"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
-<nav class="main" aria-label="Navegação principal">
-<a href="#inicio">Início</a>
-<a href="#colecoes">Coleções</a>
-<a href="#contato">Contato</a>
-<a href="#quemsomos">Quem Somos</a>
-</nav>
-</div>
-<a class="brand" href="#inicio" aria-label="Liora — Aromas de Luxo">
-<span class="name">LIORA</span>
-<span class="tag">Aromas de Luxo</span>
-</a>
-<div class="h-actions">
-<button class="icon-btn" aria-label="Buscar" onclick="openSearch()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
-<button class="icon-btn" aria-label="Favoritos" onclick="openDrawer('wish')"><svg viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.7-9.3-9C1.2 8 3 4.5 6.6 4.5c2.2 0 3.9 1.3 5.4 3.4 1.5-2.1 3.2-3.4 5.4-3.4 3.6 0 5.4 3.5 3.9 7-1.8 4.3-9.3 9-9.3 9z"/></svg><span class="count" id="wishCount">0</span></button>
-<button class="icon-btn" aria-label="Carrinho de compras" onclick="openDrawer('cart')"><svg viewBox="0 0 24 24"><path d="M6 8h12l-1 12.5H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="count" id="cartCount">0</span></button>
-</div>
-</div>
+  <div class="wrap header-in">
+    <div class="h-left">
+      <button class="icon-btn burger" aria-label="Abrir menu" onclick="openMenu()"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+      <nav class="main" aria-label="Navegação principal">
+      <a href="#inicio">Início</a>
+      <a href="#colecoes">Coleções</a>
+      <a href="#contato">Contato</a>
+      <a href="#quemsomos">Quem Somos</a>
+      </nav>
+    </div>
+    <a class="brand" href="#inicio" aria-label="Liora — Aromas de Luxo">
+      <span class="name">LIORA</span>
+      <span class="tag">Aromas de Luxo</span>
+    </a>
+    <div class="h-actions">
+      <button class="icon-btn" aria-label="Buscar" onclick="openSearch()"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg></button>
+      <button class="icon-btn" aria-label="Favoritos" onclick="openDrawer('wish')"><svg viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.7-9.3-9C1.2 8 3 4.5 6.6 4.5c2.2 0 3.9 1.3 5.4 3.4 1.5-2.1 3.2-3.4 5.4-3.4 3.6 0 5.4 3.5 3.9 7-1.8 4.3-9.3 9-9.3 9z"/></svg><span class="count" id="wishCount">0</span></button>
+      <button class="icon-btn" aria-label="Carrinho de compras" onclick="openDrawer('cart')"><svg viewBox="0 0 24 24"><path d="M6 8h12l-1 12.5H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="count" id="cartCount">0</span></button>
+    </div>
+  </div>
 </header>
 
 <!-- HERO -->
 <section class="hero" id="inicio">
-<img class="bg" data-i="eiffel" alt="Vela escultural Lady Veil da Liora diante da Torre Eiffel">
-<div class="wrap"><div class="hero-content">
-<p class="eyebrow">Velas artesanais de luxo · Curitiba/PR</p>
-<h1 class="display">A escultura<br><em>que perfuma.</em></h1>
-<p>Liora nasceu do encontro entre arte, aroma e emoção. Cada vela é uma experiência sensorial criada para transformar ambientes e despertar sentimentos.</p>
-<div class="hero-cta">
-<a class="btn btn-solid" href="#colecoes">Ver coleções</a>
-<a class="btn btn-outline-cream" href="#quemsomos">Quem somos</a>
-</div>
-</div></div>
+  <img class="bg" data-i="eiffel" alt="Vela escultural Lady Veil da Liora diante da Torre Eiffel">
+  <div class="wrap"><div class="hero-content">
+    <p class="eyebrow">Velas artesanais de luxo · Curitiba/PR</p>
+    <h1 class="display">A escultura<br><em>que perfuma.</em></h1>
+    <p>Liora nasceu do encontro entre arte, aroma e emoção. Cada vela é uma experiência sensorial criada para transformar ambientes e despertar sentimentos.</p>
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#colecoes">Ver coleções</a>
+      <a class="btn btn-outline-cream" href="#quemsomos">Quem somos</a>
+    </div>
+  </div></div>
 </section>
 
 <div class="marquee" aria-hidden="true">
-<div class="marquee-track" id="marquee">
-<span>Feito à mão, com intenção ✦ Frete grátis acima de R$ 250 ✦ Pix: 5% de desconto extra ✦ Envio para todo o Brasil ✦ Retirada em Curitiba/PR ✦</span>
-<span>Feito à mão, com intenção ✦ Frete grátis acima de R$ 250 ✦ Pix: 5% de desconto extra ✦ Envio para todo o Brasil ✦ Retirada em Curitiba/PR ✦</span>
-</div>
+  <div class="marquee-track" id="marquee">
+    <span>Feito à mão, com intenção ✦ Frete grátis acima de R$ 250 ✦ Pix: 5% de desconto extra ✦ Envio para todo o Brasil ✦ Retirada em Curitiba/PR ✦</span>
+    <span>Feito à mão, com intenção ✦ Frete grátis acima de R$ 250 ✦ Pix: 5% de desconto extra ✦ Envio para todo o Brasil ✦ Retirada em Curitiba/PR ✦</span>
+  </div>
 </div>
 
 <!-- PRODUCT GRID -->
 <section class="section" id="colecoes">
-<div class="wrap">
-<div class="section-head reveal">
-<p class="eyebrow">Escultura + aroma + presente</p>
-<h2 class="display">Nossas coleções</h2>
-</div>
-<div class="tabs reveal" role="tablist" aria-label="Filtrar coleções" id="tabsBar"></div>
-<div class="grid" id="grid"></div>
-</div>
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">Escultura + aroma + presente</p>
+      <h2 class="display">Nossas coleções</h2>
+    </div>
+    <div class="tabs reveal" role="tablist" aria-label="Filtrar coleções" id="tabsBar"></div>
+    <div class="grid" id="grid"></div>
+  </div>
 </section>
 
 <!-- COLLECTION SPLIT -->
 <section class="split reveal" id="esculturas">
-<div class="split-media"><img data-i="pair" alt="Velas esculturais Lady Veil em dois tons"></div>
-<div class="split-body">
-<p class="eyebrow">Coleção Esculturas</p>
-<h2 class="display">Lady Veil &amp; bustos artesanais</h2>
-<p>Cada peça é escultura, aroma e presente — feita à mão, com intenção. Da Lady Veil ao Anjo em vitral, do Camafeu Fada à Sagrada Família: velas que decoram antes de acender e permanecem na memória depois.</p>
-<p style="font-size:13px">Fragrância personalizada pelo cliente, sem custo adicional.</p>
-<div><a class="btn btn-outline" href="#colecoes" onclick="setTab('Esculturas')">Explorar Esculturas</a></div>
-</div>
+  <div class="split-media"><img data-i="pair" alt="Velas esculturais Lady Veil em dois tons"></div>
+  <div class="split-body">
+    <p class="eyebrow">Coleção Esculturas</p>
+    <h2 class="display">Lady Veil &amp; bustos artesanais</h2>
+    <p>Cada peça é escultura, aroma e presente — feita à mão, com intenção. Da Lady Veil ao Anjo em vitral, do Camafeu Fada à Sagrada Família: velas que decoram antes de acender e permanecem na memória depois.</p>
+    <p style="font-size:13px">Fragrância personalizada pelo cliente, sem custo adicional.</p>
+    <div><a class="btn btn-outline" href="#colecoes" onclick="setTab('Esculturas')">Explorar Esculturas</a></div>
+  </div>
 </section>
 
 <!-- COLLECTIONS OVALS -->
 <section class="section">
-<div class="wrap">
-<div class="section-head reveal">
-<p class="eyebrow">Navegue por coleção</p>
-<h2 class="display">Encontre a sua Liora</h2>
-</div>
-<div class="ovals">
-<div class="oval reveal">
-<button class="oval-frame" onclick="goCat('Flora Linea')" aria-label="Ver coleção Flora Linea"><img data-p="botanique" alt="Vela Botanique da coleção Flora Linea"></button>
-<h3>Flora Linea</h3>
-<p>Botânica · Jardins em cera</p>
-</div>
-<div class="oval reveal">
-<button class="oval-frame" onclick="goCat('Esculturas')" aria-label="Ver coleção Esculturas"><img data-p="vela-escultural-lady-veil-phie3" alt="Vela escultural Lady Veil"></button>
-<h3>Esculturas</h3>
-<p>Lady Veil · Anjos · Camafeus</p>
-</div>
-<div class="oval reveal">
-<button class="oval-frame" onclick="goCat('Clássico')" aria-label="Ver coleção Clássico"><img data-p="chama-esculpida" alt="Vela Chama Esculpida da coleção Clássico"></button>
-<h3>Clássico</h3>
-<p>Pérolas · Cilindros · Lumina</p>
-</div>
-</div>
-</div>
+  <div class="wrap">
+    <div class="section-head reveal">
+      <p class="eyebrow">Navegue por coleção</p>
+      <h2 class="display">Encontre a sua Liora</h2>
+    </div>
+    <div class="ovals">
+      <div class="oval reveal">
+        <button class="oval-frame" onclick="goCat('Flora Linea')" aria-label="Ver coleção Flora Linea"><img data-p="botanique" alt="Vela Botanique da coleção Flora Linea"></button>
+        <h3>Flora Linea</h3>
+        <p>Botânica · Jardins em cera</p>
+      </div>
+      <div class="oval reveal">
+        <button class="oval-frame" onclick="goCat('Esculturas')" aria-label="Ver coleção Esculturas"><img data-p="vela-escultural-lady-veil-phie3" alt="Vela escultural Lady Veil"></button>
+        <h3>Esculturas</h3>
+        <p>Lady Veil · Anjos · Camafeus</p>
+      </div>
+      <div class="oval reveal">
+        <button class="oval-frame" onclick="goCat('Clássico')" aria-label="Ver coleção Clássico"><img data-p="chama-esculpida" alt="Vela Chama Esculpida da coleção Clássico"></button>
+        <h3>Clássico</h3>
+        <p>Pérolas · Cilindros · Lumina</p>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- QUEM SOMOS -->
 <section class="split rev dark reveal" id="quemsomos">
-<div class="split-media"><img data-i="veiled" alt="Detalhe do véu esculpido em cera" style="object-position:50% 28%"></div>
-<div class="split-body">
-<p class="eyebrow">Quem somos</p>
-<h2 class="display">Luxo que se sente,<br>luz que transforma</h2>
-<p>A Liora nasceu do encontro entre arte, aroma e emoção. Cada vela é criada com design refinado, fragrâncias sofisticadas e produção artesanal que respeita o tempo, o toque e a essência de cada detalhe.</p>
-<p>Nossa chama não ilumina apenas o espaço — simboliza presença, calma e beleza. É o luxo que não grita: ele se revela na sutileza do brilho, no perfume suave e na textura das ceras naturais.</p>
-<div><a class="btn btn-outline-cream" href="#colecoes">Descobrir as velas</a></div>
-</div>
+  <div class="split-media"><img data-i="veiled" alt="Detalhe do véu esculpido em cera" style="object-position:50% 28%"></div>
+  <div class="split-body">
+    <p class="eyebrow">Quem somos</p>
+    <h2 class="display">Luxo que se sente,<br>luz que transforma</h2>
+    <p>A Liora nasceu do encontro entre arte, aroma e emoção. Cada vela é criada com design refinado, fragrâncias sofisticadas e produção artesanal que respeita o tempo, o toque e a essência de cada detalhe.</p>
+    <p>Nossa chama não ilumina apenas o espaço — simboliza presença, calma e beleza. É o luxo que não grita: ele se revela na sutileza do brilho, no perfume suave e na textura das ceras naturais.</p>
+    <div><a class="btn btn-outline-cream" href="#colecoes">Descobrir as velas</a></div>
+  </div>
 </section>
 
 <!-- SERVICES -->
 <section class="services">
-<div class="wrap services-in">
-<div class="service reveal">
-<svg viewBox="0 0 24 24"><path d="M1 7h13v10H1zM14 10h5l3 3v4h-8z"/><circle cx="6" cy="18.5" r="1.8"/><circle cx="17.5" cy="18.5" r="1.8"/></svg>
-<h4>Todo o Brasil</h4><p>Enviamos para todo o país. Frete grátis acima de R$ 250.</p>
-</div>
-<div class="service reveal">
-<svg viewBox="0 0 24 24"><path d="M12 21s-7-5.2-7-11a7 7 0 0 1 14 0c0 5.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>
-<h4>Retirada em Curitiba/PR</h4><p>Combine a retirada sem custo de frete.</p>
-</div>
-<div class="service reveal">
-<svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M2.5 10h19"/></svg>
-<h4>Pagamento facilitado</h4><p>Pix com 5% extra, cartão em até 3x sem juros, transferência e boleto.</p>
-</div>
-<div class="service reveal">
-<svg viewBox="0 0 24 24"><path d="M12 3c3.5 4.2 5.5 7.2 5.5 10a5.5 5.5 0 0 1-11 0c0-2.8 2-5.8 5.5-10z"/></svg>
-<h4>Feito à mão</h4><p>Fragrância personalizada pelo cliente, sem custo adicional.</p>
-</div>
-</div>
+  <div class="wrap services-in">
+    <div class="service reveal">
+      <svg viewBox="0 0 24 24"><path d="M1 7h13v10H1zM14 10h5l3 3v4h-8z"/><circle cx="6" cy="18.5" r="1.8"/><circle cx="17.5" cy="18.5" r="1.8"/></svg>
+      <h4>Todo o Brasil</h4><p>Enviamos para todo o país. Frete grátis acima de R$ 250.</p>
+    </div>
+    <div class="service reveal">
+      <svg viewBox="0 0 24 24"><path d="M12 21s-7-5.2-7-11a7 7 0 0 1 14 0c0 5.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>
+      <h4>Retirada em Curitiba/PR</h4><p>Combine a retirada sem custo de frete.</p>
+    </div>
+    <div class="service reveal">
+      <svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M2.5 10h19"/></svg>
+      <h4>Pagamento facilitado</h4><p>Pix com 5% extra, cartão em até 3x sem juros, transferência e boleto.</p>
+    </div>
+    <div class="service reveal">
+      <svg viewBox="0 0 24 24"><path d="M12 3c3.5 4.2 5.5 7.2 5.5 10a5.5 5.5 0 0 1-11 0c0-2.8 2-5.8 5.5-10z"/></svg>
+      <h4>Feito à mão</h4><p>Fragrância personalizada pelo cliente, sem custo adicional.</p>
+    </div>
+  </div>
 </section>
 
 <!-- NEWSLETTER -->
 <section class="section news">
-<div class="wrap reveal">
-<p class="eyebrow">Newsletter</p>
-<h2 class="display">Cadastre-se e receba nossas ofertas</h2>
-<p>Descubra o luxo da sua fragrância — lançamentos, coleções e ofertas exclusivas no seu e-mail.</p>
-<form class="news-form" id="newsForm" onsubmit="return subscribe(event)">
-<input type="email" id="newsEmail" placeholder="Seu melhor e-mail" required aria-label="E-mail para newsletter">
-<button type="submit">Inscrever</button>
-</form>
-<p class="news-ok" id="newsOk">Obrigado por se inscrever! A partir de agora você receberá nossas novidades no seu e-mail ✦</p>
-</div>
+  <div class="wrap reveal">
+    <p class="eyebrow">Newsletter</p>
+    <h2 class="display">Cadastre-se e receba nossas ofertas</h2>
+    <p>Descubra o luxo da sua fragrância — lançamentos, coleções e ofertas exclusivas no seu e-mail.</p>
+    <form class="news-form" id="newsForm" onsubmit="return subscribe(event)">
+      <input type="email" id="newsEmail" placeholder="Seu melhor e-mail" required aria-label="E-mail para newsletter">
+      <button type="submit">Inscrever</button>
+    </form>
+    <p class="news-ok" id="newsOk">Obrigado por se inscrever! A partir de agora você receberá nossas novidades no seu e-mail ✦</p>
+  </div>
 </section>
 
 <!-- FOOTER -->
 <footer id="contato">
-<div class="wrap">
-<div class="foot-top">
-<div class="foot-brand">
-<img class="foot-logo" data-i="logo" alt="Liora Aromas de Luxo">
-<p>Velas artesanais exclusivas que transformam momentos em experiências sensoriais. Feito à mão em Curitiba/PR, com fragrâncias elaboradas com ingredientes premium.</p>
-</div>
-<div>
-<h5>Departamentos</h5>
-<ul>
-<li><a href="#inicio">Início</a></li>
-<li><a href="#colecoes">Coleções</a></li>
-<li><a href="#quemsomos">Quem Somos</a></li>
-<li><a href="#" onclick="toast('Trocas em até 7 dias após o recebimento — fale conosco no WhatsApp');return false">Trocas e Devoluções</a></li>
-</ul>
-</div>
-<div>
-<h5>Coleções</h5>
-<ul id="footCats"></ul>
-</div>
-<div>
-<h5>Contato</h5>
-<ul>
-<li><a href="https://wa.me/5521969121244" target="_blank" rel="noopener">WhatsApp (21) 96912-1244</a></li>
-<li><a href="mailto:jullianas@gmail.com">jullianas@gmail.com</a></li>
-<li>Curitiba/PR · Retirada local</li>
-<li><a href="https://www.instagram.com/liora_aromas_de_luxo" target="_blank" rel="noopener">Instagram @liora_aromas_de_luxo</a></li>
-<li><a href="https://www.facebook.com/share/1KdL6dtP7F/" target="_blank" rel="noopener">Facebook</a></li>
-</ul>
-</div>
-</div>
-<div class="foot-bottom">
-<span>© 2026 Liora Aromas de Luxo · Juliana Straatmann · Todos os direitos reservados</span>
-<div class="pays"><span class="pay">PIX</span><span class="pay">VISA</span><span class="pay">MASTER</span><span class="pay">ELO</span><span class="pay">AMEX</span><span class="pay">HIPERCARD</span><span class="pay">DINERS</span><span class="pay">BOLETO</span></div>
-</div>
-</div>
+  <div class="wrap">
+    <div class="foot-top">
+      <div class="foot-brand">
+        <img class="foot-logo" data-i="logo" alt="Liora Aromas de Luxo">
+        <p>Velas artesanais exclusivas que transformam momentos em experiências sensoriais. Feito à mão em Curitiba/PR, com fragrâncias elaboradas com ingredientes premium.</p>
+      </div>
+      <div>
+        <h5>Departamentos</h5>
+        <ul>
+          <li><a href="#inicio">Início</a></li>
+          <li><a href="#colecoes">Coleções</a></li>
+          <li><a href="#quemsomos">Quem Somos</a></li>
+          <li><a href="#" onclick="toast('Trocas em até 7 dias após o recebimento — fale conosco no WhatsApp');return false">Trocas e Devoluções</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Coleções</h5>
+        <ul id="footCats"></ul>
+      </div>
+      <div>
+        <h5>Contato</h5>
+        <ul>
+          <li><a href="https://wa.me/5521969121244" target="_blank" rel="noopener">WhatsApp (21) 96912-1244</a></li>
+          <li><a href="mailto:jullianas@gmail.com">jullianas@gmail.com</a></li>
+          <li>Curitiba/PR · Retirada local</li>
+          <li><a href="https://www.instagram.com/liora_aromas_de_luxo" target="_blank" rel="noopener">Instagram @liora_aromas_de_luxo</a></li>
+          <li><a href="https://www.facebook.com/share/1KdL6dtP7F/" target="_blank" rel="noopener">Facebook</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Liora Aromas de Luxo · Juliana Straatmann · Todos os direitos reservados</span>
+      <div class="pays"><span class="pay">PIX</span><span class="pay">VISA</span><span class="pay">MASTER</span><span class="pay">ELO</span><span class="pay">AMEX</span><span class="pay">HIPERCARD</span><span class="pay">DINERS</span><span class="pay">BOLETO</span></div>
+    </div>
+  </div>
 </footer>
 
 <!-- WHATSAPP FLOAT -->
 <a class="wa-float" href="https://wa.me/5521969121244" target="_blank" rel="noopener" aria-label="Fale conosco no WhatsApp">
-<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.7.8-.8 1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-2-1.2 7.4 7.4 0 0 1-1.4-1.7c-.1-.3 0-.4.1-.5l.4-.5c.1-.2.2-.3.3-.5v-.5c0-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.1s.9 2.5 1 2.6c.1.2 1.8 2.7 4.3 3.8.6.3 1.1.4 1.5.6.6.2 1.2.2 1.6.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.2-.2-.4-.3z"/></svg>
+  <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.7.8-.8 1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-2-1.2 7.4 7.4 0 0 1-1.4-1.7c-.1-.3 0-.4.1-.5l.4-.5c.1-.2.2-.3.3-.5v-.5c0-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.1s.9 2.5 1 2.6c.1.2 1.8 2.7 4.3 3.8.6.3 1.1.4 1.5.6.6.2 1.2.2 1.6.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.2-.2-.4-.3z"/></svg>
 </a>
 
 <!-- SCRIM -->
@@ -580,40 +580,40 @@ button,a{-webkit-tap-highlight-color:transparent}
 
 <!-- CART / WISHLIST DRAWER -->
 <aside class="drawer" id="drawer" aria-label="Painel lateral">
-<div class="drawer-head">
-<h3 id="drawerTitle">Carrinho de compras</h3>
-<button class="close-x icon-btn" aria-label="Fechar" onclick="closeAll()"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
-</div>
-<div class="drawer-body" id="drawerBody"></div>
-<div class="drawer-foot" id="drawerFoot"></div>
+  <div class="drawer-head">
+    <h3 id="drawerTitle">Carrinho de compras</h3>
+    <button class="close-x icon-btn" aria-label="Fechar" onclick="closeAll()"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+  <div class="drawer-foot" id="drawerFoot"></div>
 </aside>
 
 <!-- QUICK VIEW MODAL -->
 <div class="modal" id="modal" role="dialog" aria-modal="true">
-<div class="modal-card" id="modalCard"></div>
+  <div class="modal-card" id="modalCard"></div>
 </div>
 
 <!-- SEARCH OVERLAY -->
 <div class="search-ov" id="searchOv">
-<button class="icon-btn search-close" aria-label="Fechar busca" onclick="closeSearch()"><svg viewBox="0 0 24 24" style="width:22px;height:22px;stroke:var(--ink);fill:none;stroke-width:1.4"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
-<div class="search-in">
-<div class="search-field">
-<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
-<input type="text" id="searchInput" placeholder="O que você está buscando?" oninput="doSearch(this.value)">
-</div>
-<p class="search-hint">Sugestões: lady veil · botanique · bubble · anjo · kit</p>
-<div class="search-res" id="searchRes"></div>
-</div>
+  <button class="icon-btn search-close" aria-label="Fechar busca" onclick="closeSearch()"><svg viewBox="0 0 24 24" style="width:22px;height:22px;stroke:var(--ink);fill:none;stroke-width:1.4"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+  <div class="search-in">
+    <div class="search-field">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="text" id="searchInput" placeholder="O que você está buscando?" oninput="doSearch(this.value)">
+    </div>
+    <p class="search-hint">Sugestões: lady veil · botanique · bubble · anjo · kit</p>
+    <div class="search-res" id="searchRes"></div>
+  </div>
 </div>
 
 <!-- MOBILE MENU -->
 <nav class="mmenu" id="mmenu" aria-label="Menu móvel">
-<button class="mmenu-close icon-btn" aria-label="Fechar menu" onclick="closeAll()"><svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke-width:1.4"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
-<a href="#inicio" onclick="closeAll()">Início</a>
-<a href="#colecoes" onclick="closeAll()">Coleções</a>
-<a href="#contato" onclick="closeAll()">Contato</a>
-<a href="#quemsomos" onclick="closeAll()">Quem Somos</a>
-<p class="tagline">Liora · Aromas de Luxo · Curitiba/PR</p>
+  <button class="mmenu-close icon-btn" aria-label="Fechar menu" onclick="closeAll()"><svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke-width:1.4"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+  <a href="#inicio" onclick="closeAll()">Início</a>
+  <a href="#colecoes" onclick="closeAll()">Coleções</a>
+  <a href="#contato" onclick="closeAll()">Contato</a>
+  <a href="#quemsomos" onclick="closeAll()">Quem Somos</a>
+  <p class="tagline">Liora · Aromas de Luxo · Curitiba/PR</p>
 </nav>
 
 <!-- TOAST -->
@@ -622,5 +622,421 @@ button,a{-webkit-tap-highlight-color:transparent}
 <script>
 /* ============ EMBEDDED IMAGES ============ */
 const IMGS={
-veiled:'data:image/jpeg;base64,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
-...
+  veiled:'/assets/images/veiled.jpg',
+  pair:'/assets/images/pair.jpg',
+  eiffel:'/assets/images/eiffel.jpg',
+  logo:'/assets/images/logo.jpg'
+};
+const PIMG={"vela-escultural-lady-veil-phie3": "/assets/images/vela-escultural-lady-veil-phie3.webp", "vela-decorativa-anjo-em-vitral-1sbe9": "/assets/images/vela-decorativa-anjo-em-vitral-1sbe9.webp", "botanique": "/assets/images/botanique.webp", "botanique-150-gr-1gyzj": "/assets/images/botanique-150-gr-1gyzj.webp", "botanique-70-ml-1dqj4": "/assets/images/botanique-70-ml-1dqj4.webp", "ursinho": "/assets/images/ursinho.webp", "flordevenus": "/assets/images/flordevenus.webp", "abraco-em-luz": "/assets/images/abraco-em-luz.webp", "mini-bubble": "/assets/images/mini-bubble.webp", "bolhas": "/assets/images/bolhas.webp", "no-deluz": "/assets/images/no-deluz.webp", "lioracoral": "/assets/images/lioracoral.webp", "essenza-cube": "/assets/images/essenza-cube.webp", "kit-silhouette": "/assets/images/kit-silhouette.webp", "trevo": "/assets/images/trevo.webp", "perolas": "/assets/images/perolas.webp", "kit-boho-glass": "/assets/images/kit-boho-glass.webp", "lumina": "/assets/images/lumina.webp", "gota-de-luz1": "/assets/images/gota-de-luz1.webp", "geometricafacetada": "/assets/images/geometricafacetada.webp", "cilindro-mosaico": "/assets/images/cilindro-mosaico.webp", "chama-esculpida": "/assets/images/chama-esculpida.webp", "jardim-encantado": "/assets/images/jardim-encantado.webp", "camafeufada": "/assets/images/camafeufada.webp", "botanicavasogesso": "/assets/images/botanicavasogesso.webp", "peonia": "/assets/images/peonia.webp", "sagrada-familia": "/assets/images/sagrada-familia.webp"};
+document.querySelectorAll('[data-i]').forEach(el=>el.src=IMGS[el.dataset.i]);
+document.querySelectorAll('[data-p]').forEach(el=>el.src=PIMG[el.dataset.p]);
+document.getElementById('fav').href=IMGS.logo;
+
+/* ============ STORE DATA (lioraaromasdeluxo.lojavirtualnuvem.com.br) ============ */
+const CATS=['Todas','Essenciais','Esculturas','Clássico','Boho Glass','Flora Linea','Kits e Presentes'];
+const PRODUCTS=[{"id": "vela-escultural-lady-veil-phie3", "name": "Vela escultural Lady Veil", "price": 62.0, "old": 65.0, "stock": 10, "soldout": false, "cats": ["Essenciais", "Esculturas", "Clássico", "Kits e Presentes"], "desc": "Vela decorativa feminina em formato de busto com véu e flores, perfeita para dar sofisticação ao seu ambiente.", "dims": "Peso: 110gr", "frag": true}, {"id": "vela-decorativa-anjo-em-vitral-1sbe9", "name": "Vela Decorativa Anjo em vitral", "price": 55.0, "old": 59.0, "stock": 20, "soldout": false, "cats": ["Essenciais", "Esculturas", "Kits e Presentes"], "desc": "Vela decorativa com anjo e criança, ornamentos florais e moldura detalhada. Perfeita para decorar ou presentear.", "dims": "Peso: 100 gr · Medidas: 11cm x 6,2 cm", "frag": true}, {"id": "botanique", "name": "Botanique - 250gr", "price": 75.0, "old": 80.0, "stock": 2, "soldout": false, "cats": ["Essenciais", "Flora Linea", "Kits e Presentes"], "desc": "Vela em vidro, luminária,com tampa metálica, decorada com pássaros e flores, perfeita para decorar e ambientar. Aproveite e compre já!", "dims": "", "frag": true}, {"id": "botanique-150-gr-1gyzj", "name": "Botanique - 150gr", "price": 52.0, "old": 55.0, "stock": 12, "soldout": false, "cats": ["Essenciais", "Flora Linea"], "desc": "Conjunto de velas decorativas em copo de vidro com tampa de madeira, estampas florais e de pássaro. Decore e aromatize seu ambiente. Compre já!", "dims": "", "frag": true}, {"id": "botanique-70-ml-1dqj4", "name": "Botanique - 70gr", "price": 25.0, "old": 28.0, "stock": 5, "soldout": false, "cats": ["Essenciais", "Flora Linea", "Kits e Presentes"], "desc": "Vela perfumada em copo de vidro com tampa de madeira e estampa floral delicada. Decore e aromatize seu ambiente com charme. Compre já!", "dims": "Peso 70gr | Medidas: 9cm x 9cm x 7cm (C x L x A) · Medidas: 9cm x 9cm x 7cm (C x L x A)", "frag": true}, {"id": "ursinho", "name": "PEQUENO AMOR", "price": 10.0, "old": 12.0, "stock": 30, "soldout": false, "cats": ["Essenciais"], "desc": "Pedidos acima de 20 unidades: 10% de desconto\nPedidos acima de 30 unidades: 15% de desconto\nPedidos acima de 50 unidades: 20% de desconto\nPeças feitas a mão, com intenção.\nPrazo confecção - 5 a 7 dias.", "dims": "Peso: 40gr · Medidas: 4cmX4cmX5cm (CXLXA)", "frag": true}, {"id": "flordevenus", "name": "FLOR DE VÊNUS", "price": 55.0, "old": 59.0, "stock": 5, "soldout": false, "cats": ["Flora Linea"], "desc": "Vela decorativa em formato de rosto feminino com flores, perfeita para uma decoração charmosa e delicada.", "dims": "Peso: 120gr · Medidas: 8cmX4cmX10cm (CXLXA)", "frag": true}, {"id": "abraco-em-luz", "name": "ABRAÇO EM LUZ", "price": 42.0, "old": 46.0, "stock": 10, "soldout": false, "cats": ["Flora Linea"], "desc": "Escultura decorativa de anjo com asas grandes segurando criança, em material translúcido. Ideal para decoração elegante. Compre já!", "dims": "Peso: 65gr · Medidas: 8cmX4cmX10cm (CXLXA)", "frag": true}, {"id": "mini-bubble", "name": "MINI BUBBLE", "price": 16.0, "old": 18.0, "stock": 30, "soldout": false, "cats": ["Essenciais"], "desc": "Vela decorativa bolinhas pequena com textura em relevo e acabamento liso para um toque acolhedor. Ideal para decorar ambientes.", "dims": "Peso: 40gr · Medidas: 4cmX4cmX4cm (CXLXA)", "frag": true}, {"id": "bolhas", "name": "BOLHAS", "price": 30.0, "old": 32.0, "stock": 10, "soldout": false, "cats": ["Clássico"], "desc": "Esfera decorativa com textura de bolhas, perfeita para realçar ambientes com estilo e charme. Compre já e transforme seu espaço!", "dims": "Peso: 88gr · Medidas: 7cmX5cmX6cm (CXLXA)", "frag": true}, {"id": "no-deluz", "name": "NÓ DE LUZ", "price": 32.0, "old": 36.0, "stock": 5, "soldout": false, "cats": ["Essenciais"], "desc": "Decore seu ambiente com a vela nó entrelaçada. Textura artesanal única e exclusiva.", "dims": "Peso: 55gr · Medidas: 8cmX8cmX8cm (CXLXA)", "frag": true}, {"id": "lioracoral", "name": "LIORA CORAL", "price": 32.0, "old": 36.0, "stock": 10, "soldout": false, "cats": ["Esculturas"], "desc": "Realce a beleza natural e sofisticada da sua decoração com a vela Liora Coral escultural.. Inspirada na delicadeza das formas orgânicas, esta coleção traz pe...", "dims": "Peso: 65gr · Medidas: 7cmX7cmX7cm (CXLXA)", "frag": true}, {"id": "essenza-cube", "name": "ESSENZA CUBE", "price": 42.0, "old": 45.0, "stock": 4, "soldout": false, "cats": ["Esculturas"], "desc": "Realce a beleza e a originalidade da sua decoração com a Escultura Essenza cube , uma vela artesanal que une arte, design e emoção em uma peça única. Com seu...", "dims": "Peso: 125gr · Medidas: 7cmX7cmX7cm (CXLXA)", "frag": true}, {"id": "kit-silhouette", "name": "KIT SILHOUETTE", "price": 75.0, "old": 80.0, "stock": 3, "soldout": false, "cats": ["Esculturas"], "desc": "Realce a originalidade e o impacto visual da sua decoração com o Kit Silhouette da Linha Esculturas. Esta coleção exclusiva traz peças que combinam design in...", "dims": "Peso: 253gr · Medidas: 8cmX6cmX13cm (CXLXA)", "frag": true}, {"id": "trevo", "name": "TREVO", "price": 42.0, "old": 46.0, "stock": 4, "soldout": false, "cats": ["Esculturas"], "desc": "Realce sua decoração com a Escultura Trevo Cilindro, uma peça que une design contemporâneo e simbolismo em um formato único e marcante. Inspirada na forma do...", "dims": "Peso: 120gr · Medidas: 5cmX5cmX12cm (CXLXA)", "frag": true}, {"id": "perolas", "name": "PÉROLAS", "price": 42.0, "old": 46.0, "stock": 4, "soldout": false, "cats": ["Clássico"], "desc": "Vela decorativa cilíndrica com textura em bolinhas, perfeita para decorar e criar aconchego. Compre agora e transforme seu espaço!", "dims": "Peso: 130gr · Medidas: 7cmX7cmX8cm (CXLXA)", "frag": true}, {"id": "kit-boho-glass", "name": "KIT BOHO GLASS", "price": 75.0, "old": 80.0, "stock": 2, "soldout": false, "cats": ["Boho Glass", "Kits e Presentes"], "desc": "Vela perfumada em vidro listrado com tampa bolinhas para ambientes aromatizados com estilo. Compre já!", "dims": "Peso: 350gr · Medidas: 8cmX8cmX10cm (CXLXA)", "frag": false}, {"id": "lumina", "name": "LUMINA", "price": 46.0, "old": 49.0, "stock": 5, "soldout": false, "cats": ["Clássico"], "desc": "Vaso decorativo arredondado com textura geométrica, perfeito para valorizar sua decoração interna. Compre agora e transforme seu ambiente!", "dims": "Peso: 130gr · Medidas: 7cmX7cmX9cm (CXLXA)", "frag": true}, {"id": "gota-de-luz1", "name": "GOTA DE LUZ", "price": 42.0, "old": 46.0, "stock": 10, "soldout": false, "cats": ["Esculturas"], "desc": "Vela artesanal esculturas redonda espiral. Compre agora e dê charme ao seu espaço!", "dims": "Peso: 108gr · Medidas: 7cmX7cmX8cm (CXLXA).", "frag": true}, {"id": "geometricafacetada", "name": "LIORA ELEGANCE", "price": 32.0, "old": 36.0, "stock": 5, "soldout": false, "cats": ["Esculturas"], "desc": "Vela aromática esculturas em formato geométrico facetado, perfeito para decorar e dar charme ao seu ambiente. Compre agora e transforme seu espaço.", "dims": "Peso: 100gr · Medidas: 6cmX6cmX5cm (CXLXA).", "frag": true}, {"id": "cilindro-mosaico", "name": "CILINDRO MOSAICO", "price": 42.0, "old": 46.0, "stock": 5, "soldout": false, "cats": ["Esculturas"], "desc": "Vela decorativa com textura geométrica e aroma suave para ambientação moderna. Decore seu espaço com estilo e aconchego.", "dims": "Peso: 130gr · Medidas: 6cmX6cmX8cm (CXLXA)", "frag": true}, {"id": "chama-esculpida", "name": "CHAMA ESCULPIDA", "price": 62.0, "old": 65.0, "stock": 5, "soldout": false, "cats": ["Clássico"], "desc": "Vela decorativa cilíndrica com relevo em ondas, perfeita para transformar ambientes internos. Adquira já e decore com estilo!", "dims": "Peso: 208gr · Medidas: 7cmX7cmX13cm (CXLXA)", "frag": true}, {"id": "jardim-encantado", "name": "JARDIM ENCANTADO", "price": 85.0, "old": 89.9, "stock": 3, "soldout": false, "cats": ["Flora Linea", "Kits e Presentes"], "desc": "Decore ambientes com arranjo de velas florais em vaso decorativo. Ideal para trazer charme e aroma suave.", "dims": "Peso: 700gr · Medidas: 15cmX15cmX18cm (CXLXA)", "frag": true}, {"id": "camafeufada", "name": "CAMAFEU FADA", "price": 8.0, "old": 12.0, "stock": 30, "soldout": false, "cats": ["Essenciais", "Esculturas", "Clássico", "Kits e Presentes"], "desc": "Presente decorativo com fita e relevo de fada com flores para um ambiente delicado e clássico. Decore com charme, compre agora!", "dims": "Peso: 50gr · Medidas: 10cmX8cmX11cm (CXLXA).", "frag": true}, {"id": "botanicavasogesso", "name": "JARDIM ENCANTADO", "price": 75.0, "old": 79.9, "stock": 0, "soldout": true, "cats": ["Flora Linea"], "desc": "Vela artesanal em vaso com flores detalhadas, perfeita para decorar com charme e delicadeza. Adquira já a sua!", "dims": "Peso: 200gr · Medidas: 12cmX12cmX12cm (CXLXA)", "frag": true}, {"id": "peonia", "name": "FLOR DE VÊNUS", "price": 12.0, "old": 15.0, "stock": 8, "soldout": false, "cats": ["Flora Linea"], "desc": "Vela decorativa em forma de flor com base texturizada. Decore seu ambiente com charme.", "dims": "Peso 100gr · Medidas: 10cmX10cmX7cm (CXLXA).", "frag": true}, {"id": "sagrada-familia", "name": "Sagrada Familia", "price": 52.0, "old": 55.0, "stock": 5, "soldout": false, "cats": ["Essenciais", "Esculturas"], "desc": "Escultura Família Sagrada em material liso, ideal para decoração religiosa. Adquira já e valorize seu ambiente com arte e fé.", "dims": "Peso: 200g · Medidas: 12cm x 8cm x 15cm (C x L x A)", "frag": true}];
+PRODUCTS.forEach(p=>p.img=PIMG[p.id]);
+const SHIP_FREE=250, SHIP_COST=22.9;
+
+/* ============ STATE ============ */
+let cart=[], wish=new Set(), drawerView='cart', currentTab='Todas';
+let quick={id:null,qty:1};
+let payMethod='pix', shipMethod='correios';
+let checkoutForm={name:'',email:'',cep:'',num:'',addr:''};
+
+const $=id=>document.getElementById(id);
+const money=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const roundCurrency=v=>Math.round((v+Number.EPSILON)*100)/100;
+const escapeAttr=v=>String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const prod=id=>PRODUCTS.find(p=>p.id===id);
+const instOf=p=>p.price>=15?3:(p.price>=10?2:0);
+const instTxt=p=>{const n=instOf(p);return n?`${n} x de ${money(p.price/n)} sem juros`:'À vista'};
+const offPct=p=>p.old?Math.round((1-p.price/p.old)*100):0;
+
+/* ============ TABS + GRID ============ */
+function renderTabs(){
+  $('tabsBar').innerHTML=CATS.map(c=>`<button class="tab${c===currentTab?' active':''}" data-cat="${c}" onclick="setTab('${c}')">${c}</button>`).join('');
+  $('footCats').innerHTML=CATS.slice(1).map(c=>`<li><a href="#colecoes" onclick="setTab('${c}')">${c}</a></li>`).join('');
+}
+function cardHTML(p){
+  const off=offPct(p);
+  return `<article class="card${p.soldout?' soldout':''}${currentTab!=='Todas'&&!p.cats.includes(currentTab)?' hide':''}">
+    <div class="card-media" onclick="openQuick('${p.id}')">
+      ${p.soldout?`<span class="badge out">Esgotado</span>`:(off?`<span class="badge">${off}% OFF</span>`:'')}
+      <button class="wish-btn${wish.has(p.id)?' on':''}" aria-label="Favoritar ${p.name}" onclick="event.stopPropagation();toggleWish('${p.id}')"><svg viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.7-9.3-9C1.2 8 3 4.5 6.6 4.5c2.2 0 3.9 1.3 5.4 3.4 1.5-2.1 3.2-3.4 5.4-3.4 3.6 0 5.4 3.5 3.9 7-1.8 4.3-9.3 9-9.3 9z"/></svg></button>
+      <img src="${p.img}" alt="Vela ${p.name}" loading="lazy">
+      <button class="quick-add" ${p.soldout?'disabled':''} onclick="event.stopPropagation();${p.soldout?'':`quickAdd('${p.id}')`}">${p.soldout?'Esgotado':'Adicionar ao carrinho'}</button>
+    </div>
+    <div class="card-info">
+      <h3 onclick="openQuick('${p.id}')">${p.name}</h3>
+      <p class="card-price">${p.old?`<span class="old">${money(p.old)}</span>`:''}${money(p.price)}</p>
+      <p class="inst">${instTxt(p)}</p>
+      <span class="tag-frete">Frete grátis*</span>
+    </div>
+  </article>`;
+}
+function renderGrid(){$('grid').innerHTML=PRODUCTS.map(cardHTML).join('')}
+function setTab(cat){
+  currentTab=cat;
+  renderTabs();renderGrid();
+}
+function goCat(cat){setTab(cat);document.getElementById('colecoes').scrollIntoView({behavior:'smooth'})}
+
+/* ============ WISHLIST ============ */
+function toggleWish(id){
+  wish.has(id)?wish.delete(id):wish.add(id);
+  renderGrid();updateCounts();
+  toast(wish.has(id)?'Adicionado aos favoritos':'Removido dos favoritos');
+  if(drawerView==='wish'&&$('drawer').classList.contains('on'))renderDrawer();
+}
+
+/* ============ CART ============ */
+function addToCart(id,qty=1,frag=''){
+  const p=prod(id);
+  if(p.soldout){toast('Produto esgotado');return}
+  const key=id+'|'+(frag||'-');
+  const ex=cart.find(i=>i.key===key);
+  const have=ex?ex.qty:0;
+  if(p.stock&&have+qty>p.stock){toast(`Só ${p.stock} em estoque`);qty=Math.max(0,p.stock-have);if(!qty)return}
+  if(ex)ex.qty+=qty;
+  else cart.push({key,id,qty,frag,price:p.price,name:p.name,img:p.img});
+  updateCounts();
+}
+function quickAdd(id){addToCart(id);toast('Adicionado ao carrinho!');bump()}
+function changeQty(key,d){
+  const it=cart.find(i=>i.key===key);if(!it)return;
+  const p=prod(it.id);
+  if(d>0&&p.stock&&it.qty+1>p.stock){toast(`Só ${p.stock} em estoque`);return}
+  it.qty+=d;if(it.qty<1)cart=cart.filter(i=>i.key!==key);
+  updateCounts();renderDrawer();
+}
+function removeItem(key){cart=cart.filter(i=>i.key!==key);updateCounts();renderDrawer()}
+const subtotal=()=>cart.reduce((s,i)=>s+i.price*i.qty,0);
+const cartQty=()=>cart.reduce((s,i)=>s+i.qty,0);
+function updateCounts(){
+  const c=$('cartCount'),w=$('wishCount');
+  c.textContent=cartQty();c.classList.toggle('on',cartQty()>0);
+  w.textContent=wish.size;w.classList.toggle('on',wish.size>0);
+}
+function bump(){const b=$('cartCount');b.style.transform='scale(1.4)';setTimeout(()=>b.style.transform='',250)}
+const shipCost=()=>shipMethod==='retirada'?0:(subtotal()>=SHIP_FREE?0:SHIP_COST);
+
+/* ============ DRAWER ============ */
+function openDrawer(view){
+  drawerView=view;renderDrawer();
+  $('drawer').classList.add('on');$('scrim').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+function renderDrawer(){
+  const body=$('drawerBody'),foot=$('drawerFoot'),title=$('drawerTitle');
+  if(drawerView==='wish'){
+    title.textContent='Favoritos';
+    if(!wish.size){body.innerHTML=`<div class="cart-empty"><p class="display">Nenhum favorito ainda</p><p>Toque no coração de uma vela para guardá-la aqui.</p></div>`;foot.innerHTML='';return}
+    body.innerHTML=[...wish].map(id=>{const p=prod(id);return `
+      <div class="cart-item">
+        <img src="${p.img}" alt="${p.name}">
+        <div><p class="ci-name">${p.name}</p><p class="ci-meta">${p.cats[0]||''}</p>
+        <button class="ci-remove" onclick="toggleWish('${p.id}')">Remover</button></div>
+        <div class="ci-right"><span class="ci-price">${money(p.price)}</span>
+        ${p.soldout?'<span class="ci-meta">Esgotado</span>':`<button class="btn btn-ink" style="padding:10px 14px;font-size:9px" onclick="quickAdd('${p.id}')">Mover ao carrinho</button>`}</div>
+      </div>`}).join('');
+    foot.innerHTML='';return;
+  }
+  if(drawerView==='checkout'){renderCheckout();return}
+  if(drawerView==='success'){renderSuccess();return}
+  title.textContent='Carrinho de compras';
+  if(!cart.length){
+    body.innerHTML=`<div class="cart-empty"><p class="display">O carrinho de compras está vazio</p><p>As velas mais desejadas esperam por você.</p><br><button class="btn btn-outline" onclick="closeAll()">Ver mais produtos</button></div>`;
+    foot.innerHTML='';return;
+  }
+  const st=subtotal(),left=SHIP_FREE-st;
+  body.innerHTML=`
+    <div class="ship-bar">
+      <p>${left>0?`Faltam <b>${money(left)}</b> para o frete grátis`:`<b>Você ganhou frete grátis ✦</b>`}</p>
+      <div class="ship-track"><div class="ship-fill" style="width:${Math.min(st/SHIP_FREE*100,100)}%"></div></div>
+    </div>
+    ${cart.map(i=>`
+    <div class="cart-item">
+      <img src="${i.img}" alt="${i.name}">
+      <div>
+        <p class="ci-name">${i.name}</p>
+        <p class="ci-meta">${i.frag?`Fragrância: ${i.frag}`:'Fragrância a combinar'}</p>
+        <div class="qty">
+          <button onclick="changeQty('${i.key}',-1)" aria-label="Diminuir">−</button><span>${i.qty}</span><button onclick="changeQty('${i.key}',1)" aria-label="Aumentar">+</button>
+        </div>
+      </div>
+      <div class="ci-right"><span class="ci-price">${money(i.price*i.qty)}</span>
+      <button class="ci-remove" onclick="removeItem('${i.key}')">Remover</button></div>
+    </div>`).join('')}`;
+  foot.innerHTML=`
+    <div class="sum-row"><span>Subtotal (sem frete)</span><span>${money(st)}</span></div>
+    <div class="sum-row total"><span>Total parcial</span><span>${money(st)}</span></div>
+    <button class="btn btn-ink w-full" style="margin-top:14px" onclick="drawerView='checkout';renderDrawer()">Iniciar compra</button>
+    <p style="text-align:center;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);margin-top:12px">Pix: 5% de desconto extra ✦</p>`;
+}
+
+/* ============ CHECKOUT ============ */
+function renderCheckout(){
+  $('drawerTitle').textContent='Finalizar compra';
+  const st=subtotal(),ship=shipCost();
+  const disc=payMethod==='pix'?roundCurrency(st*0.05):0;
+  const total=roundCurrency(st+ship-disc);
+  $('drawerBody').innerHTML=`
+    <button class="back-link" onclick="drawerView='cart';renderDrawer()">← Voltar ao carrinho</button>
+    <p class="chk-step">1 · Entrega</p>
+    <div class="field"><label for="fN">Nome completo</label><input id="fN" placeholder="Seu nome" value="${escapeAttr(checkoutForm.name)}" oninput="checkoutForm.name=this.value"></div>
+    <div class="field"><label for="fE">E-mail</label><input id="fE" type="email" placeholder="voce@email.com" value="${escapeAttr(checkoutForm.email)}" oninput="checkoutForm.email=this.value"></div>
+    <div class="f-row">
+      <div class="field"><label for="fC">CEP</label><input id="fC" placeholder="80000-000" inputmode="numeric" maxlength="9" value="${escapeAttr(checkoutForm.cep)}" oninput="maskCEP(this);checkoutForm.cep=this.value"><span id="cepStatus" class="cep-status"></span></div>
+      <div class="field"><label for="fNum">Número</label><input id="fNum" placeholder="100" value="${escapeAttr(checkoutForm.num)}" oninput="checkoutForm.num=this.value"></div>
+    </div>
+    <div class="field"><label for="fA">Endereço</label><input id="fA" placeholder="Rua, bairro — cidade/UF" value="${escapeAttr(checkoutForm.addr)}" oninput="checkoutForm.addr=this.value"></div>
+    <p class="chk-step mt">2 · Meio de envio</p>
+    <div class="pay-opt ${shipMethod==='correios'?'sel':''}" onclick="shipMethod='correios';renderCheckout()"><span>Correios — todo o Brasil</span><span class="disc">${st>=SHIP_FREE?'Grátis':money(SHIP_COST)}</span></div>
+    <div class="pay-opt ${shipMethod==='retirada'?'sel':''}" onclick="shipMethod='retirada';renderCheckout()"><span>Retirada em Curitiba/PR</span><span class="disc">Grátis</span></div>
+    <p class="chk-step mt">3 · Pagamento</p>
+    <div class="pay-opt ${payMethod==='pix'?'sel':''}" onclick="payMethod='pix';renderCheckout()"><span>Pix</span><span class="disc">5% de desconto extra</span></div>
+    <div class="pay-opt ${payMethod==='card'?'sel':''}" onclick="payMethod='card';renderCheckout()"><span>Cartão de crédito</span><span class="disc">até 3x sem juros</span></div>
+    <div class="pay-opt ${payMethod==='transfer'?'sel':''}" onclick="payMethod='transfer';renderCheckout()"><span>Transferência</span><span class="disc"></span></div>
+    <div class="pay-opt ${payMethod==='boleto'?'sel':''}" onclick="payMethod='boleto';renderCheckout()"><span>Boleto bancário</span><span class="disc">aprova em 1–2 dias</span></div>`;
+  $('drawerFoot').innerHTML=`
+    <div class="sum-row"><span>Subtotal</span><span>${money(st)}</span></div>
+    <div class="sum-row"><span>Frete</span><span>${ship?money(ship):'<span class="free">Grátis</span>'}</span></div>
+    ${disc?`<div class="sum-row"><span>Desconto Pix (5%)</span><span style="color:var(--gold-deep)">− ${money(disc)}</span></div>`:''}
+    <div class="sum-row total"><span>Total</span><span>${money(total)}</span></div>
+    <button class="btn btn-solid w-full" style="margin-top:14px" onclick="confirmOrder()">${payMethod==='pix'?'Pagar com Pix':'Confirmar pedido'} · ${money(total)}</button>
+    <p style="text-align:center;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin-top:12px">Você será redirecionado a um ambiente seguro do Mercado Pago</p>`;
+}
+/* ============ CEP: MÁSCARA + AUTOCOMPLETE ============ */
+function maskCEP(el){
+  let v=el.value.replace(/\D/g,'').slice(0,8);
+  if(v.length>5) v=v.slice(0,5)+'-'+v.slice(5);
+  el.value=v;
+  const status=document.getElementById('cepStatus');
+  if(v.replace('-','').length===8){
+    buscarCEP(v.replace('-',''));
+  }else if(status){
+    status.textContent='';
+    status.className='cep-status';
+  }
+}
+
+async function buscarCEP(cep){
+  const status=document.getElementById('cepStatus');
+  const fA=document.getElementById('fA');
+  if(status){status.textContent='Buscando endereço…';status.className='cep-status loading';}
+  try{
+    const resp=await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    const data=await resp.json();
+    if(data.erro){
+      if(status){status.textContent='CEP não encontrado — preencha manualmente';status.className='cep-status error';}
+      return;
+    }
+    if(fA){
+      const partes=[data.logradouro,data.bairro,`${data.localidade}/${data.uf}`].filter(Boolean);
+      fA.value=partes.join(', ');
+      checkoutForm.addr=fA.value;
+    }
+    if(status){status.textContent='Endereço encontrado ✓';status.className='cep-status ok';}
+    const fNum=document.getElementById('fNum');
+    if(fNum && !fNum.value) fNum.focus();
+  }catch(err){
+    if(status){status.textContent='Não foi possível buscar o CEP — preencha manualmente';status.className='cep-status error';}
+  }
+}
+
+async function confirmOrder(){
+  const name=$('fN').value.trim(),email=$('fE').value.trim(),cep=$('fC').value.trim(),num=$('fNum').value.trim(),addr=$('fA').value.trim();
+  checkoutForm={name,email,cep,num,addr};
+  if(!name||!email||!$('fE').checkValidity()){toast('Preencha nome e e-mail válidos para continuar');return}
+  if(shipMethod==='correios'&&(!cep||!addr)){toast('Preencha o endereço de entrega');return}
+  const btn=document.querySelector('#drawerFoot .btn-solid');
+  const original=btn.textContent;
+  btn.disabled=true;btn.textContent='Gerando pagamento…';
+  try{
+    const payload={
+      items:cart.map(i=>({id:i.id,qty:i.qty,frag:i.frag})),
+      payMethod,
+      shipping:{method:shipMethod},
+      payer:{name,email,cep,num,addr}
+    };
+    const resp=await fetch('/api/create-preference',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(payload)
+    });
+    const data=await resp.json().catch(()=>({}));
+    if(!resp.ok||!data.init_point){
+      toast(data.error||'Não foi possível iniciar o pagamento. Tente novamente.');
+      btn.disabled=false;btn.textContent=original;
+      return;
+    }
+    if(data.order_id)sessionStorage.setItem('liora_checkout_order',data.order_id);
+    window.location.href=data.init_point;
+  }catch(err){
+    toast('Erro de conexão. Tente novamente.');
+    btn.disabled=false;btn.textContent=original;
+  }
+}
+function renderSuccess(){
+  $('drawerTitle').textContent='Pedido confirmado';
+  $('drawerBody').innerHTML=`
+    <div class="success">
+      <div class="ok-ring"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></div>
+      <h3>Obrigada pelo seu pedido ✦</h3>
+      <p>${shipMethod==='retirada'?'Vamos combinar a retirada em Curitiba/PR pelo WhatsApp.':'Seu pedido já está sendo preparado com carinho no ateliê.'}</p>
+      <p class="order">Pedido ${window._order}</p>
+      <button class="btn btn-outline" onclick="cart=[];updateCounts();closeAll()">Ver mais produtos</button>
+    </div>`;
+  $('drawerFoot').innerHTML='';
+}
+
+/* ============ QUICK VIEW ============ */
+function openQuick(id){
+  quick={id,qty:1};
+  renderQuick();
+  $('modal').classList.add('on');$('scrim').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+function stockNote(p){
+  if(p.soldout)return '<p class="stock-note">Esgotado — avise-me quando voltar</p>';
+  if(p.stock===1)return '<p class="stock-note">Atenção, última peça!</p>';
+  if(p.stock&&p.stock<=5)return `<p class="stock-note">Só ${p.stock} em estoque</p>`;
+  return p.stock?`<p class="stock-note" style="color:var(--ink-soft)">${p.stock} em estoque</p>`:'';
+}
+function renderQuick(){
+  const p=prod(quick.id);if(!p)return;
+  const off=offPct(p);
+  $('modalCard').innerHTML=`
+    <button class="modal-close" aria-label="Fechar" onclick="closeAll()"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--ink);fill:none;stroke-width:1.4"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+    <div class="modal-media"><img src="${p.img}" alt="Vela ${p.name}"></div>
+    <div class="modal-body">
+      <p class="eyebrow">${p.soldout?'Esgotado':(off?off+'% OFF · Frete grátis*':'Coleção Liora')}</p>
+      <h3>${p.name}</h3>
+      <p class="m-variant">${p.cats.join(' · ')||'Liora Aromas de Luxo'}</p>
+      <p class="m-price">${p.old?`<span class="old">${money(p.old)}</span>`:''}${money(p.price)}</p>
+      <p class="m-inst">${instTxt(p)} · Pix com 5% de desconto extra</p>
+      ${stockNote(p)}
+      <p class="m-desc">${p.desc}</p>
+      <div class="pyramid">
+        ${p.dims?`<div class="pyr-row"><span>Dimensões</span><div>${p.dims}</div></div>`:''}
+        ${p.frag?`<div class="pyr-row"><span>Fragrância</span><div>Personalizada pelo cliente — sem custo adicional</div></div>`:''}
+        <div class="pyr-row"><span>Produção</span><div>Artesanal, feita à mão com ceras naturais</div></div>
+      </div>
+      ${p.frag&&!p.soldout?`
+      <p class="opt-label">Qual fragrância você deseja? (opcional)</p>
+      <input class="frag-input" id="fragIn" placeholder="Ex.: lavanda, baunilha, flor de cerejeira…" value="">`:''}
+      <div class="m-actions">
+        <div class="qty" style="height:48px">
+          <button style="width:42px;height:46px" onclick="quick.qty=Math.max(1,quick.qty-1);syncQty()" aria-label="Diminuir">−</button><span id="qQty">${quick.qty}</span><button style="width:42px;height:46px" onclick="quick.qty++;syncQty()" aria-label="Aumentar">+</button>
+        </div>
+        <button class="btn btn-ink" style="flex:1" id="qAdd" ${p.soldout?'disabled':''} onclick="modalAdd('${p.id}')">${p.soldout?'Esgotado':`Comprar · ${money(p.price*quick.qty)}`}</button>
+      </div>
+      <div class="m-specs">
+        <div><svg viewBox="0 0 24 24"><path d="M12 3c3.5 4.2 5.5 7.2 5.5 10a5.5 5.5 0 0 1-11 0c0-2.8 2-5.8 5.5-10z"/></svg>Feito à mão</div>
+        <div><svg viewBox="0 0 24 24"><path d="M1 7h13v10H1zM14 10h5l3 3v4h-8z"/><circle cx="6" cy="18.5" r="1.8"/><circle cx="17.5" cy="18.5" r="1.8"/></svg>Todo o Brasil</div>
+        <div><svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M2.5 10h19"/></svg>Até 3x sem juros</div>
+      </div>
+      <div style="margin-top:26px">
+        <details><summary>Pagamento</summary><p>Pix com 5% de desconto extra, cartão de crédito em até 3x sem juros, transferência bancária ou boleto.</p></details>
+        <details><summary>Envio &amp; retirada</summary><p>Enviamos para todo o Brasil pelos Correios — frete grátis acima de R$ 250. Em Curitiba/PR você também pode combinar a retirada sem custo.</p></details>
+        <details><summary>Cuidados com a vela</summary><p>Na primeira queima, deixe acesa por cerca de 2h para nivelar a superfície. Apare o pavio a 5&nbsp;mm antes de cada uso e mantenha longe de correntes de ar.</p></details>
+      </div>
+    </div>`;
+}
+function syncQty(){
+  const p=prod(quick.id);
+  if(p.stock&&quick.qty>p.stock){quick.qty=p.stock;toast(`Só ${p.stock} em estoque`)}
+  $('qQty').textContent=quick.qty;
+  if(!p.soldout)$('qAdd').textContent=`Comprar · ${money(p.price*quick.qty)}`;
+}
+function modalAdd(id){
+  const fragEl=$('fragIn');
+  addToCart(id,quick.qty,fragEl?fragEl.value.trim():'');
+  closeAll();toast('Adicionado ao carrinho!');bump();
+  setTimeout(()=>openDrawer('cart'),350);
+}
+
+/* ============ SEARCH ============ */
+function openSearch(){$('searchOv').classList.add('on');document.body.style.overflow='hidden';setTimeout(()=>$('searchInput').focus(),400);doSearch('')}
+function closeSearch(){$('searchOv').classList.remove('on');document.body.style.overflow=''}
+function doSearch(q){
+  q=q.trim().toLowerCase();
+  const res=PRODUCTS.filter(p=>!q||`${p.name} ${p.cats.join(' ')} ${p.desc}`.toLowerCase().includes(q));
+  $('searchRes').innerHTML=res.length?res.map(p=>`
+    <div class="sr-item" onclick="closeSearch();openQuick('${p.id}')">
+      <img src="${p.img}" alt="${p.name}">
+      <h4>${p.name}</h4><p>${p.old?`<span class="old">${money(p.old)}</span>`:''}${money(p.price)}${p.soldout?' · Esgotado':''}</p>
+    </div>`).join('')
+  :`<p style="grid-column:1/-1;color:var(--ink-soft);font-size:14px">Nenhuma vela encontrada para “${q}”. Tente “lady veil”, “botanique” ou “kit”.</p>`;
+}
+
+/* ============ MENU / OVERLAYS ============ */
+function openMenu(){$('mmenu').classList.add('on');document.body.style.overflow='hidden'}
+function closeAll(){
+  ['drawer','scrim','modal','mmenu'].forEach(i=>$(i).classList.remove('on'));
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAll();closeSearch()}});
+
+/* ============ NEWSLETTER / TOAST ============ */
+function subscribe(e){
+  e.preventDefault();
+  $('newsForm').style.display='none';
+  $('newsOk').style.display='block';
+  toast('Inscrição confirmada ✦');
+  return false;
+}
+let toastT;
+function toast(msg){
+  $('toastMsg').textContent=msg;
+  $('toast').classList.add('on');
+  clearTimeout(toastT);
+  toastT=setTimeout(()=>$('toast').classList.remove('on'),2600);
+}
+
+/* ============ SCROLL FX ============ */
+window.addEventListener('scroll',()=>$('header').classList.toggle('scrolled',scrollY>10),{passive:true});
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* init */
+renderTabs();renderGrid();updateCounts();
+
+/* ============ RETORNO DO MERCADO PAGO ============ */
+(async function checkPaymentReturn(){
+  const params=new URLSearchParams(window.location.search);
+  const paymentId=params.get('payment_id')||params.get('collection_id');
+  const orderId=params.get('order_id')||params.get('external_reference')||sessionStorage.getItem('liora_checkout_order');
+  const isReturn=params.get('checkout')==='return'||Boolean(paymentId&&orderId);
+  if(!isReturn)return;
+
+  window.history.replaceState({},document.title,window.location.pathname);
+  if(!paymentId||!orderId){
+    toast('Não foi possível confirmar o pagamento. Consulte seu e-mail ou tente novamente.');
+    return;
+  }
+
+  toast('Confirmando pagamento…');
+  try{
+    const resp=await fetch(`/api/payment-status?payment_id=${encodeURIComponent(paymentId)}&order_id=${encodeURIComponent(orderId)}`);
+    const data=await resp.json().catch(()=>({}));
+    if(!resp.ok)throw new Error(data.error||'Falha ao confirmar pagamento');
+
+    if(data.status==='approved'){
+      cart=[];updateCounts();checkoutForm={name:'',email:'',cep:'',num:'',addr:''};
+      sessionStorage.removeItem('liora_checkout_order');
+      toast('Pagamento aprovado ✦ Obrigada pelo seu pedido!');
+    }else if(['pending','in_process','authorized'].includes(data.status)){
+      toast('Pagamento em análise — avisaremos por e-mail assim que confirmado.');
+    }else{
+      sessionStorage.removeItem('liora_checkout_order');
+      toast('Pagamento não concluído. Você pode tentar novamente.');
+    }
+  }catch(err){
+    toast('Não foi possível confirmar o pagamento agora. Consulte seu e-mail.');
+  }
+})();
+</script>
+</body>
+</html>
