@@ -642,9 +642,12 @@ const SHIP_FREE=250, SHIP_COST=22.9;
 let cart=[], wish=new Set(), drawerView='cart', currentTab='Todas';
 let quick={id:null,qty:1};
 let payMethod='pix', shipMethod='correios';
+let checkoutForm={name:'',email:'',cep:'',num:'',addr:''};
 
 const $=id=>document.getElementById(id);
 const money=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const roundCurrency=v=>Math.round((v+Number.EPSILON)*100)/100;
+const escapeAttr=v=>String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const prod=id=>PRODUCTS.find(p=>p.id===id);
 const instOf=p=>p.price>=15?3:(p.price>=10?2:0);
 const instTxt=p=>{const n=instOf(p);return n?`${n} x de ${money(p.price/n)} sem juros`:'À vista'};
@@ -776,18 +779,18 @@ function renderDrawer(){
 function renderCheckout(){
   $('drawerTitle').textContent='Finalizar compra';
   const st=subtotal(),ship=shipCost();
-  const disc=payMethod==='pix'?st*0.05:0;
-  const total=st+ship-disc;
+  const disc=payMethod==='pix'?roundCurrency(st*0.05):0;
+  const total=roundCurrency(st+ship-disc);
   $('drawerBody').innerHTML=`
     <button class="back-link" onclick="drawerView='cart';renderDrawer()">← Voltar ao carrinho</button>
     <p class="chk-step">1 · Entrega</p>
-    <div class="field"><label for="fN">Nome completo</label><input id="fN" placeholder="Seu nome"></div>
-    <div class="field"><label for="fE">E-mail</label><input id="fE" type="email" placeholder="voce@email.com"></div>
+    <div class="field"><label for="fN">Nome completo</label><input id="fN" placeholder="Seu nome" value="${escapeAttr(checkoutForm.name)}" oninput="checkoutForm.name=this.value"></div>
+    <div class="field"><label for="fE">E-mail</label><input id="fE" type="email" placeholder="voce@email.com" value="${escapeAttr(checkoutForm.email)}" oninput="checkoutForm.email=this.value"></div>
     <div class="f-row">
-      <div class="field"><label for="fC">CEP</label><input id="fC" placeholder="80000-000" inputmode="numeric" maxlength="9" oninput="maskCEP(this)"><span id="cepStatus" class="cep-status"></span></div>
-      <div class="field"><label for="fNum">Número</label><input id="fNum" placeholder="100"></div>
+      <div class="field"><label for="fC">CEP</label><input id="fC" placeholder="80000-000" inputmode="numeric" maxlength="9" value="${escapeAttr(checkoutForm.cep)}" oninput="maskCEP(this);checkoutForm.cep=this.value"><span id="cepStatus" class="cep-status"></span></div>
+      <div class="field"><label for="fNum">Número</label><input id="fNum" placeholder="100" value="${escapeAttr(checkoutForm.num)}" oninput="checkoutForm.num=this.value"></div>
     </div>
-    <div class="field"><label for="fA">Endereço</label><input id="fA" placeholder="Rua, bairro — cidade/UF"></div>
+    <div class="field"><label for="fA">Endereço</label><input id="fA" placeholder="Rua, bairro — cidade/UF" value="${escapeAttr(checkoutForm.addr)}" oninput="checkoutForm.addr=this.value"></div>
     <p class="chk-step mt">2 · Meio de envio</p>
     <div class="pay-opt ${shipMethod==='correios'?'sel':''}" onclick="shipMethod='correios';renderCheckout()"><span>Correios — todo o Brasil</span><span class="disc">${st>=SHIP_FREE?'Grátis':money(SHIP_COST)}</span></div>
     <div class="pay-opt ${shipMethod==='retirada'?'sel':''}" onclick="shipMethod='retirada';renderCheckout()"><span>Retirada em Curitiba/PR</span><span class="disc">Grátis</span></div>
@@ -832,6 +835,7 @@ async function buscarCEP(cep){
     if(fA){
       const partes=[data.logradouro,data.bairro,`${data.localidade}/${data.uf}`].filter(Boolean);
       fA.value=partes.join(', ');
+      checkoutForm.addr=fA.value;
     }
     if(status){status.textContent='Endereço encontrado ✓';status.className='cep-status ok';}
     const fNum=document.getElementById('fNum');
@@ -843,16 +847,17 @@ async function buscarCEP(cep){
 
 async function confirmOrder(){
   const name=$('fN').value.trim(),email=$('fE').value.trim(),cep=$('fC').value.trim(),num=$('fNum').value.trim(),addr=$('fA').value.trim();
-  if(!name||!email){toast('Preencha nome e e-mail para continuar');return}
+  checkoutForm={name,email,cep,num,addr};
+  if(!name||!email||!$('fE').checkValidity()){toast('Preencha nome e e-mail válidos para continuar');return}
   if(shipMethod==='correios'&&(!cep||!addr)){toast('Preencha o endereço de entrega');return}
   const btn=document.querySelector('#drawerFoot .btn-solid');
   const original=btn.textContent;
   btn.disabled=true;btn.textContent='Gerando pagamento…';
   try{
     const payload={
-      items:cart.map(i=>({name:i.name,qty:i.qty,price:i.price})),
+      items:cart.map(i=>({id:i.id,qty:i.qty,frag:i.frag})),
       payMethod,
-      shipping:{method:shipMethod,cost:shipCost()},
+      shipping:{method:shipMethod},
       payer:{name,email,cep,num,addr}
     };
     const resp=await fetch('/api/create-preference',{
@@ -860,12 +865,13 @@ async function confirmOrder(){
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify(payload)
     });
-    const data=await resp.json();
+    const data=await resp.json().catch(()=>({}));
     if(!resp.ok||!data.init_point){
-      toast('Não foi possível iniciar o pagamento. Tente novamente.');
+      toast(data.error||'Não foi possível iniciar o pagamento. Tente novamente.');
       btn.disabled=false;btn.textContent=original;
       return;
     }
+    if(data.order_id)sessionStorage.setItem('liora_checkout_order',data.order_id);
     window.location.href=data.init_point;
   }catch(err){
     toast('Erro de conexão. Tente novamente.');
@@ -998,19 +1004,38 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 renderTabs();renderGrid();updateCounts();
 
 /* ============ RETORNO DO MERCADO PAGO ============ */
-(function checkPaymentReturn(){
+(async function checkPaymentReturn(){
   const params=new URLSearchParams(window.location.search);
-  const status=params.get('status');
-  if(!status)return;
-  if(status==='success'){
-    cart=[];updateCounts();
-    toast('Pagamento aprovado ✦ Obrigada pelo seu pedido!');
-  }else if(status==='pending'){
-    toast('Pagamento em análise — avisaremos por e-mail assim que confirmado.');
-  }else if(status==='failure'){
-    toast('Pagamento não concluído. Você pode tentar novamente.');
-  }
+  const paymentId=params.get('payment_id')||params.get('collection_id');
+  const orderId=params.get('order_id')||params.get('external_reference')||sessionStorage.getItem('liora_checkout_order');
+  const isReturn=params.get('checkout')==='return'||Boolean(paymentId&&orderId);
+  if(!isReturn)return;
+
   window.history.replaceState({},document.title,window.location.pathname);
+  if(!paymentId||!orderId){
+    toast('Não foi possível confirmar o pagamento. Consulte seu e-mail ou tente novamente.');
+    return;
+  }
+
+  toast('Confirmando pagamento…');
+  try{
+    const resp=await fetch(`/api/payment-status?payment_id=${encodeURIComponent(paymentId)}&order_id=${encodeURIComponent(orderId)}`);
+    const data=await resp.json().catch(()=>({}));
+    if(!resp.ok)throw new Error(data.error||'Falha ao confirmar pagamento');
+
+    if(data.status==='approved'){
+      cart=[];updateCounts();checkoutForm={name:'',email:'',cep:'',num:'',addr:''};
+      sessionStorage.removeItem('liora_checkout_order');
+      toast('Pagamento aprovado ✦ Obrigada pelo seu pedido!');
+    }else if(['pending','in_process','authorized'].includes(data.status)){
+      toast('Pagamento em análise — avisaremos por e-mail assim que confirmado.');
+    }else{
+      sessionStorage.removeItem('liora_checkout_order');
+      toast('Pagamento não concluído. Você pode tentar novamente.');
+    }
+  }catch(err){
+    toast('Não foi possível confirmar o pagamento agora. Consulte seu e-mail.');
+  }
 })();
 </script>
 </body>
