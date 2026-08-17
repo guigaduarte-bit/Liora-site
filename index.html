@@ -226,7 +226,11 @@ footer li a:hover{color:#E4C98F}
 /* checkout */
 .chk-step{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold-deep);margin:0 0 18px}
 .chk-step.mt{margin-top:26px}
-.field{margin-bottom:14px}
+.field{margin-bottom:14px;position:relative}
+.cep-status{display:block;font-size:10px;letter-spacing:.04em;margin-top:5px;color:var(--ink-soft)}
+.cep-status.loading{color:var(--ink-soft)}
+.cep-status.ok{color:#5a7d5a}
+.cep-status.error{color:#a8564a}
 .field label{display:block;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:7px}
 .field input{width:100%;border:1px solid var(--line);background:transparent;padding:13px 14px;font-family:var(--ui);font-size:13.5px;color:var(--ink)}
 .field input:focus{outline:none;border-color:var(--gold)}
@@ -780,7 +784,7 @@ function renderCheckout(){
     <div class="field"><label for="fN">Nome completo</label><input id="fN" placeholder="Seu nome"></div>
     <div class="field"><label for="fE">E-mail</label><input id="fE" type="email" placeholder="voce@email.com"></div>
     <div class="f-row">
-      <div class="field"><label for="fC">CEP</label><input id="fC" placeholder="80000-000"></div>
+      <div class="field"><label for="fC">CEP</label><input id="fC" placeholder="80000-000" inputmode="numeric" maxlength="9" oninput="maskCEP(this)"><span id="cepStatus" class="cep-status"></span></div>
       <div class="field"><label for="fNum">Número</label><input id="fNum" placeholder="100"></div>
     </div>
     <div class="field"><label for="fA">Endereço</label><input id="fA" placeholder="Rua, bairro — cidade/UF"></div>
@@ -800,6 +804,43 @@ function renderCheckout(){
     <button class="btn btn-solid w-full" style="margin-top:14px" onclick="confirmOrder()">${payMethod==='pix'?'Pagar com Pix':'Confirmar pedido'} · ${money(total)}</button>
     <p style="text-align:center;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin-top:12px">Você será redirecionado a um ambiente seguro do Mercado Pago</p>`;
 }
+/* ============ CEP: MÁSCARA + AUTOCOMPLETE ============ */
+function maskCEP(el){
+  let v=el.value.replace(/\D/g,'').slice(0,8);
+  if(v.length>5) v=v.slice(0,5)+'-'+v.slice(5);
+  el.value=v;
+  const status=document.getElementById('cepStatus');
+  if(v.replace('-','').length===8){
+    buscarCEP(v.replace('-',''));
+  }else if(status){
+    status.textContent='';
+    status.className='cep-status';
+  }
+}
+
+async function buscarCEP(cep){
+  const status=document.getElementById('cepStatus');
+  const fA=document.getElementById('fA');
+  if(status){status.textContent='Buscando endereço…';status.className='cep-status loading';}
+  try{
+    const resp=await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    const data=await resp.json();
+    if(data.erro){
+      if(status){status.textContent='CEP não encontrado — preencha manualmente';status.className='cep-status error';}
+      return;
+    }
+    if(fA){
+      const partes=[data.logradouro,data.bairro,`${data.localidade}/${data.uf}`].filter(Boolean);
+      fA.value=partes.join(', ');
+    }
+    if(status){status.textContent='Endereço encontrado ✓';status.className='cep-status ok';}
+    const fNum=document.getElementById('fNum');
+    if(fNum && !fNum.value) fNum.focus();
+  }catch(err){
+    if(status){status.textContent='Não foi possível buscar o CEP — preencha manualmente';status.className='cep-status error';}
+  }
+}
+
 async function confirmOrder(){
   const name=$('fN').value.trim(),email=$('fE').value.trim(),cep=$('fC').value.trim(),num=$('fNum').value.trim(),addr=$('fA').value.trim();
   if(!name||!email){toast('Preencha nome e e-mail para continuar');return}
