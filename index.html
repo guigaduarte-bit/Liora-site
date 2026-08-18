@@ -101,6 +101,46 @@ nav.main a:hover::after{width:100%}
 .tab:hover{border-color:var(--gold)}
 .tab.active{background:var(--ink);color:var(--cream);border-color:var(--ink)}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:clamp(20px,2.6vw,36px)}
+.grid.aroma-mode{display:block}
+.aroma-catalog{position:relative;overflow:hidden;border:1px solid rgba(140,106,47,.28);background:linear-gradient(145deg,#F8F1E5 0%,#EEE3D1 52%,#F8F3E9 100%);padding:clamp(28px,5vw,72px)}
+.aroma-catalog::before,.aroma-catalog::after{content:'';position:absolute;border:1px solid rgba(176,138,71,.22);border-radius:50%;pointer-events:none}
+.aroma-catalog::before{width:330px;height:330px;right:-180px;top:-190px}
+.aroma-catalog::after{width:250px;height:250px;left:-150px;bottom:-165px}
+.aroma-hero{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(260px,.9fr);gap:clamp(24px,5vw,76px);align-items:end;padding-bottom:clamp(30px,4vw,52px);border-bottom:1px solid rgba(43,33,24,.13)}
+.aroma-title{font-family:var(--display);font-size:clamp(42px,5.8vw,74px);font-weight:500;line-height:.96;margin:13px 0 18px}
+.aroma-title em{display:block;color:var(--gold-deep);font-weight:400}
+.aroma-lead{max-width:55ch;color:var(--ink-soft);font-size:15px}
+.aroma-guide{background:rgba(251,246,236,.68);border:1px solid rgba(176,138,71,.2);padding:22px 24px}
+.aroma-guide-title{font-family:var(--display);font-size:24px;font-weight:500;line-height:1.1;margin-bottom:8px}
+.aroma-guide p{font-size:12.5px;color:var(--ink-soft)}
+.aroma-legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;font-size:9px;letter-spacing:.14em;text-transform:uppercase}
+.aroma-legend span{display:inline-flex;align-items:center;gap:7px}
+.aroma-legend i{width:7px;height:7px;border-radius:50%;background:var(--gold);display:inline-block}
+.aroma-legend .archive-dot{background:transparent;border:1px solid var(--gold-deep)}
+.aroma-family-grid{position:relative;z-index:1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:24px}
+.aroma-family{--family:#A7606B;background:rgba(255,252,246,.72);border:1px solid rgba(43,33,24,.1);padding:clamp(22px,3vw,34px);transition:transform .3s ease,border-color .3s ease,box-shadow .3s ease}
+.aroma-family:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--family) 45%,transparent);box-shadow:0 16px 40px rgba(43,33,24,.08)}
+.aroma-family.floral{--family:#A84F66}
+.aroma-family.aromatico{--family:#7B628F}
+.aroma-family.citrico{--family:#B57A34}
+.aroma-family.citrico-frutal{--family:#78843B}
+.aroma-family.frutal{--family:#A44B45}
+.aroma-family.gourmand{--family:#8A6546}
+.aroma-family-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:18px;padding-bottom:15px;border-bottom:1px solid rgba(43,33,24,.1)}
+.aroma-family-name{display:flex;gap:12px;align-items:center;font-family:var(--display);font-style:italic;font-size:clamp(25px,2.7vw,34px);font-weight:500;line-height:1;color:var(--family)}
+.aroma-symbol{width:11px;height:11px;border:1px solid var(--family);transform:rotate(45deg);background:color-mix(in srgb,var(--family) 25%,transparent);flex:0 0 auto}
+.aroma-profile{max-width:190px;color:var(--family);font-size:8.5px;letter-spacing:.17em;text-transform:uppercase;text-align:right;line-height:1.55}
+.aroma-items{display:grid;gap:4px}
+.aroma-item{display:grid;grid-template-columns:minmax(130px,.72fr) minmax(0,1.28fr) auto;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(43,33,24,.08)}
+.aroma-item:last-child{border-bottom:0}
+.aroma-name{font-family:var(--display);font-size:20px;font-weight:600;line-height:1.1}
+.aroma-notes{font-size:11.5px;color:var(--ink-soft);line-height:1.5}
+.aroma-status{align-self:center;border:1px solid rgba(176,138,71,.4);color:var(--gold-deep);font-size:7.5px;letter-spacing:.18em;text-transform:uppercase;padding:4px 7px;white-space:nowrap}
+.aroma-catalog-foot{position:relative;z-index:1;display:flex;justify-content:space-between;gap:24px;align-items:center;margin-top:24px;padding:clamp(22px,3vw,34px);background:var(--umber);color:var(--cream)}
+.aroma-catalog-foot h3{font-family:var(--display);font-size:clamp(26px,3vw,38px);font-weight:500;line-height:1.05}
+.aroma-catalog-foot p{font-size:12px;color:rgba(251,246,236,.68);margin-top:7px}
+.aroma-catalog-foot .btn{flex:0 0 auto;border-color:rgba(251,246,236,.72);color:var(--cream)}
+.aroma-catalog-foot .btn:hover{background:var(--cream);color:var(--ink)}
 .card{position:relative;display:flex;flex-direction:column;transition:opacity .4s,transform .4s}
 .card.hide{display:none}
 .card-media{position:relative;aspect-ratio:4/5;overflow:hidden;background:#fff;cursor:pointer}
@@ -326,6 +366,8 @@ details p{font-size:13px;color:var(--ink-soft);padding-bottom:16px}
   .modal-media{min-height:340px;aspect-ratio:4/3}
   .header-in{height:72px}
   .brand .name{font-size:24px}
+  .aroma-hero{grid-template-columns:1fr;align-items:start}
+  .aroma-family-grid{grid-template-columns:1fr}
 }
 @media(max-width:560px){
   .announce{font-size:9px;letter-spacing:.2em;padding:9px 12px}
@@ -363,6 +405,17 @@ details p{font-size:13px;color:var(--ink-soft);padding-bottom:16px}
   .wa-float{bottom:calc(16px + env(safe-area-inset-bottom))}
   .toast{bottom:calc(28px + env(safe-area-inset-bottom))}
   .drawer-foot{padding-bottom:calc(22px + env(safe-area-inset-bottom))}
+  .grid.aroma-mode{display:block}
+  .aroma-catalog{padding:24px 16px}
+  .aroma-title{font-size:42px}
+  .aroma-guide{padding:18px}
+  .aroma-family{padding:20px 17px}
+  .aroma-family-head{display:block}
+  .aroma-profile{max-width:none;text-align:left;margin-top:12px}
+  .aroma-item{grid-template-columns:1fr auto;gap:5px 10px}
+  .aroma-notes{grid-column:1/-1}
+  .aroma-catalog-foot{align-items:flex-start;flex-direction:column}
+  .aroma-catalog-foot .btn{width:100%}
 }
 @media(max-width:380px){
   .brand .name{font-size:22px;letter-spacing:.28em;margin-right:-.28em}
@@ -633,7 +686,40 @@ document.querySelectorAll('[data-p]').forEach(el=>el.src=PIMG[el.dataset.p]);
 document.getElementById('fav').href=IMGS.logo;
 
 /* ============ STORE DATA (lioraaromasdeluxo.lojavirtualnuvem.com.br) ============ */
-const CATS=['Todas','Essenciais','Esculturas','Clássico','Boho Glass','Flora Linea','Kits e Presentes'];
+const AROMA_TAB='Catálogo de Aromas';
+const CATS=['Todas','Essenciais','Esculturas','Clássico','Boho Glass','Flora Linea','Kits e Presentes',AROMA_TAB];
+const AROMA_FAMILIES=[
+  {name:'Floral Frutal',className:'floral-frutal',profile:'Romântico · Fresco · Feminino',items:[
+    {name:'Sim Arman',notes:'Figo · Damasco · Cedro · Musk'},
+    {name:'Fig Flower',notes:'Figo · Damasco · Cedro · Musk'},
+    {name:'Cereja & Avelã',notes:'Cereja · Gardênia · Cacau · Musk'}
+  ]},
+  {name:'Floral',className:'floral',profile:'Delicado · Clássico · Elegante',items:[
+    {name:'Blum',notes:'Néroli · Jasmim · Tuberosa · Musk'},
+    {name:'Cloé',notes:'Peônia · Magnólia · Musk'},
+    {name:'Ar da Primavera',notes:'Floral verde'},
+    {name:'Flor de Peônia',notes:'Peônia · Rosa'},
+    {name:'White Gardênia',notes:'Gardênia · Jasmim · Almíscar',archive:true}
+  ]},
+  {name:'Floral Aromático',className:'aromatico',profile:'Sofisticado · Sereno',items:[
+    {name:'Lavanda Sofisticada',notes:'Lavanda · Almíscar · Acorde aromático'}
+  ]},
+  {name:'Floral Cítrico',className:'citrico',profile:'Leve · Fresco · Doce',items:[
+    {name:'Lichia Sublime',notes:'Lichia · Rosa · Baunilha · Musk'}
+  ]},
+  {name:'Cítrico Frutal',className:'citrico-frutal',profile:'Vibrante · Energizante · Ensolarado',items:[
+    {name:'Goji & Tarocco Orange',notes:'Laranja · Bergamota · Goji · Manga · Buquê · Musk'},
+    {name:'Aurora Cítrica',notes:'Perfil cítrico frutal',archive:true}
+  ]},
+  {name:'Frutal',className:'frutal',profile:'Alegre · Tropical · Sedutor',items:[
+    {name:'Trick or Treat',notes:'Maçapão · Pera · Berry · Beetle Juice'},
+    {name:'Smell of Dawn',notes:'Lichia · Rosa · Violeta · Berry'},
+    {name:'Beetle Juice',notes:'Perfil frutal',archive:true}
+  ]},
+  {name:'Oriental Gourmand',className:'gourmand',profile:'Quente · Envolvente · Confortante',items:[
+    {name:'Dolci Notte',notes:'Baunilha · Amêndoa · Cacau'}
+  ]}
+];
 const PRODUCTS=[{"id": "vela-escultural-lady-veil-phie3", "name": "Vela escultural Lady Veil", "price": 62.0, "old": 65.0, "stock": 10, "soldout": false, "cats": ["Essenciais", "Esculturas", "Clássico", "Kits e Presentes"], "desc": "Vela decorativa feminina em formato de busto com véu e flores, perfeita para dar sofisticação ao seu ambiente.", "dims": "Peso: 110gr", "frag": true}, {"id": "vela-decorativa-anjo-em-vitral-1sbe9", "name": "Vela Decorativa Anjo em vitral", "price": 55.0, "old": 59.0, "stock": 20, "soldout": false, "cats": ["Essenciais", "Esculturas", "Kits e Presentes"], "desc": "Vela decorativa com anjo e criança, ornamentos florais e moldura detalhada. Perfeita para decorar ou presentear.", "dims": "Peso: 100 gr · Medidas: 11cm x 6,2 cm", "frag": true}, {"id": "botanique", "name": "Botanique - 250gr", "price": 75.0, "old": 80.0, "stock": 2, "soldout": false, "cats": ["Essenciais", "Flora Linea", "Kits e Presentes"], "desc": "Vela em vidro, luminária,com tampa metálica, decorada com pássaros e flores, perfeita para decorar e ambientar. Aproveite e compre já!", "dims": "", "frag": true}, {"id": "botanique-150-gr-1gyzj", "name": "Botanique - 150gr", "price": 52.0, "old": 55.0, "stock": 12, "soldout": false, "cats": ["Essenciais", "Flora Linea"], "desc": "Conjunto de velas decorativas em copo de vidro com tampa de madeira, estampas florais e de pássaro. Decore e aromatize seu ambiente. Compre já!", "dims": "", "frag": true}, {"id": "botanique-70-ml-1dqj4", "name": "Botanique - 70gr", "price": 25.0, "old": 28.0, "stock": 5, "soldout": false, "cats": ["Essenciais", "Flora Linea", "Kits e Presentes"], "desc": "Vela perfumada em copo de vidro com tampa de madeira e estampa floral delicada. Decore e aromatize seu ambiente com charme. Compre já!", "dims": "Peso 70gr | Medidas: 9cm x 9cm x 7cm (C x L x A) · Medidas: 9cm x 9cm x 7cm (C x L x A)", "frag": true}, {"id": "ursinho", "name": "PEQUENO AMOR", "price": 10.0, "old": 12.0, "stock": 30, "soldout": false, "cats": ["Essenciais"], "desc": "Pedidos acima de 20 unidades: 10% de desconto\nPedidos acima de 30 unidades: 15% de desconto\nPedidos acima de 50 unidades: 20% de desconto\nPeças feitas a mão, com intenção.\nPrazo confecção - 5 a 7 dias.", "dims": "Peso: 40gr · Medidas: 4cmX4cmX5cm (CXLXA)", "frag": true}, {"id": "flordevenus", "name": "FLOR DE VÊNUS", "price": 55.0, "old": 59.0, "stock": 5, "soldout": false, "cats": ["Flora Linea"], "desc": "Vela decorativa em formato de rosto feminino com flores, perfeita para uma decoração charmosa e delicada.", "dims": "Peso: 120gr · Medidas: 8cmX4cmX10cm (CXLXA)", "frag": true}, {"id": "abraco-em-luz", "name": "ABRAÇO EM LUZ", "price": 42.0, "old": 46.0, "stock": 10, "soldout": false, "cats": ["Flora Linea"], "desc": "Escultura decorativa de anjo com asas grandes segurando criança, em material translúcido. Ideal para decoração elegante. Compre já!", "dims": "Peso: 65gr · Medidas: 8cmX4cmX10cm (CXLXA)", "frag": true}, {"id": "mini-bubble", "name": "MINI BUBBLE", "price": 16.0, "old": 18.0, "stock": 30, "soldout": false, "cats": ["Essenciais"], "desc": "Vela decorativa bolinhas pequena com textura em relevo e acabamento liso para um toque acolhedor. Ideal para decorar ambientes.", "dims": "Peso: 40gr · Medidas: 4cmX4cmX4cm (CXLXA)", "frag": true}, {"id": "bolhas", "name": "BOLHAS", "price": 30.0, "old": 32.0, "stock": 10, "soldout": false, "cats": ["Clássico"], "desc": "Esfera decorativa com textura de bolhas, perfeita para realçar ambientes com estilo e charme. Compre já e transforme seu espaço!", "dims": "Peso: 88gr · Medidas: 7cmX5cmX6cm (CXLXA)", "frag": true}, {"id": "no-deluz", "name": "NÓ DE LUZ", "price": 32.0, "old": 36.0, "stock": 5, "soldout": false, "cats": ["Essenciais"], "desc": "Decore seu ambiente com a vela nó entrelaçada. Textura artesanal única e exclusiva.", "dims": "Peso: 55gr · Medidas: 8cmX8cmX8cm (CXLXA)", "frag": true}, {"id": "lioracoral", "name": "LIORA CORAL", "price": 32.0, "old": 36.0, "stock": 10, "soldout": false, "cats": ["Esculturas"], "desc": "Realce a beleza natural e sofisticada da sua decoração com a vela Liora Coral escultural.. Inspirada na delicadeza das formas orgânicas, esta coleção traz pe...", "dims": "Peso: 65gr · Medidas: 7cmX7cmX7cm (CXLXA)", "frag": true}, {"id": "essenza-cube", "name": "ESSENZA CUBE", "price": 42.0, "old": 45.0, "stock": 4, "soldout": false, "cats": ["Esculturas"], "desc": "Realce a beleza e a originalidade da sua decoração com a Escultura Essenza cube , uma vela artesanal que une arte, design e emoção em uma peça única. Com seu...", "dims": "Peso: 125gr · Medidas: 7cmX7cmX7cm (CXLXA)", "frag": true}, {"id": "kit-silhouette", "name": "KIT SILHOUETTE", "price": 75.0, "old": 80.0, "stock": 3, "soldout": false, "cats": ["Esculturas"], "desc": "Realce a originalidade e o impacto visual da sua decoração com o Kit Silhouette da Linha Esculturas. Esta coleção exclusiva traz peças que combinam design in...", "dims": "Peso: 253gr · Medidas: 8cmX6cmX13cm (CXLXA)", "frag": true}, {"id": "trevo", "name": "TREVO", "price": 42.0, "old": 46.0, "stock": 4, "soldout": false, "cats": ["Esculturas"], "desc": "Realce sua decoração com a Escultura Trevo Cilindro, uma peça que une design contemporâneo e simbolismo em um formato único e marcante. Inspirada na forma do...", "dims": "Peso: 120gr · Medidas: 5cmX5cmX12cm (CXLXA)", "frag": true}, {"id": "perolas", "name": "PÉROLAS", "price": 42.0, "old": 46.0, "stock": 4, "soldout": false, "cats": ["Clássico"], "desc": "Vela decorativa cilíndrica com textura em bolinhas, perfeita para decorar e criar aconchego. Compre agora e transforme seu espaço!", "dims": "Peso: 130gr · Medidas: 7cmX7cmX8cm (CXLXA)", "frag": true}, {"id": "kit-boho-glass", "name": "KIT BOHO GLASS", "price": 75.0, "old": 80.0, "stock": 2, "soldout": false, "cats": ["Boho Glass", "Kits e Presentes"], "desc": "Vela perfumada em vidro listrado com tampa bolinhas para ambientes aromatizados com estilo. Compre já!", "dims": "Peso: 350gr · Medidas: 8cmX8cmX10cm (CXLXA)", "frag": false}, {"id": "lumina", "name": "LUMINA", "price": 46.0, "old": 49.0, "stock": 5, "soldout": false, "cats": ["Clássico"], "desc": "Vaso decorativo arredondado com textura geométrica, perfeito para valorizar sua decoração interna. Compre agora e transforme seu ambiente!", "dims": "Peso: 130gr · Medidas: 7cmX7cmX9cm (CXLXA)", "frag": true}, {"id": "gota-de-luz1", "name": "GOTA DE LUZ", "price": 42.0, "old": 46.0, "stock": 10, "soldout": false, "cats": ["Esculturas"], "desc": "Vela artesanal esculturas redonda espiral. Compre agora e dê charme ao seu espaço!", "dims": "Peso: 108gr · Medidas: 7cmX7cmX8cm (CXLXA).", "frag": true}, {"id": "geometricafacetada", "name": "LIORA ELEGANCE", "price": 32.0, "old": 36.0, "stock": 5, "soldout": false, "cats": ["Esculturas"], "desc": "Vela aromática esculturas em formato geométrico facetado, perfeito para decorar e dar charme ao seu ambiente. Compre agora e transforme seu espaço.", "dims": "Peso: 100gr · Medidas: 6cmX6cmX5cm (CXLXA).", "frag": true}, {"id": "cilindro-mosaico", "name": "CILINDRO MOSAICO", "price": 42.0, "old": 46.0, "stock": 5, "soldout": false, "cats": ["Esculturas"], "desc": "Vela decorativa com textura geométrica e aroma suave para ambientação moderna. Decore seu espaço com estilo e aconchego.", "dims": "Peso: 130gr · Medidas: 6cmX6cmX8cm (CXLXA)", "frag": true}, {"id": "chama-esculpida", "name": "CHAMA ESCULPIDA", "price": 62.0, "old": 65.0, "stock": 5, "soldout": false, "cats": ["Clássico"], "desc": "Vela decorativa cilíndrica com relevo em ondas, perfeita para transformar ambientes internos. Adquira já e decore com estilo!", "dims": "Peso: 208gr · Medidas: 7cmX7cmX13cm (CXLXA)", "frag": true}, {"id": "jardim-encantado", "name": "JARDIM ENCANTADO", "price": 85.0, "old": 89.9, "stock": 3, "soldout": false, "cats": ["Flora Linea", "Kits e Presentes"], "desc": "Decore ambientes com arranjo de velas florais em vaso decorativo. Ideal para trazer charme e aroma suave.", "dims": "Peso: 700gr · Medidas: 15cmX15cmX18cm (CXLXA)", "frag": true}, {"id": "camafeufada", "name": "CAMAFEU FADA", "price": 8.0, "old": 12.0, "stock": 30, "soldout": false, "cats": ["Essenciais", "Esculturas", "Clássico", "Kits e Presentes"], "desc": "Presente decorativo com fita e relevo de fada com flores para um ambiente delicado e clássico. Decore com charme, compre agora!", "dims": "Peso: 50gr · Medidas: 10cmX8cmX11cm (CXLXA).", "frag": true}, {"id": "botanicavasogesso", "name": "JARDIM ENCANTADO", "price": 75.0, "old": 79.9, "stock": 0, "soldout": true, "cats": ["Flora Linea"], "desc": "Vela artesanal em vaso com flores detalhadas, perfeita para decorar com charme e delicadeza. Adquira já a sua!", "dims": "Peso: 200gr · Medidas: 12cmX12cmX12cm (CXLXA)", "frag": true}, {"id": "peonia", "name": "FLOR DE VÊNUS", "price": 12.0, "old": 15.0, "stock": 8, "soldout": false, "cats": ["Flora Linea"], "desc": "Vela decorativa em forma de flor com base texturizada. Decore seu ambiente com charme.", "dims": "Peso 100gr · Medidas: 10cmX10cmX7cm (CXLXA).", "frag": true}, {"id": "sagrada-familia", "name": "Sagrada Familia", "price": 52.0, "old": 55.0, "stock": 5, "soldout": false, "cats": ["Essenciais", "Esculturas"], "desc": "Escultura Família Sagrada em material liso, ideal para decoração religiosa. Adquira já e valorize seu ambiente com arte e fé.", "dims": "Peso: 200g · Medidas: 12cm x 8cm x 15cm (C x L x A)", "frag": true}];
 PRODUCTS.forEach(p=>p.img=PIMG[p.id]);
 const SHIP_FREE=250, SHIP_COST=22.9;
@@ -655,8 +741,50 @@ const offPct=p=>p.old?Math.round((1-p.price/p.old)*100):0;
 
 /* ============ TABS + GRID ============ */
 function renderTabs(){
-  $('tabsBar').innerHTML=CATS.map(c=>`<button class="tab${c===currentTab?' active':''}" data-cat="${c}" onclick="setTab('${c}')">${c}</button>`).join('');
+  $('tabsBar').innerHTML=CATS.map(c=>`<button class="tab${c===currentTab?' active':''}" role="tab" aria-selected="${c===currentTab}" data-cat="${c}" onclick="setTab('${c}')">${c}</button>`).join('');
   $('footCats').innerHTML=CATS.slice(1).map(c=>`<li><a href="#colecoes" onclick="setTab('${c}')">${c}</a></li>`).join('');
+}
+function aromaItemHTML(item){
+  return `<li class="aroma-item">
+    <strong class="aroma-name">${item.name}</strong>
+    <span class="aroma-notes">${item.notes}</span>
+    ${item.archive?'<span class="aroma-status">Arquivo</span>':''}
+  </li>`;
+}
+function aromaCatalogHTML(){
+  return `<article class="aroma-catalog" aria-labelledby="aromaTitle">
+    <header class="aroma-hero">
+      <div>
+        <p class="eyebrow">Guia olfativo Liora</p>
+        <h3 class="aroma-title" id="aromaTitle">Catálogo <em>de Aromas</em></h3>
+        <p class="aroma-lead">Descubra a família olfativa que traduz a atmosfera que você deseja criar. Cada fragrância transforma o ambiente em uma experiência sensorial.</p>
+      </div>
+      <aside class="aroma-guide">
+        <h4 class="aroma-guide-title">Famílias olfativas</h4>
+        <p>Cada aroma pertence a uma família — a linguagem que ajuda a encontrar a sua essência.</p>
+        <div class="aroma-legend" aria-label="Legenda do catálogo">
+          <span><i></i>Aroma atual</span>
+          <span><i class="archive-dot"></i>Referência de arquivo</span>
+        </div>
+      </aside>
+    </header>
+    <div class="aroma-family-grid">
+      ${AROMA_FAMILIES.map(f=>`<section class="aroma-family ${f.className}">
+        <header class="aroma-family-head">
+          <h4 class="aroma-family-name"><i class="aroma-symbol"></i>${f.name}</h4>
+          <p class="aroma-profile">${f.profile}</p>
+        </header>
+        <ul class="aroma-items">${f.items.map(aromaItemHTML).join('')}</ul>
+      </section>`).join('')}
+    </div>
+    <footer class="aroma-catalog-foot">
+      <div>
+        <h3>Descubra sua essência.</h3>
+        <p>Conte para a Liora qual atmosfera você quer criar.</p>
+      </div>
+      <a class="btn" href="https://wa.me/5521969121244?text=Ol%C3%A1%2C%20quero%20ajuda%20para%20escolher%20um%20aroma%20Liora" target="_blank" rel="noopener">Falar sobre um aroma</a>
+    </footer>
+  </article>`;
 }
 function cardHTML(p){
   const off=offPct(p);
@@ -675,7 +803,12 @@ function cardHTML(p){
     </div>
   </article>`;
 }
-function renderGrid(){$('grid').innerHTML=PRODUCTS.map(cardHTML).join('')}
+function renderGrid(){
+  const grid=$('grid');
+  const aromaMode=currentTab===AROMA_TAB;
+  grid.classList.toggle('aroma-mode',aromaMode);
+  grid.innerHTML=aromaMode?aromaCatalogHTML():PRODUCTS.map(cardHTML).join('');
+}
 function setTab(cat){
   currentTab=cat;
   renderTabs();renderGrid();
