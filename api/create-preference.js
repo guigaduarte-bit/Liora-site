@@ -2,16 +2,11 @@
 
 const { randomUUID } = require('node:crypto');
 const CATALOG = require('./catalog');
+const { SHIP_FREE, cleanZip, quoteShipping, roundCurrency } = require('./_shipping');
 
-const SHIP_FREE = 250;
-const SHIP_COST = 22.9;
 const PAYMENT_TYPES = ['credit_card', 'debit_card', 'ticket', 'bank_transfer'];
-const PAYMENT_METHODS = new Set(['pix', 'card', 'transfer', 'boleto']);
-const SHIPPING_METHODS = new Set(['correios', 'retirada']);
-
-function roundCurrency(value) {
-  return Math.round((value + Number.EPSILON) * 100) / 100;
-}
+const PAYMENT_METHODS = new Set(['pix', 'card', 'boleto']);
+const SHIPPING_METHODS = new Set(['delivery']);
 
 function cleanText(value, maxLength) {
   return String(value || '').replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, maxLength);
@@ -122,10 +117,10 @@ function paymentSettings(payMethod) {
   let allowed = PAYMENT_TYPES;
   let installments;
 
-  if (payMethod === 'pix' || payMethod === 'transfer') allowed = ['bank_transfer'];
+  if (payMethod === 'pix') allowed = ['bank_transfer'];
   if (payMethod === 'boleto') allowed = ['ticket'];
   if (payMethod === 'card') {
-    allowed = ['credit_card', 'debit_card'];
+    allowed = ['credit_card'];
     installments = 3;
   }
 
@@ -169,14 +164,14 @@ module.exports = async function handler(req, res) {
 
     const name = cleanText(payer && payer.name, 120);
     const email = cleanText(payer && payer.email, 160).toLowerCase();
-    const zipCode = cleanText(payer && payer.cep, 10).replace(/\D/g, '');
+    const zipCode = cleanZip(payer && payer.cep);
     const streetNumber = cleanText(payer && payer.num, 20);
     const address = cleanText(payer && payer.addr, 250);
 
     if (name.length < 2 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({ error: 'Nome e e-mail válidos são obrigatórios' });
     }
-    if (selectedShipping === 'correios' && (zipCode.length !== 8 || !address)) {
+    if (selectedShipping === 'delivery' && (zipCode.length !== 8 || !address)) {
       return res.status(400).json({ error: 'Endereço de entrega incompleto' });
     }
 
@@ -185,9 +180,18 @@ module.exports = async function handler(req, res) {
       (sum, item) => sum + item.price * item.quantity,
       0
     ));
-    const shippingCost = selectedShipping === 'correios' && subtotal < SHIP_FREE
-      ? SHIP_COST
-      : 0;
+    let selectedQuote = null;
+    let shippingCost = 0;
+    if (selectedShipping === 'delivery') {
+      const quoteResult = await quoteShipping({ zipCode, cart, subtotal });
+      if (quoteResult.preview) {
+        return res.status(503).json({ error: 'O frete real ainda precisa ser conectado antes do pagamento' });
+      }
+      const serviceId = cleanText(shipping && shipping.serviceId, 80);
+      selectedQuote = quoteResult.quotes.find((quote) => quote.id === serviceId);
+      if (!selectedQuote) return res.status(400).json({ error: 'Selecione novamente a opção de entrega' });
+      shippingCost = subtotal >= SHIP_FREE ? 0 : selectedQuote.price;
+    }
     const productTotal = selectedPayment === 'pix'
       ? roundCurrency(subtotal * 0.95)
       : subtotal;
@@ -200,7 +204,7 @@ module.exports = async function handler(req, res) {
       payer: {
         name,
         email,
-        ...(selectedShipping === 'correios' ? {
+        ...(selectedShipping === 'delivery' ? {
           address: {
             zip_code: zipCode,
             street_name: address,
@@ -208,7 +212,7 @@ module.exports = async function handler(req, res) {
           }
         } : {})
       },
-      ...(selectedShipping === 'correios' ? {
+      ...(selectedShipping === 'delivery' ? {
         shipments: { cost: shippingCost, mode: 'not_specified' }
       } : {}),
       payment_methods: paymentSettings(selectedPayment),
@@ -223,6 +227,9 @@ module.exports = async function handler(req, res) {
       metadata: {
         order_id: orderId,
         shipping_method: selectedShipping,
+        shipping_service: selectedQuote.name,
+        shipping_carrier: selectedQuote.carrier,
+        shipping_delivery_days: selectedQuote.deliveryDays || 0,
         customer_address: address,
         customer_number: streetNumber,
         subtotal,
