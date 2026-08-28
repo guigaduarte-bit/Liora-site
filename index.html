@@ -561,7 +561,7 @@ button,a{-webkit-tap-highlight-color:transparent}
   <div class="wrap services-in">
     <div class="service reveal">
       <svg viewBox="0 0 24 24"><path d="M1 7h13v10H1zM14 10h5l3 3v4h-8z"/><circle cx="6" cy="18.5" r="1.8"/><circle cx="17.5" cy="18.5" r="1.8"/></svg>
-      <h4>Todo o Brasil</h4><p>Enviamos para todo o país. Frete grátis a partir de R$ 150.</p>
+      <h4>SuperFrete para todo o Brasil</h4><p>Compare Correios e outras transportadoras. Frete grátis a partir de R$ 150.</p>
     </div>
     <div class="service reveal">
       <svg viewBox="0 0 24 24"><path d="M12 21s-7-5.2-7-11a7 7 0 0 1 14 0c0 5.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>
@@ -569,7 +569,7 @@ button,a{-webkit-tap-highlight-color:transparent}
     </div>
     <div class="service reveal">
       <svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M2.5 10h19"/></svg>
-      <h4>Pagamento facilitado</h4><p>Pix com 5% extra, cartão de crédito em até 3x sem juros ou boleto bancário.</p>
+      <h4>Pagamento facilitado</h4><p>Mercado Pago com Pix, cartão e boleto, além do checkout InfinitePay.</p>
     </div>
     <div class="service reveal">
       <svg viewBox="0 0 24 24"><path d="M12 3c3.5 4.2 5.5 7.2 5.5 10a5.5 5.5 0 0 1-11 0c0-2.8 2-5.8 5.5-10z"/></svg>
@@ -626,7 +626,7 @@ button,a{-webkit-tap-highlight-color:transparent}
     </div>
     <div class="foot-bottom">
       <span>© 2026 Liora Aromas de Luxo · Juliana Straatmann · Todos os direitos reservados</span>
-      <div class="pays"><span class="pay">PIX</span><span class="pay">VISA</span><span class="pay">MASTER</span><span class="pay">ELO</span><span class="pay">AMEX</span><span class="pay">HIPERCARD</span><span class="pay">DINERS</span><span class="pay">BOLETO</span></div>
+      <div class="pays"><span class="pay">PIX</span><span class="pay">VISA</span><span class="pay">MASTER</span><span class="pay">ELO</span><span class="pay">AMEX</span><span class="pay">BOLETO</span><span class="pay">MERCADO PAGO</span><span class="pay">INFINITEPAY</span></div>
     </div>
   </div>
 </footer>
@@ -939,20 +939,21 @@ function renderCheckout(){
     <p class="chk-step mt">3 · Pagamento</p>
     <div class="pay-opt ${payMethod==='pix'?'sel':''}" onclick="payMethod='pix';renderCheckout()"><span>Pix</span><span class="disc">5% de desconto extra</span></div>
     <div class="pay-opt ${payMethod==='card'?'sel':''}" onclick="payMethod='card';renderCheckout()"><span>Cartão de crédito</span><span class="disc">até 3x sem juros</span></div>
-    <div class="pay-opt ${payMethod==='boleto'?'sel':''}" onclick="payMethod='boleto';renderCheckout()"><span>Boleto bancário</span><span class="disc">aprovação após compensação</span></div>`;
+    <div class="pay-opt ${payMethod==='boleto'?'sel':''}" onclick="payMethod='boleto';renderCheckout()"><span>Boleto bancário</span><span class="disc">aprovação após compensação</span></div>
+    <div class="pay-opt ${payMethod==='infinitepay'?'sel':''}" onclick="payMethod='infinitepay';renderCheckout()"><span class="ship-opt-main"><b>InfinitePay</b><small>Pix, cartão em até 12x e carteiras digitais</small></span><span class="disc">Opção adicional</span></div>`;
   $('drawerFoot').innerHTML=`
     <div class="sum-row"><span>Subtotal</span><span>${money(st)}</span></div>
     <div class="sum-row"><span>Frete</span><span>${shipMethod==='delivery'&&!selectedQuote?'A calcular':ship?money(ship):'<span class="free">Grátis</span>'}</span></div>
     ${disc?`<div class="sum-row"><span>Desconto Pix (5%)</span><span style="color:var(--gold-deep)">− ${money(disc)}</span></div>`:''}
     <div class="sum-row total"><span>Total</span><span>${money(total)}</span></div>
-    <button class="btn btn-solid w-full" style="margin-top:14px" onclick="confirmOrder()">${payMethod==='pix'?'Pagar com Pix':payMethod==='boleto'?'Gerar boleto':'Confirmar pedido'} · ${money(total)}</button>
-    <p style="text-align:center;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin-top:12px">Você será redirecionado a um ambiente seguro do Mercado Pago</p>`;
+    <button class="btn btn-solid w-full" style="margin-top:14px" onclick="confirmOrder()">${payMethod==='pix'?'Pagar com Pix':payMethod==='boleto'?'Gerar boleto':payMethod==='infinitepay'?'Pagar com InfinitePay':'Confirmar pedido'} · ${money(total)}</button>
+    <p style="text-align:center;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin-top:12px">Você será redirecionado ao ambiente seguro ${payMethod==='infinitepay'?'da InfinitePay':'do Mercado Pago'}</p>`;
 }
 function shippingOptionsHTML(st){
   if(shippingState.status==='loading') return `<div class="pay-opt" aria-disabled="true"><span class="ship-loading">Calculando as melhores opções…</span></div>`;
   if(shippingState.status==='error') return `<div class="pay-opt" aria-disabled="true"><span>${escapeAttr(shippingState.error)}</span><span class="disc">Revise o CEP</span></div>`;
   if(!shippingState.quotes.length) return `<div class="pay-opt" aria-disabled="true"><span>Informe o CEP para calcular</span><span class="disc">Prazo e valor</span></div>`;
-  const note=shippingState.preview?`<p class="ship-preview-note">Valores demonstrativos neste preview. A cotação real será conectada antes da publicação.</p>`:'';
+  const note=shippingState.preview?`<p class="ship-preview-note">Opções demonstrativas da SuperFrete neste preview. Valores e prazos reais aparecerão após conectar o token da loja.</p>`:'';
   return shippingState.quotes.map(q=>`<div class="pay-opt ship-opt ${shipMethod==='delivery'&&selectedShippingService===q.id?'sel':''}" onclick="selectShipping('${escapeAttr(q.id)}')"><span class="ship-opt-main"><b>${escapeAttr(q.name)}</b><small>${escapeAttr(q.carrier)} · ${q.deliveryDays?`entrega em até ${q.deliveryDays} dias úteis`:'prazo combinado após a compra'}</small></span><span class="disc">${q.price===0?'Grátis':money(q.price)}</span></div>`).join('')+note;
 }
 function selectShipping(serviceId){
@@ -1099,8 +1100,8 @@ function renderQuick(){
         <div><svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M2.5 10h19"/></svg>Até 3x sem juros</div>
       </div>
       <div style="margin-top:26px">
-        <details><summary>Pagamento</summary><p>Pix com 5% de desconto extra, cartão de crédito em até 3x sem juros ou boleto bancário.</p></details>
-        <details><summary>Envio</summary><p>Calculamos o frete pelo CEP para todo o Brasil. Em Curitiba, a entrega custa R$ 19,90 para compras abaixo de R$ 150. A partir desse valor, aplica-se a gratuidade geral.</p></details>
+        <details><summary>Pagamento</summary><p>Mercado Pago com Pix (5% de desconto), cartão em até 3x ou boleto. Como alternativa, use InfinitePay com Pix, cartão em até 12x e carteiras digitais.</p></details>
+        <details><summary>Envio</summary><p>Comparamos opções da SuperFrete pelo CEP, incluindo Correios e outras transportadoras disponíveis. Em Curitiba, a entrega Liora custa R$ 19,90 abaixo de R$ 150. A partir desse valor, aplica-se a gratuidade geral.</p></details>
         <details><summary>Cuidados com a vela</summary><p>Na primeira queima, deixe acesa por cerca de 2h para nivelar a superfície. Apare o pavio a 5&nbsp;mm antes de cada uso e mantenha longe de correntes de ar.</p></details>
       </div>
     </div>`;
@@ -1164,23 +1165,33 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 /* init */
 renderTabs();renderGrid();updateCounts();
 
-/* ============ RETORNO DO MERCADO PAGO ============ */
+/* ============ RETORNO DOS CHECKOUTS ============ */
 (async function checkPaymentReturn(){
   const params=new URLSearchParams(window.location.search);
+  const isInfinitePay=params.get('checkout')==='infinitepay-return'||Boolean(params.get('transaction_nsu')&&params.get('slug'));
   const paymentId=params.get('payment_id')||params.get('collection_id');
-  const orderId=params.get('order_id')||params.get('external_reference')||sessionStorage.getItem('liora_checkout_order');
-  const isReturn=params.get('checkout')==='return'||Boolean(paymentId&&orderId);
+  const orderId=params.get('order_nsu')||params.get('order_id')||params.get('external_reference')||sessionStorage.getItem('liora_checkout_order');
+  const isReturn=isInfinitePay||params.get('checkout')==='return'||Boolean(paymentId&&orderId);
   if(!isReturn)return;
 
   window.history.replaceState({},document.title,window.location.pathname);
-  if(!paymentId||!orderId){
+  if(!orderId||(!isInfinitePay&&!paymentId)){
     toast('Não foi possível confirmar o pagamento. Consulte seu e-mail ou tente novamente.');
     return;
   }
 
   toast('Confirmando pagamento…');
   try{
-    const resp=await fetch(`/api/payment-status?payment_id=${encodeURIComponent(paymentId)}&order_id=${encodeURIComponent(orderId)}`);
+    let statusUrl;
+    if(isInfinitePay){
+      const transactionNsu=params.get('transaction_nsu');
+      const slug=params.get('slug')||params.get('invoice_slug');
+      if(!transactionNsu||!slug)throw new Error('Retorno InfinitePay incompleto');
+      statusUrl=`/api/infinitepay-status?transaction_nsu=${encodeURIComponent(transactionNsu)}&slug=${encodeURIComponent(slug)}&order_id=${encodeURIComponent(orderId)}`;
+    }else{
+      statusUrl=`/api/payment-status?payment_id=${encodeURIComponent(paymentId)}&order_id=${encodeURIComponent(orderId)}`;
+    }
+    const resp=await fetch(statusUrl);
     const data=await resp.json().catch(()=>({}));
     if(!resp.ok)throw new Error(data.error||'Falha ao confirmar pagamento');
 
