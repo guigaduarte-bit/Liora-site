@@ -6,7 +6,7 @@ const CATALOG = require('./catalog');
 const SHIP_FREE = 250;
 const SHIP_COST = 22.9;
 const PAYMENT_TYPES = ['credit_card', 'debit_card', 'ticket', 'bank_transfer'];
-const PAYMENT_METHODS = new Set(['pix', 'card', 'transfer', 'boleto']);
+const PAYMENT_METHODS = new Set(['pix', 'card', 'boleto']);
 const SHIPPING_METHODS = new Set(['correios', 'retirada']);
 
 function roundCurrency(value) {
@@ -122,7 +122,7 @@ function paymentSettings(payMethod) {
   let allowed = PAYMENT_TYPES;
   let installments;
 
-  if (payMethod === 'pix' || payMethod === 'transfer') allowed = ['bank_transfer'];
+  if (payMethod === 'pix') allowed = ['bank_transfer'];
   if (payMethod === 'boleto') allowed = ['ticket'];
   if (payMethod === 'card') {
     allowed = ['credit_card', 'debit_card'];
@@ -176,7 +176,7 @@ module.exports = async function handler(req, res) {
     if (name.length < 2 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({ error: 'Nome e e-mail válidos são obrigatórios' });
     }
-    if (selectedShipping === 'correios' && (zipCode.length !== 8 || !address)) {
+    if (selectedShipping === 'correios' && (zipCode.length !== 8 || address.length < 8 || !streetNumber)) {
       return res.status(400).json({ error: 'Endereço de entrega incompleto' });
     }
 
