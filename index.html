@@ -272,13 +272,25 @@ footer li a:hover{color:#E4C98F}
 .cep-status.ok{color:#5a7d5a}
 .cep-status.error{color:#a8564a}
 .field label{display:block;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:7px}
-.field input{width:100%;border:1px solid var(--line);background:transparent;padding:13px 14px;font-family:var(--ui);font-size:13.5px;color:var(--ink)}
-.field input:focus{outline:none;border-color:var(--gold)}
+.field input{width:100%;min-height:46px;border:1px solid var(--line);background:transparent;padding:13px 14px;font-family:var(--ui);font-size:16px;color:var(--ink)}
+.field input:focus{outline:2px solid var(--gold);outline-offset:2px;border-color:var(--gold-deep)}
+.field input[aria-invalid="true"]{border-color:#8b3d34;background:rgba(139,61,52,.035)}
+.field-error{display:block;min-height:17px;margin-top:5px;color:#8b3d34;font-size:11px;line-height:1.4}
+.checkout-alert{display:none;margin-bottom:18px;padding:13px 14px;border:1px solid #8b3d34;color:#6f3029;background:rgba(139,61,52,.045);font-size:12px;line-height:1.5}
+.checkout-alert.on{display:block}
 .f-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.pay-opt{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);padding:15px 16px;margin-bottom:10px;cursor:pointer;transition:border-color .25s;font-size:13px;gap:10px}
+.pay-options{border:0;padding:0;margin:0}
+.pay-options legend{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.pay-opt{display:flex;min-height:48px;align-items:center;justify-content:space-between;border:1px solid var(--line);padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:border-color .25s,background .25s;font-size:13px;gap:10px}
 .pay-opt:hover{border-color:var(--gold)}
+.pay-opt:focus-within{outline:2px solid var(--gold);outline-offset:2px}
 .pay-opt.sel{border-color:var(--ink);background:rgba(176,138,71,.07)}
+.pay-opt input{width:18px;height:18px;margin:0 10px 0 0;accent-color:var(--ink);flex:0 0 auto}
+.pay-opt-main{display:flex;align-items:center;min-width:0}
 .pay-opt .disc{font-size:10px;letter-spacing:.12em;color:var(--gold-deep);text-transform:uppercase;text-align:right}
+.checkout-note{text-align:center;font-size:10px;line-height:1.55;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-top:12px}
+.checkout-note strong{color:var(--ink);font-weight:500}
+.checkout-submit[disabled]{cursor:wait;opacity:.65}
 .back-link{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;text-decoration:underline;text-underline-offset:4px;margin-bottom:20px;display:inline-block}
 .success{text-align:center;padding:60px 10px}
 .success .ok-ring{width:74px;height:74px;border-radius:50%;border:1px solid var(--gold);display:grid;place-items:center;margin:0 auto 26px}
@@ -561,7 +573,7 @@ button,a{-webkit-tap-highlight-color:transparent}
     </div>
     <div class="service reveal">
       <svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M2.5 10h19"/></svg>
-      <h4>Pagamento facilitado</h4><p>Pix com 5% extra, cartão em até 3x sem juros, transferência e boleto.</p>
+      <h4>Pagamento facilitado</h4><p>Pix com 5% extra, cartão de crédito ou débito e boleto pelo Mercado Pago.</p>
     </div>
     <div class="service reveal">
       <svg viewBox="0 0 24 24"><path d="M12 3c3.5 4.2 5.5 7.2 5.5 10a5.5 5.5 0 0 1-11 0c0-2.8 2-5.8 5.5-10z"/></svg>
@@ -727,8 +739,8 @@ const SHIP_FREE=250, SHIP_COST=22.9;
 /* ============ STATE ============ */
 let cart=[], wish=new Set(), drawerView='cart', currentTab='Todas';
 let quick={id:null,qty:1};
-let payMethod='pix', shipMethod='correios';
-let checkoutForm={name:'',email:'',cep:'',num:'',addr:''};
+let payMethod='pix', shipMethod='correios', checkoutSubmitting=false, checkoutRequest=null;
+let checkoutForm=loadCheckoutDraft();
 
 const $=id=>document.getElementById(id);
 const money=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
@@ -738,6 +750,21 @@ const prod=id=>PRODUCTS.find(p=>p.id===id);
 const instOf=p=>p.price>=15?3:(p.price>=10?2:0);
 const instTxt=p=>{const n=instOf(p);return n?`${n} x de ${money(p.price/n)} sem juros`:'À vista'};
 const offPct=p=>p.old?Math.round((1-p.price/p.old)*100):0;
+
+function loadCheckoutDraft(){
+  try{
+    const saved=JSON.parse(sessionStorage.getItem('liora_checkout_draft')||'{}');
+    return {name:saved.name||'',email:saved.email||'',cep:saved.cep||'',num:saved.num||'',addr:saved.addr||''};
+  }catch{return {name:'',email:'',cep:'',num:'',addr:''}}
+}
+function saveCheckoutDraft(){
+  sessionStorage.setItem('liora_checkout_draft',JSON.stringify(checkoutForm));
+}
+function updateCheckoutField(field,value){checkoutForm[field]=value;saveCheckoutDraft();clearFieldError(field)}
+function selectCheckoutOption(type,value){
+  if(type==='shipping')shipMethod=value;else payMethod=value;
+  saveCheckoutDraft();renderCheckout();
+}
 
 /* ============ TABS + GRID ============ */
 function renderTabs(){
@@ -916,29 +943,33 @@ function renderCheckout(){
   const total=roundCurrency(st+ship-disc);
   $('drawerBody').innerHTML=`
     <button class="back-link" onclick="drawerView='cart';renderDrawer()">← Voltar ao carrinho</button>
+    <div id="checkoutAlert" class="checkout-alert" role="alert" tabindex="-1"></div>
     <p class="chk-step">1 · Entrega</p>
-    <div class="field"><label for="fN">Nome completo</label><input id="fN" placeholder="Seu nome" value="${escapeAttr(checkoutForm.name)}" oninput="checkoutForm.name=this.value"></div>
-    <div class="field"><label for="fE">E-mail</label><input id="fE" type="email" placeholder="voce@email.com" value="${escapeAttr(checkoutForm.email)}" oninput="checkoutForm.email=this.value"></div>
+    <div class="field"><label for="fN">Nome completo</label><input id="fN" name="name" autocomplete="name" maxlength="120" required aria-describedby="fNError" placeholder="Seu nome" value="${escapeAttr(checkoutForm.name)}" oninput="updateCheckoutField('name',this.value)"><span class="field-error" id="fNError"></span></div>
+    <div class="field"><label for="fE">E-mail</label><input id="fE" name="email" type="email" autocomplete="email" inputmode="email" maxlength="160" required aria-describedby="fEError" placeholder="voce@email.com" value="${escapeAttr(checkoutForm.email)}" oninput="updateCheckoutField('email',this.value)"><span class="field-error" id="fEError"></span></div>
     <div class="f-row">
-      <div class="field"><label for="fC">CEP</label><input id="fC" placeholder="80000-000" inputmode="numeric" maxlength="9" value="${escapeAttr(checkoutForm.cep)}" oninput="maskCEP(this);checkoutForm.cep=this.value"><span id="cepStatus" class="cep-status"></span></div>
-      <div class="field"><label for="fNum">Número</label><input id="fNum" placeholder="100" value="${escapeAttr(checkoutForm.num)}" oninput="checkoutForm.num=this.value"></div>
+      <div class="field"><label for="fC">CEP</label><input id="fC" name="postal-code" autocomplete="postal-code" placeholder="80000-000" inputmode="numeric" pattern="[0-9]{5}-?[0-9]{3}" maxlength="9" required aria-describedby="cepStatus fCError" value="${escapeAttr(checkoutForm.cep)}" oninput="maskCEP(this);updateCheckoutField('cep',this.value)"><span id="cepStatus" class="cep-status" aria-live="polite"></span><span class="field-error" id="fCError"></span></div>
+      <div class="field"><label for="fNum">Número</label><input id="fNum" name="address-line2" autocomplete="address-line2" inputmode="text" maxlength="20" required aria-describedby="fNumError" placeholder="100 ou S/N" value="${escapeAttr(checkoutForm.num)}" oninput="updateCheckoutField('num',this.value)"><span class="field-error" id="fNumError"></span></div>
     </div>
-    <div class="field"><label for="fA">Endereço</label><input id="fA" placeholder="Rua, bairro — cidade/UF" value="${escapeAttr(checkoutForm.addr)}" oninput="checkoutForm.addr=this.value"></div>
+    <div class="field"><label for="fA">Endereço</label><input id="fA" name="street-address" autocomplete="street-address" maxlength="250" required aria-describedby="fAError" placeholder="Rua, bairro — cidade/UF" value="${escapeAttr(checkoutForm.addr)}" oninput="updateCheckoutField('addr',this.value)"><span class="field-error" id="fAError"></span></div>
     <p class="chk-step mt">2 · Meio de envio</p>
-    <div class="pay-opt ${shipMethod==='correios'?'sel':''}" onclick="shipMethod='correios';renderCheckout()"><span>Correios — todo o Brasil</span><span class="disc">${st>=SHIP_FREE?'Grátis':money(SHIP_COST)}</span></div>
-    <div class="pay-opt ${shipMethod==='retirada'?'sel':''}" onclick="shipMethod='retirada';renderCheckout()"><span>Retirada em Curitiba/PR</span><span class="disc">Grátis</span></div>
+    <fieldset class="pay-options"><legend>Escolha o meio de envio</legend>
+      <label class="pay-opt ${shipMethod==='correios'?'sel':''}"><span class="pay-opt-main"><input type="radio" name="shipping" value="correios" ${shipMethod==='correios'?'checked':''} onchange="selectCheckoutOption('shipping',this.value)"><span>Correios — todo o Brasil</span></span><span class="disc">${st>=SHIP_FREE?'Grátis':money(SHIP_COST)}</span></label>
+      <label class="pay-opt ${shipMethod==='retirada'?'sel':''}"><span class="pay-opt-main"><input type="radio" name="shipping" value="retirada" ${shipMethod==='retirada'?'checked':''} onchange="selectCheckoutOption('shipping',this.value)"><span>Retirada em Curitiba/PR</span></span><span class="disc">Grátis</span></label>
+    </fieldset>
     <p class="chk-step mt">3 · Pagamento</p>
-    <div class="pay-opt ${payMethod==='pix'?'sel':''}" onclick="payMethod='pix';renderCheckout()"><span>Pix</span><span class="disc">5% de desconto extra</span></div>
-    <div class="pay-opt ${payMethod==='card'?'sel':''}" onclick="payMethod='card';renderCheckout()"><span>Cartão de crédito</span><span class="disc">até 3x sem juros</span></div>
-    <div class="pay-opt ${payMethod==='transfer'?'sel':''}" onclick="payMethod='transfer';renderCheckout()"><span>Transferência</span><span class="disc"></span></div>
-    <div class="pay-opt ${payMethod==='boleto'?'sel':''}" onclick="payMethod='boleto';renderCheckout()"><span>Boleto bancário</span><span class="disc">aprova em 1–2 dias</span></div>`;
+    <fieldset class="pay-options"><legend>Escolha o meio de pagamento</legend>
+      <label class="pay-opt ${payMethod==='pix'?'sel':''}"><span class="pay-opt-main"><input type="radio" name="payment" value="pix" ${payMethod==='pix'?'checked':''} onchange="selectCheckoutOption('payment',this.value)"><span>Pix</span></span><span class="disc">5% de desconto extra</span></label>
+      <label class="pay-opt ${payMethod==='card'?'sel':''}"><span class="pay-opt-main"><input type="radio" name="payment" value="card" ${payMethod==='card'?'checked':''} onchange="selectCheckoutOption('payment',this.value)"><span>Cartão de crédito ou débito</span></span><span class="disc">crédito em até 3x</span></label>
+      <label class="pay-opt ${payMethod==='boleto'?'sel':''}"><span class="pay-opt-main"><input type="radio" name="payment" value="boleto" ${payMethod==='boleto'?'checked':''} onchange="selectCheckoutOption('payment',this.value)"><span>Boleto bancário</span></span><span class="disc">compensação em 1–2 dias úteis</span></label>
+    </fieldset>`;
   $('drawerFoot').innerHTML=`
     <div class="sum-row"><span>Subtotal</span><span>${money(st)}</span></div>
     <div class="sum-row"><span>Frete</span><span>${ship?money(ship):'<span class="free">Grátis</span>'}</span></div>
     ${disc?`<div class="sum-row"><span>Desconto Pix (5%)</span><span style="color:var(--gold-deep)">− ${money(disc)}</span></div>`:''}
     <div class="sum-row total"><span>Total</span><span>${money(total)}</span></div>
-    <button class="btn btn-solid w-full" style="margin-top:14px" onclick="confirmOrder()">${payMethod==='pix'?'Pagar com Pix':'Confirmar pedido'} · ${money(total)}</button>
-    <p style="text-align:center;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin-top:12px">Você será redirecionado a um ambiente seguro do Mercado Pago</p>`;
+    <button class="btn btn-solid w-full checkout-submit" style="margin-top:14px" onclick="confirmOrder()" ${checkoutSubmitting?'disabled aria-busy="true"':''}>${checkoutSubmitting?'Preparando pagamento…':'Continuar no Mercado Pago'} · ${money(total)}</button>
+    <p class="checkout-note">Pagamento processado com segurança pelo <strong>Mercado Pago</strong>. Seus dados serão preservados se for necessário tentar novamente.</p>`;
 }
 /* ============ CEP: MÁSCARA + AUTOCOMPLETE ============ */
 function maskCEP(el){
@@ -969,6 +1000,8 @@ async function buscarCEP(cep){
       const partes=[data.logradouro,data.bairro,`${data.localidade}/${data.uf}`].filter(Boolean);
       fA.value=partes.join(', ');
       checkoutForm.addr=fA.value;
+      saveCheckoutDraft();
+      clearFieldError('addr');
     }
     if(status){status.textContent='Endereço encontrado ✓';status.className='cep-status ok';}
     const fNum=document.getElementById('fNum');
@@ -978,37 +1011,80 @@ async function buscarCEP(cep){
   }
 }
 
+const checkoutFieldIds={name:'fN',email:'fE',cep:'fC',num:'fNum',addr:'fA'};
+function clearFieldError(field){
+  const id=checkoutFieldIds[field],input=id&&$(id),error=id&&$(`${id}Error`);
+  if(input)input.removeAttribute('aria-invalid');
+  if(error)error.textContent='';
+}
+function setFieldError(field,message){
+  const id=checkoutFieldIds[field],input=$(id),error=$(`${id}Error`);
+  if(input)input.setAttribute('aria-invalid','true');
+  if(error)error.textContent=message;
+}
+function showCheckoutAlert(message){
+  const alert=$('checkoutAlert');
+  if(!alert)return;
+  alert.textContent=message;alert.classList.add('on');alert.focus();
+}
+function validateCheckout(){
+  Object.keys(checkoutFieldIds).forEach(clearFieldError);
+  const errors=[];
+  const name=checkoutForm.name.trim(),email=checkoutForm.email.trim();
+  const cep=checkoutForm.cep.replace(/\D/g,''),num=checkoutForm.num.trim(),addr=checkoutForm.addr.trim();
+  if(name.length<2){setFieldError('name','Informe o nome completo.');errors.push('name')}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){setFieldError('email','Digite um e-mail válido, como nome@exemplo.com.');errors.push('email')}
+  if(shipMethod==='correios'){
+    if(cep.length!==8){setFieldError('cep','Digite os 8 números do CEP.');errors.push('cep')}
+    if(!num){setFieldError('num','Informe o número ou escreva S/N.');errors.push('num')}
+    if(addr.length<8){setFieldError('addr','Informe rua, bairro, cidade e estado.');errors.push('addr')}
+  }
+  if(errors.length){
+    showCheckoutAlert('Revise os campos destacados. Seus dados foram mantidos.');
+    $(checkoutFieldIds[errors[0]])?.focus();return null;
+  }
+  return {name,email,cep:checkoutForm.cep.trim(),num,addr};
+}
+
 async function confirmOrder(){
-  const name=$('fN').value.trim(),email=$('fE').value.trim(),cep=$('fC').value.trim(),num=$('fNum').value.trim(),addr=$('fA').value.trim();
-  checkoutForm={name,email,cep,num,addr};
-  if(!name||!email||!$('fE').checkValidity()){toast('Preencha nome e e-mail válidos para continuar');return}
-  if(shipMethod==='correios'&&(!cep||!addr)){toast('Preencha o endereço de entrega');return}
-  const btn=document.querySelector('#drawerFoot .btn-solid');
-  const original=btn.textContent;
-  btn.disabled=true;btn.textContent='Gerando pagamento…';
+  if(checkoutSubmitting)return;
+  checkoutForm={name:$('fN').value,email:$('fE').value,cep:$('fC').value,num:$('fNum').value,addr:$('fA').value};
+  saveCheckoutDraft();
+  const payer=validateCheckout();
+  if(!payer)return;
+  checkoutSubmitting=true;renderCheckout();
+  checkoutRequest=new AbortController();
+  const timeout=setTimeout(()=>checkoutRequest.abort(),15000);
   try{
     const payload={
       items:cart.map(i=>({id:i.id,qty:i.qty,frag:i.frag})),
       payMethod,
       shipping:{method:shipMethod},
-      payer:{name,email,cep,num,addr}
+      payer
     };
     const resp=await fetch('/api/create-preference',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(payload)
+      body:JSON.stringify(payload),
+      signal:checkoutRequest.signal
     });
     const data=await resp.json().catch(()=>({}));
     if(!resp.ok||!data.init_point){
-      toast(data.error||'Não foi possível iniciar o pagamento. Tente novamente.');
-      btn.disabled=false;btn.textContent=original;
+      const message=resp.status===429
+        ?'Muitas tentativas em sequência. Aguarde um minuto e tente novamente.'
+        :data.error||'Não foi possível iniciar o pagamento. Revise os dados e tente novamente.';
+      checkoutSubmitting=false;renderCheckout();showCheckoutAlert(message);
       return;
     }
     if(data.order_id)sessionStorage.setItem('liora_checkout_order',data.order_id);
     window.location.href=data.init_point;
   }catch(err){
-    toast('Erro de conexão. Tente novamente.');
-    btn.disabled=false;btn.textContent=original;
+    checkoutSubmitting=false;renderCheckout();
+    showCheckoutAlert(err.name==='AbortError'
+      ?'O Mercado Pago demorou para responder. Verifique sua conexão e tente novamente.'
+      :'Não foi possível conectar ao Mercado Pago. Seus dados foram mantidos; tente novamente.');
+  }finally{
+    clearTimeout(timeout);checkoutRequest=null;
   }
 }
 function renderSuccess(){
@@ -1071,7 +1147,7 @@ function renderQuick(){
         <div><svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M2.5 10h19"/></svg>Até 3x sem juros</div>
       </div>
       <div style="margin-top:26px">
-        <details><summary>Pagamento</summary><p>Pix com 5% de desconto extra, cartão de crédito em até 3x sem juros, transferência bancária ou boleto.</p></details>
+        <details><summary>Pagamento</summary><p>Pix com 5% de desconto extra, cartão de crédito ou débito e boleto, processados com segurança pelo Mercado Pago.</p></details>
         <details><summary>Envio &amp; retirada</summary><p>Enviamos para todo o Brasil pelos Correios — frete grátis acima de R$ 250. Em Curitiba/PR você também pode combinar a retirada sem custo.</p></details>
         <details><summary>Cuidados com a vela</summary><p>Na primeira queima, deixe acesa por cerca de 2h para nivelar a superfície. Apare o pavio a 5&nbsp;mm antes de cada uso e mantenha longe de correntes de ar.</p></details>
       </div>
@@ -1159,6 +1235,7 @@ renderTabs();renderGrid();updateCounts();
     if(data.status==='approved'){
       cart=[];updateCounts();checkoutForm={name:'',email:'',cep:'',num:'',addr:''};
       sessionStorage.removeItem('liora_checkout_order');
+      sessionStorage.removeItem('liora_checkout_draft');
       toast('Pagamento aprovado ✦ Obrigada pelo seu pedido!');
     }else if(['pending','in_process','authorized'].includes(data.status)){
       toast('Pagamento em análise — avisaremos por e-mail assim que confirmado.');

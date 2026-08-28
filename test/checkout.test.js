@@ -133,6 +133,38 @@ test('estoque é somado por produto mesmo com fragrâncias diferentes', async ()
   assert.match(res.body.error, /Estoque insuficiente/);
 });
 
+test('checkout recusa método ambíguo de transferência e endereço sem número', async () => {
+  process.env.MP_ACCESS_TOKEN = 'TEST-token';
+  process.env.SITE_URL = 'https://liora.example';
+  global.fetch = async () => { throw new Error('não deveria consultar o Mercado Pago'); };
+
+  const transfer = await invoke(createPreference, validRequest({ payMethod: 'transfer' }));
+  assert.equal(transfer.statusCode, 400);
+  assert.match(transfer.body.error, /pagamento inválido/);
+
+  const noNumber = await invoke(createPreference, validRequest({
+    payer: {
+      name: 'Cliente Teste',
+      email: 'cliente@example.com',
+      cep: '80000-000',
+      num: '',
+      addr: 'Rua Teste, Curitiba/PR'
+    }
+  }));
+  assert.equal(noNumber.statusCode, 400);
+  assert.match(noNumber.body.error, /Endereço de entrega incompleto/);
+});
+
+test('checkout publicado usa controles semânticos e resiliência de rede', () => {
+  const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+  assert.match(html, /type="radio" name="payment" value="pix"/);
+  assert.match(html, /autocomplete="email"/);
+  assert.match(html, /autocomplete="postal-code"/);
+  assert.match(html, /AbortController/);
+  assert.match(html, /checkoutSubmitting/);
+  assert.doesNotMatch(html, /value="transfer"/);
+});
+
 test('retorno aprovado só é aceito quando pertence ao mesmo pedido', async () => {
   process.env.MP_ACCESS_TOKEN = 'TEST-token';
   const orderId = 'LIORA-ABC12345-1234ABCD';
