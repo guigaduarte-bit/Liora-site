@@ -2,16 +2,11 @@
 
 const { randomUUID } = require('node:crypto');
 const CATALOG = require('./catalog');
+const { SHIP_FREE, cleanZip, quoteShipping, roundCurrency } = require('./_shipping');
 
-const SHIP_FREE = 250;
-const SHIP_COST = 22.9;
 const PAYMENT_TYPES = ['credit_card', 'debit_card', 'ticket', 'bank_transfer'];
-const PAYMENT_METHODS = new Set(['pix', 'card', 'transfer', 'boleto']);
-const SHIPPING_METHODS = new Set(['correios', 'retirada']);
-
-function roundCurrency(value) {
-  return Math.round((value + Number.EPSILON) * 100) / 100;
-}
+const PAYMENT_METHODS = new Set(['pix', 'card', 'boleto', 'infinitepay']);
+const SHIPPING_METHODS = new Set(['delivery']);
 
 function cleanText(value, maxLength) {
   return String(value || '').replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, maxLength);
@@ -122,10 +117,10 @@ function paymentSettings(payMethod) {
   let allowed = PAYMENT_TYPES;
   let installments;
 
-  if (payMethod === 'pix' || payMethod === 'transfer') allowed = ['bank_transfer'];
+  if (payMethod === 'pix') allowed = ['bank_transfer'];
   if (payMethod === 'boleto') allowed = ['ticket'];
   if (payMethod === 'card') {
-    allowed = ['credit_card', 'debit_card'];
+    allowed = ['credit_card'];
     installments = 3;
   }
 
@@ -135,6 +130,22 @@ function paymentSettings(payMethod) {
       .map((id) => ({ id })),
     ...(installments ? { installments } : {})
   };
+}
+
+function buildInfinitePayItems(cart, shippingCost, selectedQuote) {
+  const items = cart.map((item) => ({
+    quantity: item.quantity,
+    price: Math.round(item.price * 100),
+    description: titleFor(item).slice(0, 120)
+  }));
+  if (shippingCost > 0) {
+    items.push({
+      quantity: 1,
+      price: Math.round(shippingCost * 100),
+      description: `Frete — ${selectedQuote.name}`.slice(0, 120)
+    });
+  }
+  return items;
 }
 
 function setResponseHeaders(res) {
@@ -149,9 +160,8 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Método não permitido' });
   }
 
-  const accessToken = process.env.MP_ACCESS_TOKEN;
   const siteUrl = getSiteUrl();
-  if (!accessToken || !siteUrl) {
+  if (!siteUrl) {
     return res.status(500).json({ error: 'Pagamento temporariamente indisponível' });
   }
 
@@ -167,16 +177,25 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ error: 'Meio de envio inválido' });
     }
 
+    const accessToken = process.env.MP_ACCESS_TOKEN;
+    const infinitePayHandle = cleanText(process.env.INFINITEPAY_HANDLE, 100);
+    if (selectedPayment === 'infinitepay' && !infinitePayHandle) {
+      return res.status(503).json({ error: 'InfinitePay ainda precisa ser ativado para esta loja' });
+    }
+    if (selectedPayment !== 'infinitepay' && !accessToken) {
+      return res.status(500).json({ error: 'Pagamento temporariamente indisponível' });
+    }
+
     const name = cleanText(payer && payer.name, 120);
     const email = cleanText(payer && payer.email, 160).toLowerCase();
-    const zipCode = cleanText(payer && payer.cep, 10).replace(/\D/g, '');
+    const zipCode = cleanZip(payer && payer.cep);
     const streetNumber = cleanText(payer && payer.num, 20);
     const address = cleanText(payer && payer.addr, 250);
 
     if (name.length < 2 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return res.status(400).json({ error: 'Nome e e-mail válidos são obrigatórios' });
     }
-    if (selectedShipping === 'correios' && (zipCode.length !== 8 || !address)) {
+    if (selectedShipping === 'delivery' && (zipCode.length !== 8 || !address)) {
       return res.status(400).json({ error: 'Endereço de entrega incompleto' });
     }
 
@@ -185,9 +204,18 @@ module.exports = async function handler(req, res) {
       (sum, item) => sum + item.price * item.quantity,
       0
     ));
-    const shippingCost = selectedShipping === 'correios' && subtotal < SHIP_FREE
-      ? SHIP_COST
-      : 0;
+    let selectedQuote = null;
+    let shippingCost = 0;
+    if (selectedShipping === 'delivery') {
+      const quoteResult = await quoteShipping({ zipCode, cart, subtotal });
+      const serviceId = cleanText(shipping && shipping.serviceId, 80);
+      selectedQuote = quoteResult.quotes.find((quote) => quote.id === serviceId);
+      if (!selectedQuote) return res.status(400).json({ error: 'Selecione novamente a opção de entrega' });
+      if (selectedQuote.preview) {
+        return res.status(503).json({ error: 'A cotação real da SuperFrete precisa ser conectada antes do pagamento' });
+      }
+      shippingCost = subtotal >= SHIP_FREE ? 0 : selectedQuote.price;
+    }
     const productTotal = selectedPayment === 'pix'
       ? roundCurrency(subtotal * 0.95)
       : subtotal;
@@ -195,12 +223,52 @@ module.exports = async function handler(req, res) {
     const orderId = `LIORA-${Date.now().toString(36).toUpperCase()}-${randomUUID().slice(0, 8).toUpperCase()}`;
     const returnUrl = `${siteUrl}/?checkout=return&order_id=${encodeURIComponent(orderId)}`;
 
+    if (selectedPayment === 'infinitepay') {
+      const infinitePayReturnUrl = `${siteUrl}/?checkout=infinitepay-return&order_id=${encodeURIComponent(orderId)}`;
+      const checkoutPayload = {
+        handle: infinitePayHandle,
+        redirect_url: infinitePayReturnUrl,
+        order_nsu: orderId,
+        customer: { name, email },
+        address: {
+          cep: zipCode,
+          number: streetNumber || 'S/N',
+          complement: address
+        },
+        items: buildInfinitePayItems(cart, shippingCost, selectedQuote)
+      };
+      const webhookUrl = getHttpUrl(process.env.INFINITEPAY_WEBHOOK_URL);
+      if (webhookUrl) checkoutPayload.webhook_url = webhookUrl.toString();
+
+      const infiniteResponse = await fetch('https://api.checkout.infinitepay.io/links', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(checkoutPayload)
+      });
+      const data = await infiniteResponse.json().catch(() => ({}));
+      const checkoutUrl = getHttpUrl(data.url);
+      if (!infiniteResponse.ok || !checkoutUrl || checkoutUrl.hostname !== 'checkout.infinitepay.com.br') {
+        console.error('InfinitePay recusou o checkout', {
+          status: infiniteResponse.status,
+          cause: data.message || data.error || 'resposta inválida'
+        });
+        return res.status(502).json({ error: 'Não foi possível iniciar o pagamento pela InfinitePay' });
+      }
+      return res.status(200).json({
+        id: data.invoice_slug || orderId,
+        init_point: checkoutUrl.toString(),
+        order_id: orderId,
+        provider: 'infinitepay',
+        total
+      });
+    }
+
     const preference = {
       items: buildPaymentItems(cart, selectedPayment, subtotal),
       payer: {
         name,
         email,
-        ...(selectedShipping === 'correios' ? {
+        ...(selectedShipping === 'delivery' ? {
           address: {
             zip_code: zipCode,
             street_name: address,
@@ -208,7 +276,7 @@ module.exports = async function handler(req, res) {
           }
         } : {})
       },
-      ...(selectedShipping === 'correios' ? {
+      ...(selectedShipping === 'delivery' ? {
         shipments: { cost: shippingCost, mode: 'not_specified' }
       } : {}),
       payment_methods: paymentSettings(selectedPayment),
@@ -223,6 +291,9 @@ module.exports = async function handler(req, res) {
       metadata: {
         order_id: orderId,
         shipping_method: selectedShipping,
+        shipping_service: selectedQuote.name,
+        shipping_carrier: selectedQuote.carrier,
+        shipping_delivery_days: selectedQuote.deliveryDays || 0,
         customer_address: address,
         customer_number: streetNumber,
         subtotal,
@@ -255,6 +326,7 @@ module.exports = async function handler(req, res) {
       id: data.id,
       init_point: data.init_point,
       order_id: orderId,
+      provider: 'mercadopago',
       total
     });
   } catch (error) {
