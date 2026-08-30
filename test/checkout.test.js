@@ -256,6 +256,62 @@ test('SuperFrete retorna Correios e outras transportadoras disponíveis', async 
   assert.match(sentQuote.services, /3/);
 });
 
+test('SuperFrete tenta PAC e Sedex quando a primeira consulta não traz modalidades', async () => {
+  process.env.SUPERFRETE_TOKEN = 'SF-token';
+  process.env.SHIP_ORIGIN_CEP = '80000000';
+  let calls = 0;
+  global.fetch = async (url, options) => {
+    assert.equal(url, 'https://api.superfrete.com/api/v0/calculator');
+    calls += 1;
+    const body = JSON.parse(options.body);
+    if (calls === 1) {
+      assert.match(body.services, /3/);
+      return {
+        ok: true,
+        status: 200,
+        json: async () => ([{ id: 3, name: 'Package', error: 'Serviço indisponível' }])
+      };
+    }
+    assert.equal(body.services, '1,2');
+    return {
+      ok: true,
+      status: 200,
+      json: async () => ([{ id: 1, name: 'PAC', price: '26.40', delivery_time: 8, company: { name: 'Correios' } }])
+    };
+  };
+
+  const res = await invoke(shippingQuote, {
+    method: 'POST',
+    body: { cep: '95900-180', items: [{ id: 'botanique', qty: 1 }] }
+  });
+
+  assert.equal(res.statusCode, 200);
+  assert.equal(calls, 2);
+  assert.equal(res.body.quotes[0].name, 'PAC');
+});
+
+test('CEP válido sem modalidade é distinguido de CEP inválido', async () => {
+  process.env.SUPERFRETE_TOKEN = 'SF-token';
+  process.env.SHIP_ORIGIN_CEP = '80000000';
+  process.env.SUPERFRETE_BASE_URL = 'https://sandbox.superfrete.com';
+  global.fetch = async () => ({
+    ok: true,
+    status: 200,
+    json: async () => ([{ id: 1, name: 'PAC', error: 'Rota sem cobertura' }])
+  });
+
+  const res = await invoke(shippingQuote, {
+    method: 'POST',
+    body: { cep: '95900-180', items: [{ id: 'botanique', qty: 1 }] }
+  });
+
+  assert.equal(res.statusCode, 422);
+  assert.equal(res.body.code, 'NO_SHIPPING_OPTIONS');
+  assert.equal(res.body.sandbox, true);
+  assert.match(res.body.error, /CEP localizado/);
+  assert.doesNotMatch(res.body.error, /inválido|revise/i);
+});
+
 test('InfinitePay recebe itens, frete e dados do pedido em centavos', async () => {
   process.env.SITE_URL = 'https://liora.example';
   process.env.INFINITEPAY_HANDLE = 'liora-aromas';
