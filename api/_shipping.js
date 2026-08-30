@@ -102,7 +102,16 @@ async function superFreteQuotes({ destination, cart, subtotal }) {
     })
   });
   const data = await response.json().catch(() => null);
-  if (!response.ok) throw new Error('Não foi possível consultar a SuperFrete');
+  if (!response.ok) {
+    const providerMessage = data && typeof data === 'object'
+      ? String(data.error_description || data.message || data.error || '').slice(0, 240)
+      : '';
+    console.error('SuperFrete recusou a cotação', {
+      status: response.status,
+      message: providerMessage || 'sem mensagem'
+    });
+    throw new Error(`Não foi possível consultar a SuperFrete (HTTP ${response.status})`);
+  }
   const quotes = normalizeQuotes(data);
   if (!quotes.length) throw new Error('Nenhuma opção de entrega disponível para este CEP');
   return { preview: false, quotes };
