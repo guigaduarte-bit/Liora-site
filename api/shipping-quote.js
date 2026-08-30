@@ -42,9 +42,16 @@ module.exports = async function handler(req, res) {
     const result = await quoteShipping({ zipCode, cart, subtotal });
     return res.status(200).json(result);
   } catch (error) {
-    if (error instanceof SyntaxError) return res.status(400).json({ error: 'Dados inválidos' });
-    if (/Carrinho|Produto|Estoque|CEP/i.test(error.message)) return res.status(400).json({ error: error.message });
+    if (error instanceof SyntaxError) return res.status(400).json({ error: 'Dados inválidos', code: 'INVALID_DATA' });
+    if (error && error.code) {
+      return res.status(error.status || 502).json({
+        error: error.message || 'Não foi possível calcular o frete',
+        code: error.code,
+        sandbox: Boolean(error.sandbox)
+      });
+    }
+    if (/Carrinho|Produto|Estoque|CEP/i.test(error.message)) return res.status(400).json({ error: error.message, code: 'INVALID_REQUEST' });
     console.error('Erro ao calcular frete', error);
-    return res.status(502).json({ error: error.message || 'Não foi possível calcular o frete' });
+    return res.status(502).json({ error: 'Não foi possível calcular o frete agora.', code: 'SHIPPING_ERROR' });
   }
 };

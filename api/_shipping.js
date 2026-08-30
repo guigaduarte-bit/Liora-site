@@ -5,6 +5,16 @@ const CURITIBA_SHIPPING_COST = 19.9;
 const SUPERFRETE_ENDPOINT = '/api/v0/calculator';
 const DEFAULT_SERVICES = '1,2,17,3,33,31';
 
+class ShippingQuoteError extends Error {
+  constructor(code, message, { status = 502, sandbox = false } = {}) {
+    super(message);
+    this.name = 'ShippingQuoteError';
+    this.code = code;
+    this.status = status;
+    this.sandbox = sandbox;
+  }
+}
+
 function roundCurrency(value) {
   return Math.round((Number(value) + Number.EPSILON) * 100) / 100;
 }
@@ -74,12 +84,30 @@ function normalizeQuotes(data) {
     .slice(0, 6);
 }
 
-async function superFreteQuotes({ destination, cart, subtotal }) {
-  const origin = cleanZip(process.env.SHIP_ORIGIN_CEP);
-  const token = String(process.env.SUPERFRETE_TOKEN || '').trim();
-  if (!origin || !token) return { preview: true, quotes: previewQuotes(destination) };
+function providerErrors(data) {
+  const messages = [];
+  const add = (value) => {
+    if (typeof value === 'string' && value.trim()) messages.push(value.trim().slice(0, 180));
+    if (value && typeof value === 'object') {
+      add(value.message);
+      add(value.error);
+      add(value.description);
+      add(value.error_description);
+    }
+  };
+  if (Array.isArray(data)) {
+    data.forEach((item) => item && add(item.error));
+  } else if (data && typeof data === 'object') {
+    add(data.message);
+    add(data.error);
+    add(data.error_description);
+    if (Array.isArray(data.errors)) data.errors.forEach(add);
+  }
+  return [...new Set(messages)].slice(0, 8);
+}
 
-  const baseUrl = process.env.SUPERFRETE_BASE_URL || 'https://api.superfrete.com';
+async function requestSuperFrete({ baseUrl, token, destination, cart, subtotal, services }) {
+  const origin = cleanZip(process.env.SHIP_ORIGIN_CEP);
   const response = await fetch(`${baseUrl.replace(/\/$/, '')}${SUPERFRETE_ENDPOINT}`, {
     method: 'POST',
     headers: {
@@ -91,7 +119,7 @@ async function superFreteQuotes({ destination, cart, subtotal }) {
     body: JSON.stringify({
       from: { postal_code: origin },
       to: { postal_code: destination },
-      services: process.env.SUPERFRETE_SERVICES || DEFAULT_SERVICES,
+      services,
       options: {
         own_hand: false,
         receipt: false,
@@ -102,10 +130,69 @@ async function superFreteQuotes({ destination, cart, subtotal }) {
     })
   });
   const data = await response.json().catch(() => null);
-  if (!response.ok) throw new Error('Não foi possível consultar a SuperFrete');
-  const quotes = normalizeQuotes(data);
-  if (!quotes.length) throw new Error('Nenhuma opção de entrega disponível para este CEP');
-  return { preview: false, quotes };
+  return { ok: response.ok, status: response.status, data, services };
+}
+
+async function superFreteQuotes({ destination, cart, subtotal }) {
+  const origin = cleanZip(process.env.SHIP_ORIGIN_CEP);
+  const token = String(process.env.SUPERFRETE_TOKEN || '').trim();
+  if (!origin || !token) return { preview: true, quotes: previewQuotes(destination) };
+
+  const baseUrl = process.env.SUPERFRETE_BASE_URL || 'https://api.superfrete.com';
+  const sandbox = /sandbox\.superfrete\.com/i.test(baseUrl);
+  const requestedServices = process.env.SUPERFRETE_SERVICES || DEFAULT_SERVICES;
+  const attempts = [];
+
+  attempts.push(await requestSuperFrete({
+    baseUrl,
+    token,
+    destination,
+    cart,
+    subtotal,
+    services: requestedServices
+  }));
+
+  let quotes = attempts[0].ok ? normalizeQuotes(attempts[0].data) : [];
+  if (!quotes.length && requestedServices !== '1,2') {
+    attempts.push(await requestSuperFrete({
+      baseUrl,
+      token,
+      destination,
+      cart,
+      subtotal,
+      services: '1,2'
+    }));
+    quotes = attempts[1].ok ? normalizeQuotes(attempts[1].data) : [];
+  }
+
+  if (quotes.length) return { preview: false, quotes };
+
+  const diagnostics = attempts.map((attempt) => ({
+    status: attempt.status,
+    services: attempt.services,
+    messages: providerErrors(attempt.data)
+  }));
+  const hadAcceptedRequest = attempts.some((attempt) => attempt.ok);
+
+  if (hadAcceptedRequest) {
+    console.warn('SuperFrete não retornou modalidades', { sandbox, attempts: diagnostics });
+    throw new ShippingQuoteError(
+      'NO_SHIPPING_OPTIONS',
+      sandbox
+        ? 'CEP localizado, mas a SuperFrete Sandbox não retornou uma modalidade para esta rota.'
+        : 'CEP localizado, mas a SuperFrete não retornou uma modalidade para esta rota no momento.',
+      { status: 422, sandbox }
+    );
+  }
+
+  console.error('SuperFrete recusou a cotação', { sandbox, attempts: diagnostics });
+  throw new ShippingQuoteError(
+    'SHIPPING_PROVIDER_UNAVAILABLE',
+    sandbox
+      ? 'A SuperFrete Sandbox não conseguiu calcular esta rota agora.'
+      : 'A SuperFrete não conseguiu calcular esta rota agora.',
+    { status: 503, sandbox }
+  );
 }
 
 async function quoteShipping({ zipCode, cart, subtotal }) {
@@ -120,7 +207,14 @@ async function quoteShipping({ zipCode, cart, subtotal }) {
     deliveryDays: null,
     preview: false
   }] : [];
-  const superFrete = await superFreteQuotes({ destination, cart, subtotal });
+  let superFrete;
+  try {
+    superFrete = await superFreteQuotes({ destination, cart, subtotal });
+  } catch (error) {
+    if (!localQuotes.length) throw error;
+    console.warn('Cotação externa indisponível; mantendo entrega local', { code: error.code || 'UNKNOWN' });
+    superFrete = { preview: false, quotes: [] };
+  }
   const freeShipping = subtotal >= SHIP_FREE;
   const quotes = [...localQuotes, ...superFrete.quotes]
     .filter((quote, index, all) => all.findIndex((item) => item.id === quote.id) === index)
@@ -141,6 +235,7 @@ async function quoteShipping({ zipCode, cart, subtotal }) {
 module.exports = {
   SHIP_FREE,
   CURITIBA_SHIPPING_COST,
+  ShippingQuoteError,
   cleanZip,
   isCuritibaZip,
   normalizeQuotes,
