@@ -581,14 +581,9 @@ button,a{-webkit-tap-highlight-color:transparent}
 <!-- NEWSLETTER -->
 <section class="section news">
   <div class="wrap reveal">
-    <p class="eyebrow">Newsletter</p>
-    <h2 class="display">Cadastre-se e receba nossas ofertas</h2>
-    <p>Descubra o luxo da sua fragrância — lançamentos, coleções e ofertas exclusivas no seu e-mail.</p>
-    <form class="news-form" id="newsForm" onsubmit="return subscribe(event)">
-      <input type="email" id="newsEmail" placeholder="Seu melhor e-mail" required aria-label="E-mail para newsletter">
-      <button type="submit">Inscrever</button>
-    </form>
-    <p class="news-ok" id="newsOk">Obrigado por se inscrever! A partir de agora você receberá nossas novidades no seu e-mail ✦</p>
+    <p class="eyebrow">Novidades Liora</p>
+    <h2 class="display">Uma nova experiência está chegando</h2>
+    <p>Em breve, você poderá receber lançamentos, coleções e ofertas da Liora por e-mail.</p>
   </div>
 </section>
 
@@ -606,7 +601,9 @@ button,a{-webkit-tap-highlight-color:transparent}
           <li><a href="#inicio">Início</a></li>
           <li><a href="#colecoes">Coleções</a></li>
           <li><a href="#quemsomos">Quem Somos</a></li>
-          <li><a href="#" onclick="toast('Trocas em até 7 dias após o recebimento — fale conosco no WhatsApp');return false">Trocas e Devoluções</a></li>
+          <li><a href="/trocas-e-devolucoes.html">Trocas e Devoluções</a></li>
+          <li><a href="/termos-de-uso.html">Termos de Uso</a></li>
+          <li><a href="/politica-de-privacidade.html">Política de Privacidade</a></li>
         </ul>
       </div>
       <div>
@@ -1154,14 +1151,7 @@ function closeAll(){
 }
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAll();closeSearch()}});
 
-/* ============ NEWSLETTER / TOAST ============ */
-function subscribe(e){
-  e.preventDefault();
-  $('newsForm').style.display='none';
-  $('newsOk').style.display='block';
-  toast('Inscrição confirmada ✦');
-  return false;
-}
+/* ============ TOAST ============ */
 let toastT;
 function toast(msg){
   $('toastMsg').textContent=msg;
