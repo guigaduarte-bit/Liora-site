@@ -1,0 +1,12 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "redirects": [
+    { "source": "/trocas-e-devolucoes", "destination": "/trocas-e-devolucoes.html", "permanent": true },
+    { "source": "/termos-de-uso", "destination": "/termos-de-uso.html", "permanent": true },
+    { "source": "/privacidade", "destination": "/politica-de-privacidade.html", "permanent": true },
+    { "source": "/esculturas", "destination": "/velas-decorativas/", "permanent": true }
+  ]
+}

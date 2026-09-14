@@ -8,444 +8,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-:root{
-  --cream:#FBF6EC;
-  --ivory:#F2EADA;
-  --sand:#E9DFC9;
-  --ink:#2B2118;
-  --ink-soft:#5C4F40;
-  --gold:#B08A47;
-  --gold-deep:#8C6A2F;
-  --umber:#241B12;
-  --line:rgba(43,33,24,.14);
-  --shadow:0 18px 50px rgba(43,33,24,.14);
-  --display:'Cormorant Garamond',Georgia,serif;
-  --ui:'Jost','Helvetica Neue',Arial,sans-serif;
-}
-*{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{font-family:var(--ui);background:var(--cream);color:var(--ink);font-weight:300;line-height:1.6;-webkit-font-smoothing:antialiased}
-img{display:block;max-width:100%}
-button{font-family:var(--ui);cursor:pointer;background:none;border:none;color:inherit}
-a{color:inherit;text-decoration:none}
-::selection{background:var(--gold);color:var(--cream)}
-:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
-
-/* ---------- utilities ---------- */
-.wrap{max-width:1320px;margin:0 auto;padding:0 clamp(20px,4vw,56px)}
-.eyebrow{font-size:11px;letter-spacing:.42em;text-transform:uppercase;color:var(--gold-deep);font-weight:400}
-.display{font-family:var(--display);font-weight:500;line-height:1.08}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;font-size:11.5px;letter-spacing:.22em;text-transform:uppercase;font-weight:400;padding:16px 34px;border:1px solid transparent;transition:all .35s ease}
-.btn-solid{background:var(--gold);color:var(--cream)}
-.btn-solid:hover{background:var(--gold-deep)}
-.btn-ink{background:var(--ink);color:var(--cream)}
-.btn-ink:hover{background:var(--umber)}
-.btn-ink[disabled],.btn-solid[disabled]{background:#A89A86;cursor:not-allowed}
-.btn-outline{border-color:var(--ink);color:var(--ink)}
-.btn-outline:hover{background:var(--ink);color:var(--cream)}
-.btn-outline-cream{border-color:rgba(251,246,236,.7);color:var(--cream)}
-.btn-outline-cream:hover{background:var(--cream);color:var(--ink)}
-.section{padding:clamp(70px,9vw,128px) 0}
-.section-head{text-align:center;max-width:680px;margin:0 auto clamp(40px,5vw,64px)}
-.section-head h2{font-size:clamp(34px,4.4vw,54px);margin:14px 0 0}
-.reveal{opacity:0;transform:translateY(26px);transition:opacity .9s ease,transform .9s ease}
-.reveal.in{opacity:1;transform:none}
-
-/* ---------- announcement ---------- */
-.announce{background:var(--umber);color:rgba(251,246,236,.85);text-align:center;font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;padding:11px 16px}
-.announce b{color:var(--gold);font-weight:400}
-
-/* ---------- header ---------- */
-header{position:sticky;top:0;z-index:60;background:rgba(251,246,236,.92);backdrop-filter:blur(14px);border-bottom:1px solid transparent;transition:border-color .3s,box-shadow .3s}
-header.scrolled{border-bottom-color:var(--line);box-shadow:0 10px 30px rgba(43,33,24,.06)}
-.header-in{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;height:84px;gap:16px}
-.h-left{display:flex;align-items:center;gap:6px}
-nav.main{display:flex;gap:clamp(16px,2.4vw,34px)}
-nav.main a{font-size:11.5px;letter-spacing:.24em;text-transform:uppercase;position:relative;padding:6px 0}
-nav.main a::after{content:'';position:absolute;left:0;bottom:0;width:0;height:1px;background:var(--gold);transition:width .35s}
-nav.main a:hover::after{width:100%}
-.brand{text-align:center;line-height:1}
-.brand .name{font-family:var(--display);font-size:30px;letter-spacing:.42em;margin-right:-.42em;font-weight:500}
-.brand .tag{display:block;font-size:8.5px;letter-spacing:.5em;margin-right:-.5em;text-transform:uppercase;color:var(--gold-deep);margin-top:7px}
-.h-actions{display:flex;justify-content:flex-end;align-items:center;gap:6px}
-.icon-btn{position:relative;width:42px;height:42px;display:grid;place-items:center;border-radius:50%;transition:background .3s}
-.icon-btn:hover{background:rgba(176,138,71,.12)}
-.icon-btn svg{width:20px;height:20px;stroke:var(--ink);fill:none;stroke-width:1.3}
-.count{position:absolute;top:3px;right:1px;min-width:16px;height:16px;border-radius:9px;background:var(--gold);color:var(--cream);font-size:9.5px;display:grid;place-items:center;padding:0 4px;font-weight:500;opacity:0;transform:scale(.5);transition:all .3s}
-.count.on{opacity:1;transform:scale(1)}
-.burger{display:none}
-
-/* ---------- hero ---------- */
-.hero{position:relative;min-height:min(88vh,820px);display:flex;align-items:flex-end;overflow:hidden;color:var(--cream)}
-.hero img.bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:55% 45%;transform:scale(1.04);animation:heroZoom 8s ease forwards}
-@keyframes heroZoom{to{transform:scale(1)}}
-.hero::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(24,16,8,.78) 0%,rgba(24,16,8,.34) 50%,rgba(24,16,8,.14) 100%),linear-gradient(100deg,rgba(24,16,8,.5) 0%,rgba(24,16,8,0) 55%)}
-.hero .wrap{position:relative;z-index:2;width:100%}
-.hero-content{position:relative;z-index:2;padding-bottom:clamp(56px,8vw,96px);max-width:640px}
-.hero .eyebrow{color:#E8CF9A;text-shadow:0 1px 14px rgba(0,0,0,.6)}
-.hero h1{font-size:clamp(44px,6.4vw,84px);margin:18px 0 20px;text-shadow:0 2px 30px rgba(0,0,0,.25)}
-.hero h1 em{font-style:italic;font-weight:400}
-.hero p{font-size:16px;font-weight:300;max-width:50ch;color:rgba(251,246,236,.92);margin-bottom:34px}
-.hero-cta{display:flex;gap:14px;flex-wrap:wrap}
-
-/* ---------- marquee ---------- */
-.marquee{background:var(--gold);color:var(--cream);overflow:hidden;padding:13px 0;font-size:10.5px;letter-spacing:.34em;text-transform:uppercase;white-space:nowrap}
-.marquee-track{display:inline-flex;gap:64px;animation:slide 32s linear infinite;padding-left:64px}
-.marquee-track span{display:inline-flex;align-items:center;gap:64px}
-@keyframes slide{to{transform:translateX(-50%)}}
-
-/* ---------- product grid ---------- */
-.tabs{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-bottom:clamp(36px,4vw,52px)}
-.tab{font-size:11px;letter-spacing:.22em;text-transform:uppercase;padding:11px 22px;border:1px solid var(--line);border-radius:99px;transition:all .3s}
-.tab:hover{border-color:var(--gold)}
-.tab.active{background:var(--ink);color:var(--cream);border-color:var(--ink)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:clamp(20px,2.6vw,36px)}
-.grid.aroma-mode{display:block}
-.aroma-catalog{position:relative;overflow:hidden;border:1px solid rgba(140,106,47,.28);background:linear-gradient(145deg,#F8F1E5 0%,#EEE3D1 52%,#F8F3E9 100%);padding:clamp(28px,5vw,72px)}
-.aroma-catalog::before,.aroma-catalog::after{content:'';position:absolute;border:1px solid rgba(176,138,71,.22);border-radius:50%;pointer-events:none}
-.aroma-catalog::before{width:330px;height:330px;right:-180px;top:-190px}
-.aroma-catalog::after{width:250px;height:250px;left:-150px;bottom:-165px}
-.aroma-hero{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(260px,.9fr);gap:clamp(24px,5vw,76px);align-items:end;padding-bottom:clamp(30px,4vw,52px);border-bottom:1px solid rgba(43,33,24,.13)}
-.aroma-title{font-family:var(--display);font-size:clamp(42px,5.8vw,74px);font-weight:500;line-height:.96;margin:13px 0 18px}
-.aroma-title em{display:block;color:var(--gold-deep);font-weight:400}
-.aroma-lead{max-width:55ch;color:var(--ink-soft);font-size:15px}
-.aroma-guide{background:rgba(251,246,236,.68);border:1px solid rgba(176,138,71,.2);padding:22px 24px}
-.aroma-guide-title{font-family:var(--display);font-size:24px;font-weight:500;line-height:1.1;margin-bottom:8px}
-.aroma-guide p{font-size:12.5px;color:var(--ink-soft)}
-.aroma-legend{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;font-size:9px;letter-spacing:.14em;text-transform:uppercase}
-.aroma-legend span{display:inline-flex;align-items:center;gap:7px}
-.aroma-legend i{width:7px;height:7px;border-radius:50%;background:var(--gold);display:inline-block}
-.aroma-legend .archive-dot{background:transparent;border:1px solid var(--gold-deep)}
-.aroma-family-grid{position:relative;z-index:1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-top:24px}
-.aroma-family{--family:#A7606B;background:rgba(255,252,246,.72);border:1px solid rgba(43,33,24,.1);padding:clamp(22px,3vw,34px);transition:transform .3s ease,border-color .3s ease,box-shadow .3s ease}
-.aroma-family:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--family) 45%,transparent);box-shadow:0 16px 40px rgba(43,33,24,.08)}
-.aroma-family.floral{--family:#A84F66}
-.aroma-family.aromatico{--family:#7B628F}
-.aroma-family.citrico{--family:#B57A34}
-.aroma-family.citrico-frutal{--family:#78843B}
-.aroma-family.frutal{--family:#A44B45}
-.aroma-family.gourmand{--family:#8A6546}
-.aroma-family-head{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:18px;padding-bottom:15px;border-bottom:1px solid rgba(43,33,24,.1)}
-.aroma-family-name{display:flex;gap:12px;align-items:center;font-family:var(--display);font-style:italic;font-size:clamp(25px,2.7vw,34px);font-weight:500;line-height:1;color:var(--family)}
-.aroma-symbol{width:11px;height:11px;border:1px solid var(--family);transform:rotate(45deg);background:color-mix(in srgb,var(--family) 25%,transparent);flex:0 0 auto}
-.aroma-profile{max-width:190px;color:var(--family);font-size:8.5px;letter-spacing:.17em;text-transform:uppercase;text-align:right;line-height:1.55}
-.aroma-items{display:grid;gap:4px}
-.aroma-item{display:grid;grid-template-columns:minmax(130px,.72fr) minmax(0,1.28fr) auto;gap:14px;align-items:center;padding:12px 0;border-bottom:1px solid rgba(43,33,24,.08)}
-.aroma-item:last-child{border-bottom:0}
-.aroma-name{font-family:var(--display);font-size:20px;font-weight:600;line-height:1.1}
-.aroma-notes{font-size:11.5px;color:var(--ink-soft);line-height:1.5}
-.aroma-status{align-self:center;border:1px solid rgba(176,138,71,.4);color:var(--gold-deep);font-size:7.5px;letter-spacing:.18em;text-transform:uppercase;padding:4px 7px;white-space:nowrap}
-.aroma-catalog-foot{position:relative;z-index:1;display:flex;justify-content:space-between;gap:24px;align-items:center;margin-top:24px;padding:clamp(22px,3vw,34px);background:var(--umber);color:var(--cream)}
-.aroma-catalog-foot h3{font-family:var(--display);font-size:clamp(26px,3vw,38px);font-weight:500;line-height:1.05}
-.aroma-catalog-foot p{font-size:12px;color:rgba(251,246,236,.68);margin-top:7px}
-.aroma-catalog-foot .btn{flex:0 0 auto;border-color:rgba(251,246,236,.72);color:var(--cream)}
-.aroma-catalog-foot .btn:hover{background:var(--cream);color:var(--ink)}
-.card{position:relative;display:flex;flex-direction:column;transition:opacity .4s,transform .4s}
-.card.hide{display:none}
-.card-media{position:relative;aspect-ratio:4/5;overflow:hidden;background:#fff;cursor:pointer}
-.card-media img{width:100%;height:100%;object-fit:cover;transition:transform 1s cubic-bezier(.2,.6,.2,1)}
-.card:hover .card-media img{transform:scale(1.055)}
-.card.soldout .card-media img{opacity:.5;filter:grayscale(.5)}
-.badge{position:absolute;top:14px;left:14px;background:var(--gold);font-size:9px;letter-spacing:.26em;text-transform:uppercase;padding:7px 12px;color:var(--cream);z-index:2}
-.badge.out{background:#6E5F4C}
-.wish-btn{position:absolute;top:12px;right:12px;width:38px;height:38px;border-radius:50%;background:rgba(251,246,236,.9);display:grid;place-items:center;z-index:2;transition:transform .25s}
-.wish-btn:hover{transform:scale(1.1)}
-.wish-btn svg{width:17px;height:17px;fill:none;stroke:var(--ink);stroke-width:1.4;transition:all .25s}
-.wish-btn.on svg{fill:var(--gold);stroke:var(--gold)}
-.quick-add{position:absolute;left:0;right:0;bottom:0;background:rgba(36,27,18,.92);color:var(--cream);font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;padding:15px;transform:translateY(100%);transition:transform .4s ease,background .3s;z-index:2}
-.card:hover .quick-add{transform:none}
-.quick-add:hover{background:var(--gold)}
-.quick-add[disabled]{background:#857664;cursor:not-allowed}
-.card-info{padding:18px 4px 6px;text-align:center}
-.card-info h3{font-family:var(--display);font-size:21px;font-weight:500;cursor:pointer;line-height:1.2}
-.card-info h3:hover{color:var(--gold-deep)}
-.card-price{font-size:14.5px;letter-spacing:.06em;font-weight:400;margin-top:9px}
-.old{text-decoration:line-through;color:var(--ink-soft);font-size:12px;margin-right:9px;font-weight:300}
-.inst{font-size:10.5px;color:var(--ink-soft);margin-top:6px;letter-spacing:.08em}
-.tag-frete{display:inline-block;font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold-deep);border:1px solid rgba(176,138,71,.45);padding:4px 9px;margin-top:10px}
-
-/* ---------- split banners ---------- */
-.split{display:grid;grid-template-columns:1fr 1fr;min-height:620px;background:var(--ivory)}
-.split-media{position:relative;overflow:hidden;min-height:420px}
-.split-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.4s ease}
-.split:hover .split-media img{transform:scale(1.04)}
-.split-body{display:flex;flex-direction:column;justify-content:center;padding:clamp(44px,6vw,100px)}
-.split-body h2{font-size:clamp(34px,3.8vw,52px);margin:16px 0 22px}
-.split-body p{color:var(--ink-soft);max-width:50ch;margin-bottom:26px;font-size:15.5px}
-.split.rev .split-media{order:2}
-.split.dark{background:var(--umber);color:var(--cream)}
-.split.dark p{color:rgba(251,246,236,.74)}
-.split.dark .eyebrow{color:#E4C98F}
-
-/* ---------- ovals ---------- */
-.ovals{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(24px,4vw,64px);max-width:1080px;margin:0 auto}
-.oval{text-align:center}
-.oval-frame{position:relative;aspect-ratio:3/4;border-radius:50%;overflow:hidden;border:1px solid var(--line);padding:0;cursor:pointer;display:block;width:100%;transition:box-shadow .4s;background:#fff}
-.oval-frame::after{content:'';position:absolute;inset:7px;border:1px solid rgba(176,138,71,.55);border-radius:50%;z-index:2;transition:inset .4s}
-.oval-frame:hover::after{inset:13px}
-.oval-frame:hover{box-shadow:var(--shadow)}
-.oval-frame img{width:100%;height:100%;object-fit:cover;transition:transform 1.2s ease}
-.oval-frame:hover img{transform:scale(1.07)}
-.oval h3{font-family:var(--display);font-size:26px;font-weight:500;margin-top:24px}
-.oval p{font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-soft);margin-top:8px}
-
-/* ---------- services ---------- */
-.services{border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-.services-in{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;padding:clamp(44px,5vw,64px) 0;text-align:center}
-.service svg{width:30px;height:30px;stroke:var(--gold-deep);fill:none;stroke-width:1.1;margin:0 auto 16px}
-.service h4{font-size:11px;letter-spacing:.24em;text-transform:uppercase;font-weight:400;margin-bottom:8px}
-.service p{font-size:12.5px;color:var(--ink-soft)}
-
-/* ---------- newsletter ---------- */
-.news{background:var(--ivory);text-align:center}
-.news h2{font-size:clamp(32px,3.6vw,46px);margin:14px 0 12px}
-.news p{color:var(--ink-soft);max-width:48ch;margin:0 auto 32px}
-.news-form{display:flex;max-width:480px;margin:0 auto;border:1px solid var(--ink)}
-.news-form input{flex:1;border:none;background:transparent;padding:16px 20px;font-family:var(--ui);font-size:13px;letter-spacing:.06em;color:var(--ink);min-width:0}
-.news-form input:focus{outline:none}
-.news-form button{background:var(--ink);color:var(--cream);padding:0 30px;font-size:11px;letter-spacing:.22em;text-transform:uppercase;transition:background .3s;white-space:nowrap}
-.news-form button:hover{background:var(--gold-deep)}
-.news-ok{display:none;font-family:var(--display);font-size:21px;color:var(--gold-deep);font-style:italic;max-width:52ch;margin:0 auto}
-
-/* ---------- footer ---------- */
-footer{background:var(--umber);color:rgba(251,246,236,.78);font-size:13px}
-.foot-top{display:grid;grid-template-columns:1.3fr 1fr 1fr 1.1fr;gap:clamp(32px,4vw,64px);padding:clamp(56px,7vw,90px) 0 48px}
-.foot-logo{width:150px;border-radius:50%;mix-blend-mode:screen;opacity:.95;margin-bottom:20px}
-.foot-brand p{max-width:34ch;line-height:1.8;font-size:12.5px}
-footer h5{font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;color:#E4C98F;font-weight:400;margin-bottom:20px}
-footer ul{list-style:none}
-footer li{margin-bottom:12px}
-footer li a{transition:color .3s}
-footer li a:hover{color:#E4C98F}
-.foot-bottom{border-top:1px solid rgba(251,246,236,.12);padding:26px 0;display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap;font-size:11px;letter-spacing:.12em}
-.pays{display:flex;gap:8px;flex-wrap:wrap}
-.pay{border:1px solid rgba(251,246,236,.25);padding:5px 10px;font-size:9px;letter-spacing:.18em;border-radius:3px}
-
-/* ---------- whatsapp float ---------- */
-.wa-float{position:fixed;right:22px;bottom:22px;width:56px;height:56px;border-radius:50%;background:#23A455;display:grid;place-items:center;z-index:70;box-shadow:0 12px 30px rgba(0,0,0,.25);transition:transform .3s}
-.wa-float:hover{transform:scale(1.08)}
-.wa-float svg{width:28px;height:28px;fill:#fff}
-
-/* ---------- drawers & modals ---------- */
-.scrim{position:fixed;inset:0;background:rgba(24,16,8,.5);opacity:0;pointer-events:none;transition:opacity .4s;z-index:80}
-.scrim.on{opacity:1;pointer-events:auto}
-.drawer{position:fixed;top:0;right:0;height:100%;width:min(460px,100%);background:var(--cream);z-index:90;transform:translateX(105%);transition:transform .45s cubic-bezier(.3,.7,.2,1);display:flex;flex-direction:column;box-shadow:-20px 0 60px rgba(0,0,0,.18)}
-.drawer.on{transform:none}
-.drawer-head{display:flex;justify-content:space-between;align-items:center;padding:22px 26px;border-bottom:1px solid var(--line)}
-.drawer-head h3{font-family:var(--display);font-size:24px;font-weight:500}
-.drawer-body{flex:1;overflow-y:auto;padding:24px 26px}
-.drawer-foot{border-top:1px solid var(--line);padding:22px 26px;background:var(--cream)}
-.close-x svg{width:20px;height:20px;stroke:var(--ink);stroke-width:1.4}
-
-.ship-bar{margin-bottom:22px}
-.ship-bar p{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
-.ship-bar p b{color:var(--gold-deep);font-weight:500}
-.ship-track{height:3px;background:var(--sand);border-radius:3px;overflow:hidden}
-.ship-fill{height:100%;background:var(--gold);width:0;transition:width .6s ease}
-
-.cart-item{display:grid;grid-template-columns:86px 1fr auto;gap:16px;padding:18px 0;border-bottom:1px solid var(--line)}
-.cart-item img{width:86px;height:104px;object-fit:cover;background:#fff}
-.ci-name{font-family:var(--display);font-size:18px;font-weight:500;line-height:1.2}
-.ci-meta{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin:5px 0 12px}
-.qty{display:inline-flex;align-items:center;border:1px solid var(--line)}
-.qty button{width:30px;height:30px;font-size:15px;display:grid;place-items:center;transition:background .2s}
-.qty button:hover{background:var(--ivory)}
-.qty span{width:32px;text-align:center;font-size:13px}
-.ci-right{display:flex;flex-direction:column;align-items:flex-end;justify-content:space-between}
-.ci-price{font-size:14px;font-weight:400}
-.ci-remove{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);text-decoration:underline;text-underline-offset:3px}
-.ci-remove:hover{color:var(--gold-deep)}
-.cart-empty{text-align:center;padding:70px 10px;color:var(--ink-soft)}
-.cart-empty .display{font-size:26px;color:var(--ink);margin-bottom:10px}
-.sum-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:10px;color:var(--ink-soft)}
-.sum-row.total{font-size:16px;color:var(--ink);font-weight:400;border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
-.sum-row .free{color:var(--gold-deep);letter-spacing:.1em;text-transform:uppercase;font-size:11px}
-.w-full{width:100%}
-
-/* checkout */
-.chk-step{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold-deep);margin:0 0 18px}
-.chk-step.mt{margin-top:26px}
-.field{margin-bottom:14px;position:relative}
-.cep-status{display:block;font-size:10px;letter-spacing:.04em;margin-top:5px;color:var(--ink-soft)}
-.cep-status.loading{color:var(--ink-soft)}
-.cep-status.ok{color:#5a7d5a}
-.cep-status.error{color:#a8564a}
-.field label{display:block;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:7px}
-.field input{width:100%;border:1px solid var(--line);background:transparent;padding:13px 14px;font-family:var(--ui);font-size:13.5px;color:var(--ink)}
-.field input:focus{outline:none;border-color:var(--gold)}
-.f-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.pay-opt{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);padding:15px 16px;margin-bottom:10px;cursor:pointer;transition:border-color .25s;font-size:13px;gap:10px}
-.pay-opt:hover{border-color:var(--gold)}
-.pay-opt.sel{border-color:var(--ink);background:rgba(176,138,71,.07)}
-.pay-opt .disc{font-size:10px;letter-spacing:.12em;color:var(--gold-deep);text-transform:uppercase;text-align:right}
-.pay-opt[aria-disabled="true"]{cursor:default;color:var(--ink-soft);background:rgba(255,255,255,.22)}
-.ship-opt{align-items:flex-start}
-.ship-opt-main{display:flex;flex-direction:column;gap:4px}
-.ship-opt-main small{font-size:10.5px;color:var(--ink-soft);letter-spacing:.03em}
-.ship-preview-note{font-size:10.5px;line-height:1.5;color:var(--ink-soft);margin:-2px 0 12px;padding:10px 12px;border-left:2px solid var(--gold)}
-.ship-loading{display:flex;align-items:center;gap:9px;color:var(--ink-soft)}
-.ship-loading::before{content:'';width:13px;height:13px;border:1px solid var(--line);border-top-color:var(--gold-deep);border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.back-link{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;text-decoration:underline;text-underline-offset:4px;margin-bottom:20px;display:inline-block}
-.success{text-align:center;padding:60px 10px}
-.success .ok-ring{width:74px;height:74px;border-radius:50%;border:1px solid var(--gold);display:grid;place-items:center;margin:0 auto 26px}
-.success .ok-ring svg{width:30px;height:30px;stroke:var(--gold);stroke-width:1.5;fill:none}
-.success h3{font-family:var(--display);font-size:30px;font-weight:500;margin-bottom:12px}
-.success p{color:var(--ink-soft);font-size:13.5px;max-width:34ch;margin:0 auto 8px}
-.success .order{font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold-deep);margin:18px 0 30px}
-
-/* quick view modal */
-.modal{position:fixed;inset:0;z-index:95;display:grid;place-items:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .35s}
-.modal.on{opacity:1;pointer-events:auto}
-.modal-card{background:var(--cream);width:min(960px,100%);max-height:92vh;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;position:relative;transform:translateY(20px);transition:transform .45s ease;box-shadow:var(--shadow)}
-.modal.on .modal-card{transform:none}
-.modal-close{position:absolute;top:14px;right:14px;z-index:3;width:40px;height:40px;border-radius:50%;background:rgba(251,246,236,.9);display:grid;place-items:center}
-.modal-media{background:#fff;min-height:420px;position:relative}
-.modal-media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-.modal-body{padding:clamp(28px,4vw,48px)}
-.modal-body h3{font-family:var(--display);font-size:32px;font-weight:500;line-height:1.12;margin:10px 0 6px}
-.m-variant{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-soft)}
-.m-price{font-size:20px;margin:16px 0 4px;font-weight:400}
-.m-price .old{font-size:14px}
-.m-inst{font-size:12px;color:var(--ink-soft);letter-spacing:.06em;margin-bottom:18px}
-.m-desc{font-size:14px;color:var(--ink-soft);margin-bottom:20px}
-.stock-note{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#A1660F;margin-bottom:6px}
-.opt-label{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-soft);margin:16px 0 8px}
-.frag-input{width:100%;border:1px solid var(--line);background:transparent;padding:12px 14px;font-family:var(--ui);font-size:13px;color:var(--ink)}
-.frag-input:focus{outline:none;border-color:var(--gold)}
-.pyramid{border-top:1px solid var(--line);margin-top:22px}
-.pyr-row{display:grid;grid-template-columns:110px 1fr;gap:14px;padding:13px 0;border-bottom:1px solid var(--line);font-size:13px}
-.pyr-row span{font-size:9.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold-deep);padding-top:3px}
-.m-actions{display:flex;gap:12px;margin-top:26px}
-.m-specs{display:flex;gap:22px;margin-top:22px;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);flex-wrap:wrap}
-.m-specs div{display:flex;align-items:center;gap:8px}
-.m-specs svg{width:15px;height:15px;stroke:var(--gold-deep);fill:none;stroke-width:1.3}
-details{border-bottom:1px solid var(--line)}
-details summary{font-size:11px;letter-spacing:.22em;text-transform:uppercase;padding:16px 0;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center}
-details summary::after{content:'+';font-size:16px;color:var(--gold-deep);transition:transform .3s}
-details[open] summary::after{transform:rotate(45deg)}
-details p{font-size:13px;color:var(--ink-soft);padding-bottom:16px}
-
-/* search overlay */
-.search-ov{position:fixed;inset:0;background:var(--cream);z-index:100;transform:translateY(-100%);transition:transform .5s cubic-bezier(.3,.7,.2,1);overflow-y:auto}
-.search-ov.on{transform:none}
-.search-in{max-width:860px;margin:0 auto;padding:90px 24px 60px}
-.search-field{display:flex;align-items:center;gap:16px;border-bottom:1px solid var(--ink);padding-bottom:16px}
-.search-field svg{width:24px;height:24px;stroke:var(--ink);fill:none;stroke-width:1.2;flex-shrink:0}
-.search-field input{flex:1;border:none;background:transparent;font-family:var(--display);font-size:clamp(24px,3.6vw,38px);color:var(--ink);min-width:0}
-.search-field input:focus{outline:none}
-.search-field input::placeholder{color:rgba(43,33,24,.3)}
-.search-hint{font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--ink-soft);margin-top:14px}
-.search-res{margin-top:44px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:24px}
-.sr-item{cursor:pointer}
-.sr-item img{aspect-ratio:4/5;object-fit:cover;width:100%;background:#fff;margin-bottom:12px;transition:opacity .3s}
-.sr-item:hover img{opacity:.85}
-.sr-item h4{font-family:var(--display);font-size:18px;font-weight:500;line-height:1.2}
-.sr-item p{font-size:12px;color:var(--ink-soft);margin-top:4px}
-.search-close{position:absolute;top:26px;right:30px}
-
-/* mobile menu */
-.mmenu{position:fixed;inset:0;background:var(--umber);color:var(--cream);z-index:100;transform:translateX(-100%);transition:transform .5s cubic-bezier(.3,.7,.2,1);display:flex;flex-direction:column;justify-content:center;padding:40px}
-.mmenu.on{transform:none}
-.mmenu a{font-family:var(--display);font-size:clamp(32px,8vw,46px);font-weight:500;padding:12px 0;border-bottom:1px solid rgba(251,246,236,.12)}
-.mmenu a:hover{color:#E4C98F}
-.mmenu .tagline{font-size:10px;letter-spacing:.4em;text-transform:uppercase;color:#E4C98F;margin-top:36px}
-.mmenu-close{position:absolute;top:26px;right:26px}
-.mmenu-close svg{stroke:var(--cream)}
-
-/* toast */
-.toast{position:fixed;bottom:28px;left:50%;transform:translate(-50%,80px);background:var(--ink);color:var(--cream);font-size:11px;letter-spacing:.2em;text-transform:uppercase;padding:15px 28px;z-index:120;opacity:0;transition:all .45s ease;display:flex;gap:12px;align-items:center;pointer-events:none;max-width:90vw;text-align:center}
-.toast.on{opacity:1;transform:translate(-50%,0)}
-.toast svg{width:15px;height:15px;stroke:#E4C98F;fill:none;stroke-width:1.6;flex-shrink:0}
-
-/* ---------- responsive ---------- */
-@media(max-width:1024px){
-  .foot-top{grid-template-columns:1fr 1fr}
-}
-@media(max-width:880px){
-  nav.main{display:none}
-  .burger{display:grid}
-  .split,.split.rev{grid-template-columns:1fr}
-  .split.rev .split-media{order:0}
-  .ovals{grid-template-columns:1fr;max-width:380px}
-  .services-in{grid-template-columns:1fr 1fr;gap:36px 20px}
-  .modal-card{grid-template-columns:1fr;max-height:94vh}
-  .modal-media{min-height:340px;aspect-ratio:4/3}
-  .header-in{height:72px}
-  .brand .name{font-size:24px}
-  .aroma-hero{grid-template-columns:1fr;align-items:start}
-  .aroma-family-grid{grid-template-columns:1fr}
-}
-@media(max-width:560px){
-  .announce{font-size:9px;letter-spacing:.2em;padding:9px 12px}
-  .hide-sm{display:none}
-  .grid{grid-template-columns:repeat(2,1fr);gap:14px}
-  .quick-add{transform:none}
-  .card-info h3{font-size:16px}
-  .news-form{flex-direction:column;border:none;gap:10px}
-  .news-form input{border:1px solid var(--ink);padding:15px 18px}
-  .news-form button{padding:16px}
-  .foot-bottom{justify-content:center;text-align:center}
-  .hero h1{font-size:40px}
-  .f-row{grid-template-columns:1fr}
-  .wa-float{width:50px;height:50px;right:16px;bottom:16px}
-
-  /* impede o iOS de dar zoom automático ao focar campos (exige 16px) */
-  .field input,.frag-input,.news-form input,.search-field input{font-size:16px}
-
-  /* alvos de toque maiores no carrinho e no checkout */
-  .qty button{width:38px;height:38px;font-size:17px}
-  .qty span{width:36px}
-  .pay-opt{padding:16px}
-  .cart-item{grid-template-columns:72px 1fr auto;gap:12px}
-  .cart-item img{width:72px;height:88px}
-
-  /* ações do quick-view empilhadas, mais fáceis de tocar */
-  .m-actions{flex-direction:column}
-  .m-actions .btn{width:100%}
-
-  /* CTAs do hero em coluna, ocupando a largura toda */
-  .hero-cta{flex-direction:column}
-  .hero-cta .btn{width:100%}
-
-  /* respeita a área segura em iPhones com notch/home indicator */
-  .wa-float{bottom:calc(16px + env(safe-area-inset-bottom))}
-  .toast{bottom:calc(28px + env(safe-area-inset-bottom))}
-  .drawer-foot{padding-bottom:calc(22px + env(safe-area-inset-bottom))}
-  .grid.aroma-mode{display:block}
-  .aroma-catalog{padding:24px 16px}
-  .aroma-title{font-size:42px}
-  .aroma-guide{padding:18px}
-  .aroma-family{padding:20px 17px}
-  .aroma-family-head{display:block}
-  .aroma-profile{max-width:none;text-align:left;margin-top:12px}
-  .aroma-item{grid-template-columns:1fr auto;gap:5px 10px}
-  .aroma-notes{grid-column:1/-1}
-  .aroma-catalog-foot{align-items:flex-start;flex-direction:column}
-  .aroma-catalog-foot .btn{width:100%}
-}
-@media(max-width:380px){
-  .brand .name{font-size:22px;letter-spacing:.28em;margin-right:-.28em}
-  .brand .tag{display:none}
-  .h-actions{gap:2px}
-  .icon-btn{width:38px;height:38px}
-  .header-in{gap:4px}
-}
-/* dispositivos sem hover (touch): garante que o "adicionar rápido" do
-   produto sempre apareça, já que :hover nunca acontece no toque */
-@media(hover:none){
-  .quick-add{transform:none}
-}
-@media(prefers-reduced-motion:reduce){
-  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
-  .reveal{opacity:1;transform:none}
-}
-html,body{overflow-x:hidden}
-button,a{-webkit-tap-highlight-color:transparent}
-</style>
+<link rel="stylesheet" href="/assets/storefront.css">
+<link rel="stylesheet" href="/assets/seo-pages.css">
 </head>
 <body>
+<a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
 
 <div class="announce">Frete grátis a partir de <b>R$ 150</b><span class="hide-sm"> &nbsp;·&nbsp; Pagamento no Pix: <b>5% de desconto extra</b></span></div>
 
@@ -454,13 +21,13 @@ button,a{-webkit-tap-highlight-color:transparent}
     <div class="h-left">
       <button class="icon-btn burger" aria-label="Abrir menu" onclick="openMenu()"><svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
       <nav class="main" aria-label="Navegação principal">
-      <a href="#inicio">Início</a>
-      <a href="#colecoes">Coleções</a>
-      <a href="#contato">Contato</a>
-      <a href="#quemsomos">Quem Somos</a>
+      <a href="/">Início</a>
+      <a href="/velas-aromaticas/">Coleções</a>
+      <a href="/#contato">Contato</a>
+      <a href="/sobre/">Quem Somos</a>
       </nav>
     </div>
-    <a class="brand" href="#inicio" aria-label="Liora — Aromas de Luxo">
+    <a class="brand" href="/" aria-label="Liora — Aromas de Luxo">
       <span class="name">LIORA</span>
       <span class="tag">Aromas de Luxo</span>
     </a>
@@ -472,16 +39,17 @@ button,a{-webkit-tap-highlight-color:transparent}
   </div>
 </header>
 
+<main id="conteudo">
 <!-- HERO -->
 <section class="hero" id="inicio">
   <img class="bg" data-i="eiffel" alt="Vela escultural Lady Veil da Liora diante da Torre Eiffel">
   <div class="wrap"><div class="hero-content">
     <p class="eyebrow">Velas artesanais de luxo · Curitiba/PR</p>
     <h1 class="display">A escultura<br><em>que perfuma.</em></h1>
-    <p>Liora nasceu do encontro entre arte, aroma e emoção. Cada vela é uma experiência sensorial criada para transformar ambientes e despertar sentimentos.</p>
+    <p>Liora nasceu do encontro entre arte, aroma e emoção. Nossas velas artesanais aromáticas e decorativas são criadas para transformar ambientes e despertar sentimentos.</p>
     <div class="hero-cta">
-      <a class="btn btn-solid" href="#colecoes">Ver coleções</a>
-      <a class="btn btn-outline-cream" href="#quemsomos">Quem somos</a>
+      <a class="btn btn-solid" href="/velas-aromaticas/">Ver coleções</a>
+      <a class="btn btn-outline-cream" href="/sobre/">Quem somos</a>
     </div>
   </div></div>
 </section>
@@ -500,7 +68,7 @@ button,a{-webkit-tap-highlight-color:transparent}
       <p class="eyebrow">Escultura + aroma + presente</p>
       <h2 class="display">Nossas coleções</h2>
     </div>
-    <div class="tabs reveal" role="tablist" aria-label="Filtrar coleções" id="tabsBar"></div>
+    <div class="tabs reveal" aria-label="Navegar pelas coleções" id="tabsBar"></div>
     <div class="grid" id="grid"></div>
   </div>
 </section>
@@ -513,7 +81,7 @@ button,a{-webkit-tap-highlight-color:transparent}
     <h2 class="display">Lady Veil &amp; bustos artesanais</h2>
     <p>Cada peça é escultura, aroma e presente — feita à mão, com intenção. Da Lady Veil ao Anjo em vitral, do Camafeu Fada à Sagrada Família: velas que decoram antes de acender e permanecem na memória depois.</p>
     <p style="font-size:13px">Fragrância personalizada pelo cliente, sem custo adicional.</p>
-    <div><a class="btn btn-outline" href="#colecoes" onclick="setTab('Esculturas')">Explorar Esculturas</a></div>
+    <div><a class="btn btn-outline" href="/velas-decorativas/">Explorar Esculturas</a></div>
   </div>
 </section>
 
@@ -526,17 +94,17 @@ button,a{-webkit-tap-highlight-color:transparent}
     </div>
     <div class="ovals">
       <div class="oval reveal">
-        <button class="oval-frame" onclick="goCat('Flora Linea')" aria-label="Ver coleção Flora Linea"><img data-p="botanique" alt="Vela Botanique da coleção Flora Linea"></button>
+        <a class="oval-frame" href="/flora-linea/" aria-label="Ver coleção Flora Linea"><img data-p="botanique" alt="Vela Botanique da coleção Flora Linea"></a>
         <h3>Flora Linea</h3>
         <p>Botânica · Jardins em cera</p>
       </div>
       <div class="oval reveal">
-        <button class="oval-frame" onclick="goCat('Esculturas')" aria-label="Ver coleção Esculturas"><img data-p="vela-escultural-lady-veil-phie3" alt="Vela escultural Lady Veil"></button>
+        <a class="oval-frame" href="/velas-decorativas/" aria-label="Ver coleção Esculturas"><img data-p="vela-escultural-lady-veil-phie3" alt="Vela escultural Lady Veil"></a>
         <h3>Esculturas</h3>
         <p>Lady Veil · Anjos · Camafeus</p>
       </div>
       <div class="oval reveal">
-        <button class="oval-frame" onclick="goCat('Clássico')" aria-label="Ver coleção Clássico"><img data-p="chama-esculpida" alt="Vela Chama Esculpida da coleção Clássico"></button>
+        <a class="oval-frame" href="/classico/" aria-label="Ver coleção Clássico"><img data-p="chama-esculpida" alt="Vela Chama Esculpida da coleção Clássico"></a>
         <h3>Clássico</h3>
         <p>Pérolas · Cilindros · Lumina</p>
       </div>
@@ -552,7 +120,7 @@ button,a{-webkit-tap-highlight-color:transparent}
     <h2 class="display">Luxo que se sente,<br>luz que transforma</h2>
     <p>A Liora nasceu do encontro entre arte, aroma e emoção. Cada vela é criada com design refinado, fragrâncias sofisticadas e produção artesanal que respeita o tempo, o toque e a essência de cada detalhe.</p>
     <p>Nossa chama não ilumina apenas o espaço — simboliza presença, calma e beleza. É o luxo que não grita: ele se revela na sutileza do brilho, no perfume suave e na textura das ceras naturais.</p>
-    <div><a class="btn btn-outline-cream" href="#colecoes">Descobrir as velas</a></div>
+    <div><a class="btn btn-outline-cream" href="/sobre/">Conheça a Liora</a></div>
   </div>
 </section>
 
@@ -581,17 +149,13 @@ button,a{-webkit-tap-highlight-color:transparent}
 <!-- NEWSLETTER -->
 <section class="section news">
   <div class="wrap reveal">
-    <p class="eyebrow">Newsletter</p>
-    <h2 class="display">Cadastre-se e receba nossas ofertas</h2>
-    <p>Descubra o luxo da sua fragrância — lançamentos, coleções e ofertas exclusivas no seu e-mail.</p>
-    <form class="news-form" id="newsForm" onsubmit="return subscribe(event)">
-      <input type="email" id="newsEmail" placeholder="Seu melhor e-mail" required aria-label="E-mail para newsletter">
-      <button type="submit">Inscrever</button>
-    </form>
-    <p class="news-ok" id="newsOk">Obrigado por se inscrever! A partir de agora você receberá nossas novidades no seu e-mail ✦</p>
+    <p class="eyebrow">Novidades Liora</p>
+    <h2 class="display">Uma nova experiência está chegando</h2>
+    <p>Em breve, você poderá receber lançamentos, coleções e ofertas da Liora por e-mail.</p>
   </div>
 </section>
 
+</main>
 <!-- FOOTER -->
 <footer id="contato">
   <div class="wrap">
@@ -603,10 +167,12 @@ button,a{-webkit-tap-highlight-color:transparent}
       <div>
         <h5>Departamentos</h5>
         <ul>
-          <li><a href="#inicio">Início</a></li>
-          <li><a href="#colecoes">Coleções</a></li>
-          <li><a href="#quemsomos">Quem Somos</a></li>
-          <li><a href="#" onclick="toast('Trocas em até 7 dias após o recebimento — fale conosco no WhatsApp');return false">Trocas e Devoluções</a></li>
+          <li><a href="/">Início</a></li>
+          <li><a href="/velas-aromaticas/">Coleções</a></li>
+          <li><a href="/sobre/">Quem Somos</a></li>
+          <li><a href="/trocas-e-devolucoes.html">Trocas e Devoluções</a></li>
+          <li><a href="/termos-de-uso.html">Termos de Uso</a></li>
+          <li><a href="/politica-de-privacidade.html">Política de Privacidade</a></li>
         </ul>
       </div>
       <div>
@@ -616,8 +182,7 @@ button,a{-webkit-tap-highlight-color:transparent}
       <div>
         <h5>Contato</h5>
         <ul>
-          <li><a href="https://wa.me/5521969121244" target="_blank" rel="noopener">WhatsApp (21) 96912-1244</a></li>
-          <li><a href="mailto:jullianas@gmail.com">jullianas@gmail.com</a></li>
+          <li>Dados de contato omitidos neste preview público</li>
           <li>Curitiba/PR · Frete fixo de R$ 19,90</li>
           <li><a href="https://www.instagram.com/liora_aromas_de_luxo" target="_blank" rel="noopener">Instagram @liora_aromas_de_luxo</a></li>
           <li><a href="https://www.facebook.com/share/1KdL6dtP7F/" target="_blank" rel="noopener">Facebook</a></li>
@@ -625,14 +190,14 @@ button,a{-webkit-tap-highlight-color:transparent}
       </div>
     </div>
     <div class="foot-bottom">
-      <span>© 2026 Liora Aromas de Luxo · Juliana Straatmann · Todos os direitos reservados</span>
+      <span>© 2026 Liora Aromas de Luxo · Todos os direitos reservados</span>
       <div class="pays"><span class="pay">PIX</span><span class="pay">VISA</span><span class="pay">MASTER</span><span class="pay">ELO</span><span class="pay">AMEX</span><span class="pay">BOLETO</span><span class="pay">MERCADO PAGO</span><span class="pay">INFINITEPAY</span></div>
     </div>
   </div>
 </footer>
 
-<!-- WHATSAPP FLOAT -->
-<a class="wa-float" href="https://wa.me/5521969121244" target="_blank" rel="noopener" aria-label="Fale conosco no WhatsApp">
+<!-- ATENDIMENTO NO PREVIEW -->
+<a class="wa-float" href="/#contato" aria-label="Atendimento da Liora — dados omitidos no preview">
   <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.6-6.1c-.3-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1-.2.3-.7.8-.8 1-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-2-1.2 7.4 7.4 0 0 1-1.4-1.7c-.1-.3 0-.4.1-.5l.4-.5c.1-.2.2-.3.3-.5v-.5c0-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.1s.9 2.5 1 2.6c.1.2 1.8 2.7 4.3 3.8.6.3 1.1.4 1.5.6.6.2 1.2.2 1.6.1.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.2-.2-.4-.3z"/></svg>
 </a>
 
@@ -670,558 +235,18 @@ button,a{-webkit-tap-highlight-color:transparent}
 <!-- MOBILE MENU -->
 <nav class="mmenu" id="mmenu" aria-label="Menu móvel">
   <button class="mmenu-close icon-btn" aria-label="Fechar menu" onclick="closeAll()"><svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke-width:1.4"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
-  <a href="#inicio" onclick="closeAll()">Início</a>
-  <a href="#colecoes" onclick="closeAll()">Coleções</a>
-  <a href="#contato" onclick="closeAll()">Contato</a>
-  <a href="#quemsomos" onclick="closeAll()">Quem Somos</a>
+  <a href="/" onclick="closeAll()">Início</a>
+  <a href="/velas-aromaticas/" onclick="closeAll()">Coleções</a>
+  <a href="/#contato" onclick="closeAll()">Contato</a>
+  <a href="/sobre/" onclick="closeAll()">Quem Somos</a>
   <p class="tagline">Liora · Aromas de Luxo · Curitiba/PR</p>
 </nav>
 
 <!-- TOAST -->
 <div class="toast" id="toast"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg><span id="toastMsg"></span></div>
 
-<script>
-/* ============ EMBEDDED IMAGES ============ */
-const IMGS={
-  veiled:'/assets/images/veiled.jpg',
-  pair:'/assets/images/pair.jpg',
-  eiffel:'/assets/images/eiffel.jpg',
-  logo:'/assets/images/logo.jpg'
-};
-const PIMG={"vela-escultural-lady-veil-phie3": "/assets/images/vela-escultural-lady-veil-phie3.webp", "vela-decorativa-anjo-em-vitral-1sbe9": "/assets/images/vela-decorativa-anjo-em-vitral-1sbe9.webp", "botanique": "/assets/images/botanique.webp", "botanique-150-gr-1gyzj": "/assets/images/botanique-150-gr-1gyzj.webp", "botanique-70-ml-1dqj4": "/assets/images/botanique-70-ml-1dqj4.webp", "ursinho": "/assets/images/ursinho.webp", "flordevenus": "/assets/images/flordevenus.webp", "abraco-em-luz": "/assets/images/abraco-em-luz.webp", "mini-bubble": "/assets/images/mini-bubble.webp", "bolhas": "/assets/images/bolhas.webp", "no-deluz": "/assets/images/no-deluz.webp", "lioracoral": "/assets/images/lioracoral.webp", "essenza-cube": "/assets/images/essenza-cube.webp", "kit-silhouette": "/assets/images/kit-silhouette.webp", "trevo": "/assets/images/trevo.webp", "perolas": "/assets/images/perolas.webp", "kit-boho-glass": "/assets/images/kit-boho-glass.webp", "lumina": "/assets/images/lumina.webp", "gota-de-luz1": "/assets/images/gota-de-luz1.webp", "geometricafacetada": "/assets/images/geometricafacetada.webp", "cilindro-mosaico": "/assets/images/cilindro-mosaico.webp", "chama-esculpida": "/assets/images/chama-esculpida.webp", "jardim-encantado": "/assets/images/jardim-encantado.webp", "camafeufada": "/assets/images/camafeufada.webp", "botanicavasogesso": "/assets/images/botanicavasogesso.webp", "peonia": "/assets/images/peonia.webp", "sagrada-familia": "/assets/images/sagrada-familia.webp"};
-document.querySelectorAll('[data-i]').forEach(el=>el.src=IMGS[el.dataset.i]);
-document.querySelectorAll('[data-p]').forEach(el=>el.src=PIMG[el.dataset.p]);
-document.getElementById('fav').href=IMGS.logo;
-
-/* ============ STORE DATA (lioraaromasdeluxo.lojavirtualnuvem.com.br) ============ */
-const AROMA_TAB='Catálogo de Aromas';
-const CATS=['Todas','Essenciais','Esculturas','Clássico','Boho Glass','Flora Linea','Kits e Presentes',AROMA_TAB];
-const AROMA_FAMILIES=[
-  {name:'Floral Frutal',className:'floral-frutal',profile:'Romântico · Fresco · Feminino',items:[
-    {name:'Sim Arman',notes:'Figo · Damasco · Cedro · Musk'},
-    {name:'Fig Flower',notes:'Figo · Damasco · Cedro · Musk'},
-    {name:'Cereja & Avelã',notes:'Cereja · Gardênia · Cacau · Musk'}
-  ]},
-  {name:'Floral',className:'floral',profile:'Delicado · Clássico · Elegante',items:[
-    {name:'Blum',notes:'Néroli · Jasmim · Tuberosa · Musk'},
-    {name:'Cloé',notes:'Peônia · Magnólia · Musk'},
-    {name:'Ar da Primavera',notes:'Floral verde'},
-    {name:'Flor de Peônia',notes:'Peônia · Rosa'},
-    {name:'White Gardênia',notes:'Gardênia · Jasmim · Almíscar',archive:true}
-  ]},
-  {name:'Floral Aromático',className:'aromatico',profile:'Sofisticado · Sereno',items:[
-    {name:'Lavanda Sofisticada',notes:'Lavanda · Almíscar · Acorde aromático'}
-  ]},
-  {name:'Floral Cítrico',className:'citrico',profile:'Leve · Fresco · Doce',items:[
-    {name:'Lichia Sublime',notes:'Lichia · Rosa · Baunilha · Musk'}
-  ]},
-  {name:'Cítrico Frutal',className:'citrico-frutal',profile:'Vibrante · Energizante · Ensolarado',items:[
-    {name:'Goji & Tarocco Orange',notes:'Laranja · Bergamota · Goji · Manga · Buquê · Musk'},
-    {name:'Aurora Cítrica',notes:'Perfil cítrico frutal',archive:true}
-  ]},
-  {name:'Frutal',className:'frutal',profile:'Alegre · Tropical · Sedutor',items:[
-    {name:'Trick or Treat',notes:'Maçapão · Pera · Berry · Beetle Juice'},
-    {name:'Smell of Dawn',notes:'Lichia · Rosa · Violeta · Berry'},
-    {name:'Beetle Juice',notes:'Perfil frutal',archive:true}
-  ]},
-  {name:'Oriental Gourmand',className:'gourmand',profile:'Quente · Envolvente · Confortante',items:[
-    {name:'Dolci Notte',notes:'Baunilha · Amêndoa · Cacau'}
-  ]}
-];
-const PRODUCTS=[{"id": "vela-escultural-lady-veil-phie3", "name": "Vela escultural Lady Veil", "price": 62.0, "old": 65.0, "stock": 10, "soldout": false, "cats": ["Essenciais", "Esculturas", "Clássico", "Kits e Presentes"], "desc": "Vela decorativa feminina em formato de busto com véu e flores, perfeita para dar sofisticação ao seu ambiente.", "dims": "Peso: 110gr", "frag": true}, {"id": "vela-decorativa-anjo-em-vitral-1sbe9", "name": "Vela Decorativa Anjo em vitral", "price": 55.0, "old": 59.0, "stock": 20, "soldout": false, "cats": ["Essenciais", "Esculturas", "Kits e Presentes"], "desc": "Vela decorativa com anjo e criança, ornamentos florais e moldura detalhada. Perfeita para decorar ou presentear.", "dims": "Peso: 100 gr · Medidas: 11cm x 6,2 cm", "frag": true}, {"id": "botanique", "name": "Botanique - 250gr", "price": 75.0, "old": 80.0, "stock": 2, "soldout": false, "cats": ["Essenciais", "Flora Linea", "Kits e Presentes"], "desc": "Vela em vidro, luminária,com tampa metálica, decorada com pássaros e flores, perfeita para decorar e ambientar. Aproveite e compre já!", "dims": "", "frag": true}, {"id": "botanique-150-gr-1gyzj", "name": "Botanique - 150gr", "price": 52.0, "old": 55.0, "stock": 12, "soldout": false, "cats": ["Essenciais", "Flora Linea"], "desc": "Conjunto de velas decorativas em copo de vidro com tampa de madeira, estampas florais e de pássaro. Decore e aromatize seu ambiente. Compre já!", "dims": "", "frag": true}, {"id": "botanique-70-ml-1dqj4", "name": "Botanique - 70gr", "price": 25.0, "old": 28.0, "stock": 5, "soldout": false, "cats": ["Essenciais", "Flora Linea", "Kits e Presentes"], "desc": "Vela perfumada em copo de vidro com tampa de madeira e estampa floral delicada. Decore e aromatize seu ambiente com charme. Compre já!", "dims": "Peso 70gr | Medidas: 9cm x 9cm x 7cm (C x L x A) · Medidas: 9cm x 9cm x 7cm (C x L x A)", "frag": true}, {"id": "ursinho", "name": "PEQUENO AMOR", "price": 10.0, "old": 12.0, "stock": 30, "soldout": false, "cats": ["Essenciais"], "desc": "Pedidos acima de 20 unidades: 10% de desconto\nPedidos acima de 30 unidades: 15% de desconto\nPedidos acima de 50 unidades: 20% de desconto\nPeças feitas a mão, com intenção.\nPrazo confecção - 5 a 7 dias.", "dims": "Peso: 40gr · Medidas: 4cmX4cmX5cm (CXLXA)", "frag": true}, {"id": "flordevenus", "name": "FLOR DE VÊNUS", "price": 55.0, "old": 59.0, "stock": 5, "soldout": false, "cats": ["Flora Linea"], "desc": "Vela decorativa em formato de rosto feminino com flores, perfeita para uma decoração charmosa e delicada.", "dims": "Peso: 120gr · Medidas: 8cmX4cmX10cm (CXLXA)", "frag": true}, {"id": "abraco-em-luz", "name": "ABRAÇO EM LUZ", "price": 42.0, "old": 46.0, "stock": 10, "soldout": false, "cats": ["Flora Linea"], "desc": "Escultura decorativa de anjo com asas grandes segurando criança, em material translúcido. Ideal para decoração elegante. Compre já!", "dims": "Peso: 65gr · Medidas: 8cmX4cmX10cm (CXLXA)", "frag": true}, {"id": "mini-bubble", "name": "MINI BUBBLE", "price": 16.0, "old": 18.0, "stock": 30, "soldout": false, "cats": ["Essenciais"], "desc": "Vela decorativa bolinhas pequena com textura em relevo e acabamento liso para um toque acolhedor. Ideal para decorar ambientes.", "dims": "Peso: 40gr · Medidas: 4cmX4cmX4cm (CXLXA)", "frag": true}, {"id": "bolhas", "name": "BOLHAS", "price": 30.0, "old": 32.0, "stock": 10, "soldout": false, "cats": ["Clássico"], "desc": "Esfera decorativa com textura de bolhas, perfeita para realçar ambientes com estilo e charme. Compre já e transforme seu espaço!", "dims": "Peso: 88gr · Medidas: 7cmX5cmX6cm (CXLXA)", "frag": true}, {"id": "no-deluz", "name": "NÓ DE LUZ", "price": 32.0, "old": 36.0, "stock": 5, "soldout": false, "cats": ["Essenciais"], "desc": "Decore seu ambiente com a vela nó entrelaçada. Textura artesanal única e exclusiva.", "dims": "Peso: 55gr · Medidas: 8cmX8cmX8cm (CXLXA)", "frag": true}, {"id": "lioracoral", "name": "LIORA CORAL", "price": 32.0, "old": 36.0, "stock": 10, "soldout": false, "cats": ["Esculturas"], "desc": "Realce a beleza natural e sofisticada da sua decoração com a vela Liora Coral escultural.. Inspirada na delicadeza das formas orgânicas, esta coleção traz pe...", "dims": "Peso: 65gr · Medidas: 7cmX7cmX7cm (CXLXA)", "frag": true}, {"id": "essenza-cube", "name": "ESSENZA CUBE", "price": 42.0, "old": 45.0, "stock": 4, "soldout": false, "cats": ["Esculturas"], "desc": "Realce a beleza e a originalidade da sua decoração com a Escultura Essenza cube , uma vela artesanal que une arte, design e emoção em uma peça única. Com seu...", "dims": "Peso: 125gr · Medidas: 7cmX7cmX7cm (CXLXA)", "frag": true}, {"id": "kit-silhouette", "name": "KIT SILHOUETTE", "price": 75.0, "old": 80.0, "stock": 3, "soldout": false, "cats": ["Esculturas"], "desc": "Realce a originalidade e o impacto visual da sua decoração com o Kit Silhouette da Linha Esculturas. Esta coleção exclusiva traz peças que combinam design in...", "dims": "Peso: 253gr · Medidas: 8cmX6cmX13cm (CXLXA)", "frag": true}, {"id": "trevo", "name": "TREVO", "price": 42.0, "old": 46.0, "stock": 4, "soldout": false, "cats": ["Esculturas"], "desc": "Realce sua decoração com a Escultura Trevo Cilindro, uma peça que une design contemporâneo e simbolismo em um formato único e marcante. Inspirada na forma do...", "dims": "Peso: 120gr · Medidas: 5cmX5cmX12cm (CXLXA)", "frag": true}, {"id": "perolas", "name": "PÉROLAS", "price": 42.0, "old": 46.0, "stock": 4, "soldout": false, "cats": ["Clássico"], "desc": "Vela decorativa cilíndrica com textura em bolinhas, perfeita para decorar e criar aconchego. Compre agora e transforme seu espaço!", "dims": "Peso: 130gr · Medidas: 7cmX7cmX8cm (CXLXA)", "frag": true}, {"id": "kit-boho-glass", "name": "KIT BOHO GLASS", "price": 75.0, "old": 80.0, "stock": 2, "soldout": false, "cats": ["Boho Glass", "Kits e Presentes"], "desc": "Vela perfumada em vidro listrado com tampa bolinhas para ambientes aromatizados com estilo. Compre já!", "dims": "Peso: 350gr · Medidas: 8cmX8cmX10cm (CXLXA)", "frag": false}, {"id": "lumina", "name": "LUMINA", "price": 46.0, "old": 49.0, "stock": 5, "soldout": false, "cats": ["Clássico"], "desc": "Vaso decorativo arredondado com textura geométrica, perfeito para valorizar sua decoração interna. Compre agora e transforme seu ambiente!", "dims": "Peso: 130gr · Medidas: 7cmX7cmX9cm (CXLXA)", "frag": true}, {"id": "gota-de-luz1", "name": "GOTA DE LUZ", "price": 42.0, "old": 46.0, "stock": 10, "soldout": false, "cats": ["Esculturas"], "desc": "Vela artesanal esculturas redonda espiral. Compre agora e dê charme ao seu espaço!", "dims": "Peso: 108gr · Medidas: 7cmX7cmX8cm (CXLXA).", "frag": true}, {"id": "geometricafacetada", "name": "LIORA ELEGANCE", "price": 32.0, "old": 36.0, "stock": 5, "soldout": false, "cats": ["Esculturas"], "desc": "Vela aromática esculturas em formato geométrico facetado, perfeito para decorar e dar charme ao seu ambiente. Compre agora e transforme seu espaço.", "dims": "Peso: 100gr · Medidas: 6cmX6cmX5cm (CXLXA).", "frag": true}, {"id": "cilindro-mosaico", "name": "CILINDRO MOSAICO", "price": 42.0, "old": 46.0, "stock": 5, "soldout": false, "cats": ["Esculturas"], "desc": "Vela decorativa com textura geométrica e aroma suave para ambientação moderna. Decore seu espaço com estilo e aconchego.", "dims": "Peso: 130gr · Medidas: 6cmX6cmX8cm (CXLXA)", "frag": true}, {"id": "chama-esculpida", "name": "CHAMA ESCULPIDA", "price": 62.0, "old": 65.0, "stock": 5, "soldout": false, "cats": ["Clássico"], "desc": "Vela decorativa cilíndrica com relevo em ondas, perfeita para transformar ambientes internos. Adquira já e decore com estilo!", "dims": "Peso: 208gr · Medidas: 7cmX7cmX13cm (CXLXA)", "frag": true}, {"id": "jardim-encantado", "name": "JARDIM ENCANTADO", "price": 85.0, "old": 89.9, "stock": 3, "soldout": false, "cats": ["Flora Linea", "Kits e Presentes"], "desc": "Decore ambientes com arranjo de velas florais em vaso decorativo. Ideal para trazer charme e aroma suave.", "dims": "Peso: 700gr · Medidas: 15cmX15cmX18cm (CXLXA)", "frag": true}, {"id": "camafeufada", "name": "CAMAFEU FADA", "price": 8.0, "old": 12.0, "stock": 30, "soldout": false, "cats": ["Essenciais", "Esculturas", "Clássico", "Kits e Presentes"], "desc": "Presente decorativo com fita e relevo de fada com flores para um ambiente delicado e clássico. Decore com charme, compre agora!", "dims": "Peso: 50gr · Medidas: 10cmX8cmX11cm (CXLXA).", "frag": true}, {"id": "botanicavasogesso", "name": "JARDIM ENCANTADO", "price": 75.0, "old": 79.9, "stock": 0, "soldout": true, "cats": ["Flora Linea"], "desc": "Vela artesanal em vaso com flores detalhadas, perfeita para decorar com charme e delicadeza. Adquira já a sua!", "dims": "Peso: 200gr · Medidas: 12cmX12cmX12cm (CXLXA)", "frag": true}, {"id": "peonia", "name": "FLOR DE VÊNUS", "price": 12.0, "old": 15.0, "stock": 8, "soldout": false, "cats": ["Flora Linea"], "desc": "Vela decorativa em forma de flor com base texturizada. Decore seu ambiente com charme.", "dims": "Peso 100gr · Medidas: 10cmX10cmX7cm (CXLXA).", "frag": true}, {"id": "sagrada-familia", "name": "Sagrada Familia", "price": 52.0, "old": 55.0, "stock": 5, "soldout": false, "cats": ["Essenciais", "Esculturas"], "desc": "Escultura Família Sagrada em material liso, ideal para decoração religiosa. Adquira já e valorize seu ambiente com arte e fé.", "dims": "Peso: 200g · Medidas: 12cm x 8cm x 15cm (C x L x A)", "frag": true}];
-PRODUCTS.forEach(p=>p.img=PIMG[p.id]);
-const SHIP_FREE=150;
-
-/* ============ STATE ============ */
-let cart=[], wish=new Set(), drawerView='cart', currentTab='Todas';
-let quick={id:null,qty:1};
-let payMethod='pix', shipMethod='delivery', selectedShippingService='';
-let checkoutForm={name:'',email:'',cep:'',num:'',addr:''};
-let shippingState={status:'idle',quotes:[],preview:false,error:'',code:'',sandbox:false,cep:''};
-let shippingRequestId=0;
-
-const $=id=>document.getElementById(id);
-const money=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-const roundCurrency=v=>Math.round((v+Number.EPSILON)*100)/100;
-const escapeAttr=v=>String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const prod=id=>PRODUCTS.find(p=>p.id===id);
-const instOf=p=>p.price>=15?3:(p.price>=10?2:0);
-const instTxt=p=>{const n=instOf(p);return n?`${n} x de ${money(p.price/n)} sem juros`:'À vista'};
-const offPct=p=>p.old?Math.round((1-p.price/p.old)*100):0;
-
-/* ============ TABS + GRID ============ */
-function renderTabs(){
-  $('tabsBar').innerHTML=CATS.map(c=>`<button class="tab${c===currentTab?' active':''}" role="tab" aria-selected="${c===currentTab}" data-cat="${c}" onclick="setTab('${c}')">${c}</button>`).join('');
-  $('footCats').innerHTML=CATS.slice(1).map(c=>`<li><a href="#colecoes" onclick="setTab('${c}')">${c}</a></li>`).join('');
-}
-function aromaItemHTML(item){
-  return `<li class="aroma-item">
-    <strong class="aroma-name">${item.name}</strong>
-    <span class="aroma-notes">${item.notes}</span>
-    ${item.archive?'<span class="aroma-status">Arquivo</span>':''}
-  </li>`;
-}
-function aromaCatalogHTML(){
-  return `<article class="aroma-catalog" aria-labelledby="aromaTitle">
-    <header class="aroma-hero">
-      <div>
-        <p class="eyebrow">Guia olfativo Liora</p>
-        <h3 class="aroma-title" id="aromaTitle">Catálogo <em>de Aromas</em></h3>
-        <p class="aroma-lead">Descubra a família olfativa que traduz a atmosfera que você deseja criar. Cada fragrância transforma o ambiente em uma experiência sensorial.</p>
-      </div>
-      <aside class="aroma-guide">
-        <h4 class="aroma-guide-title">Famílias olfativas</h4>
-        <p>Cada aroma pertence a uma família — a linguagem que ajuda a encontrar a sua essência.</p>
-        <div class="aroma-legend" aria-label="Legenda do catálogo">
-          <span><i></i>Aroma atual</span>
-          <span><i class="archive-dot"></i>Referência de arquivo</span>
-        </div>
-      </aside>
-    </header>
-    <div class="aroma-family-grid">
-      ${AROMA_FAMILIES.map(f=>`<section class="aroma-family ${f.className}">
-        <header class="aroma-family-head">
-          <h4 class="aroma-family-name"><i class="aroma-symbol"></i>${f.name}</h4>
-          <p class="aroma-profile">${f.profile}</p>
-        </header>
-        <ul class="aroma-items">${f.items.map(aromaItemHTML).join('')}</ul>
-      </section>`).join('')}
-    </div>
-    <footer class="aroma-catalog-foot">
-      <div>
-        <h3>Descubra sua essência.</h3>
-        <p>Conte para a Liora qual atmosfera você quer criar.</p>
-      </div>
-      <a class="btn" href="https://wa.me/5521969121244?text=Ol%C3%A1%2C%20quero%20ajuda%20para%20escolher%20um%20aroma%20Liora" target="_blank" rel="noopener">Falar sobre um aroma</a>
-    </footer>
-  </article>`;
-}
-function cardHTML(p){
-  const off=offPct(p);
-  return `<article class="card${p.soldout?' soldout':''}${currentTab!=='Todas'&&!p.cats.includes(currentTab)?' hide':''}">
-    <div class="card-media" onclick="openQuick('${p.id}')">
-      ${p.soldout?`<span class="badge out">Esgotado</span>`:(off?`<span class="badge">${off}% OFF</span>`:'')}
-      <button class="wish-btn${wish.has(p.id)?' on':''}" aria-label="Favoritar ${p.name}" onclick="event.stopPropagation();toggleWish('${p.id}')"><svg viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.7-9.3-9C1.2 8 3 4.5 6.6 4.5c2.2 0 3.9 1.3 5.4 3.4 1.5-2.1 3.2-3.4 5.4-3.4 3.6 0 5.4 3.5 3.9 7-1.8 4.3-9.3 9-9.3 9z"/></svg></button>
-      <img src="${p.img}" alt="Vela ${p.name}" loading="lazy">
-      <button class="quick-add" ${p.soldout?'disabled':''} onclick="event.stopPropagation();${p.soldout?'':`quickAdd('${p.id}')`}">${p.soldout?'Esgotado':'Adicionar ao carrinho'}</button>
-    </div>
-    <div class="card-info">
-      <h3 onclick="openQuick('${p.id}')">${p.name}</h3>
-      <p class="card-price">${p.old?`<span class="old">${money(p.old)}</span>`:''}${money(p.price)}</p>
-      <p class="inst">${instTxt(p)}</p>
-      <span class="tag-frete">Frete grátis*</span>
-    </div>
-  </article>`;
-}
-function renderGrid(){
-  const grid=$('grid');
-  const aromaMode=currentTab===AROMA_TAB;
-  grid.classList.toggle('aroma-mode',aromaMode);
-  grid.innerHTML=aromaMode?aromaCatalogHTML():PRODUCTS.map(cardHTML).join('');
-}
-function setTab(cat){
-  currentTab=cat;
-  renderTabs();renderGrid();
-}
-function goCat(cat){setTab(cat);document.getElementById('colecoes').scrollIntoView({behavior:'smooth'})}
-
-/* ============ WISHLIST ============ */
-function toggleWish(id){
-  wish.has(id)?wish.delete(id):wish.add(id);
-  renderGrid();updateCounts();
-  toast(wish.has(id)?'Adicionado aos favoritos':'Removido dos favoritos');
-  if(drawerView==='wish'&&$('drawer').classList.contains('on'))renderDrawer();
-}
-
-/* ============ CART ============ */
-function addToCart(id,qty=1,frag=''){
-  const p=prod(id);
-  if(p.soldout){toast('Produto esgotado');return}
-  const key=id+'|'+(frag||'-');
-  const ex=cart.find(i=>i.key===key);
-  const have=ex?ex.qty:0;
-  if(p.stock&&have+qty>p.stock){toast(`Só ${p.stock} em estoque`);qty=Math.max(0,p.stock-have);if(!qty)return}
-  if(ex)ex.qty+=qty;
-  else cart.push({key,id,qty,frag,price:p.price,name:p.name,img:p.img});
-  updateCounts();
-}
-function quickAdd(id){addToCart(id);toast('Adicionado ao carrinho!');bump()}
-function changeQty(key,d){
-  const it=cart.find(i=>i.key===key);if(!it)return;
-  const p=prod(it.id);
-  if(d>0&&p.stock&&it.qty+1>p.stock){toast(`Só ${p.stock} em estoque`);return}
-  it.qty+=d;if(it.qty<1)cart=cart.filter(i=>i.key!==key);
-  updateCounts();renderDrawer();
-}
-function removeItem(key){cart=cart.filter(i=>i.key!==key);updateCounts();renderDrawer()}
-const subtotal=()=>cart.reduce((s,i)=>s+i.price*i.qty,0);
-const cartQty=()=>cart.reduce((s,i)=>s+i.qty,0);
-function updateCounts(){
-  const c=$('cartCount'),w=$('wishCount');
-  c.textContent=cartQty();c.classList.toggle('on',cartQty()>0);
-  w.textContent=wish.size;w.classList.toggle('on',wish.size>0);
-}
-function bump(){const b=$('cartCount');b.style.transform='scale(1.4)';setTimeout(()=>b.style.transform='',250)}
-/* ============ DRAWER ============ */
-function openDrawer(view){
-  drawerView=view;renderDrawer();
-  $('drawer').classList.add('on');$('scrim').classList.add('on');
-  document.body.style.overflow='hidden';
-}
-function renderDrawer(){
-  const body=$('drawerBody'),foot=$('drawerFoot'),title=$('drawerTitle');
-  if(drawerView==='wish'){
-    title.textContent='Favoritos';
-    if(!wish.size){body.innerHTML=`<div class="cart-empty"><p class="display">Nenhum favorito ainda</p><p>Toque no coração de uma vela para guardá-la aqui.</p></div>`;foot.innerHTML='';return}
-    body.innerHTML=[...wish].map(id=>{const p=prod(id);return `
-      <div class="cart-item">
-        <img src="${p.img}" alt="${p.name}">
-        <div><p class="ci-name">${p.name}</p><p class="ci-meta">${p.cats[0]||''}</p>
-        <button class="ci-remove" onclick="toggleWish('${p.id}')">Remover</button></div>
-        <div class="ci-right"><span class="ci-price">${money(p.price)}</span>
-        ${p.soldout?'<span class="ci-meta">Esgotado</span>':`<button class="btn btn-ink" style="padding:10px 14px;font-size:9px" onclick="quickAdd('${p.id}')">Mover ao carrinho</button>`}</div>
-      </div>`}).join('');
-    foot.innerHTML='';return;
-  }
-  if(drawerView==='checkout'){renderCheckout();return}
-  if(drawerView==='success'){renderSuccess();return}
-  title.textContent='Carrinho de compras';
-  if(!cart.length){
-    body.innerHTML=`<div class="cart-empty"><p class="display">O carrinho de compras está vazio</p><p>As velas mais desejadas esperam por você.</p><br><button class="btn btn-outline" onclick="closeAll()">Ver mais produtos</button></div>`;
-    foot.innerHTML='';return;
-  }
-  const st=subtotal(),left=SHIP_FREE-st;
-  body.innerHTML=`
-    <div class="ship-bar">
-      <p>${left>0?`Faltam <b>${money(left)}</b> para o frete grátis`:`<b>Você ganhou frete grátis ✦</b>`}</p>
-      <div class="ship-track"><div class="ship-fill" style="width:${Math.min(st/SHIP_FREE*100,100)}%"></div></div>
-    </div>
-    ${cart.map(i=>`
-    <div class="cart-item">
-      <img src="${i.img}" alt="${i.name}">
-      <div>
-        <p class="ci-name">${i.name}</p>
-        <p class="ci-meta">${i.frag?`Fragrância: ${i.frag}`:'Fragrância a combinar'}</p>
-        <div class="qty">
-          <button onclick="changeQty('${i.key}',-1)" aria-label="Diminuir">−</button><span>${i.qty}</span><button onclick="changeQty('${i.key}',1)" aria-label="Aumentar">+</button>
-        </div>
-      </div>
-      <div class="ci-right"><span class="ci-price">${money(i.price*i.qty)}</span>
-      <button class="ci-remove" onclick="removeItem('${i.key}')">Remover</button></div>
-    </div>`).join('')}`;
-  foot.innerHTML=`
-    <div class="sum-row"><span>Subtotal (sem frete)</span><span>${money(st)}</span></div>
-    <div class="sum-row total"><span>Total parcial</span><span>${money(st)}</span></div>
-    <button class="btn btn-ink w-full" style="margin-top:14px" onclick="drawerView='checkout';renderDrawer()">Iniciar compra</button>
-    <p style="text-align:center;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);margin-top:12px">Pix: 5% de desconto extra ✦</p>`;
-}
-
-/* ============ CHECKOUT ============ */
-function checkoutCepStatus(){
-  if(shippingState.status==='loading')return 'Calculando entrega…';
-  if(shippingState.status==='ready')return 'Entrega calculada para este CEP ✓';
-  if(shippingState.status==='error'&&shippingState.code==='NO_SHIPPING_OPTIONS')return 'CEP localizado; sem modalidade automática nesta rota.';
-  if(shippingState.status==='error')return 'CEP localizado; cotação temporariamente indisponível.';
-  return '';
-}
-function renderCheckout(){
-  $('drawerTitle').textContent='Finalizar compra';
-  const st=subtotal();
-  const selectedQuote=shippingState.quotes.find(q=>q.id===selectedShippingService);
-  const checkoutReady=shipMethod!=='delivery'||Boolean(selectedQuote);
-  const ship=shipMethod==='delivery'&&selectedQuote?selectedQuote.price:0;
-  const disc=payMethod==='pix'?roundCurrency(st*0.05):0;
-  const total=roundCurrency(st+ship-disc);
-  $('drawerBody').innerHTML=`
-    <button class="back-link" onclick="drawerView='cart';renderDrawer()">← Voltar ao carrinho</button>
-    <p class="chk-step">1 · Entrega</p>
-    <div class="field"><label for="fN">Nome completo</label><input id="fN" placeholder="Seu nome" value="${escapeAttr(checkoutForm.name)}" oninput="checkoutForm.name=this.value"></div>
-    <div class="field"><label for="fE">E-mail</label><input id="fE" type="email" placeholder="voce@email.com" value="${escapeAttr(checkoutForm.email)}" oninput="checkoutForm.email=this.value"></div>
-    <div class="f-row">
-      <div class="field"><label for="fC">CEP</label><input id="fC" placeholder="80000-000" inputmode="numeric" maxlength="9" value="${escapeAttr(checkoutForm.cep)}" oninput="checkoutForm.cep=this.value;maskCEP(this)"><span id="cepStatus" class="cep-status ${shippingState.status==='error'?'error':shippingState.status==='ready'?'ok':shippingState.status==='loading'?'loading':''}">${escapeAttr(checkoutCepStatus())}</span></div>
-      <div class="field"><label for="fNum">Número</label><input id="fNum" placeholder="100" value="${escapeAttr(checkoutForm.num)}" oninput="checkoutForm.num=this.value"></div>
-    </div>
-    <div class="field"><label for="fA">Endereço</label><input id="fA" placeholder="Rua, bairro — cidade/UF" value="${escapeAttr(checkoutForm.addr)}" oninput="checkoutForm.addr=this.value"></div>
-    <p class="chk-step mt">2 · Meio de envio</p>
-    ${shippingOptionsHTML(st)}
-    <p class="chk-step mt">3 · Pagamento</p>
-    <div class="pay-opt ${payMethod==='pix'?'sel':''}" onclick="payMethod='pix';renderCheckout()"><span>Pix</span><span class="disc">5% de desconto extra</span></div>
-    <div class="pay-opt ${payMethod==='card'?'sel':''}" onclick="payMethod='card';renderCheckout()"><span>Cartão de crédito</span><span class="disc">até 3x sem juros</span></div>
-    <div class="pay-opt ${payMethod==='boleto'?'sel':''}" onclick="payMethod='boleto';renderCheckout()"><span>Boleto bancário</span><span class="disc">aprovação após compensação</span></div>
-    <div class="pay-opt ${payMethod==='infinitepay'?'sel':''}" onclick="payMethod='infinitepay';renderCheckout()"><span class="ship-opt-main"><b>InfinitePay</b><small>Pix, cartão em até 12x e carteiras digitais</small></span><span class="disc">Opção adicional</span></div>`;
-  $('drawerFoot').innerHTML=`
-    <div class="sum-row"><span>Subtotal</span><span>${money(st)}</span></div>
-    <div class="sum-row"><span>Frete</span><span>${shipMethod==='delivery'&&!selectedQuote?'A calcular':ship?money(ship):'<span class="free">Grátis</span>'}</span></div>
-    ${disc?`<div class="sum-row"><span>Desconto Pix (5%)</span><span style="color:var(--gold-deep)">− ${money(disc)}</span></div>`:''}
-    <div class="sum-row total"><span>${checkoutReady?'Total':'Total parcial'}</span><span>${money(total)}</span></div>
-    <button class="btn btn-solid w-full" style="margin-top:14px" onclick="confirmOrder()" ${checkoutReady?'':'disabled'}>${checkoutReady?`${payMethod==='pix'?'Pagar com Pix':payMethod==='boleto'?'Gerar boleto':payMethod==='infinitepay'?'Pagar com InfinitePay':'Confirmar pedido'} · ${money(total)}`:'Calcule o frete para continuar'}</button>
-    <p style="text-align:center;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin-top:12px">Você será redirecionado ao ambiente seguro ${payMethod==='infinitepay'?'da InfinitePay':'do Mercado Pago'}</p>`;
-}
-function shippingOptionsHTML(st){
-  if(shippingState.status==='loading') return `<div class="pay-opt" aria-disabled="true"><span class="ship-loading">Calculando as melhores opções…</span></div>`;
-  if(shippingState.status==='error'){
-    const noRoute=shippingState.code==='NO_SHIPPING_OPTIONS';
-    const title=noRoute?'Não há modalidade automática para esta rota':'Cotação temporariamente indisponível';
-    const action=shippingState.sandbox?'Ambiente de teste':'Tente novamente';
-    return `<div class="pay-opt" aria-disabled="true"><span class="ship-opt-main"><b>${title}</b><small>${escapeAttr(shippingState.error)}</small></span><span class="disc">${action}</span></div>`;
-  }
-  if(!shippingState.quotes.length) return `<div class="pay-opt" aria-disabled="true"><span>Informe o CEP para calcular</span><span class="disc">Prazo e valor</span></div>`;
-  const note=shippingState.preview?`<p class="ship-preview-note">Opções demonstrativas da SuperFrete neste preview. Valores e prazos reais aparecerão após conectar o token da loja.</p>`:'';
-  return shippingState.quotes.map(q=>`<div class="pay-opt ship-opt ${shipMethod==='delivery'&&selectedShippingService===q.id?'sel':''}" onclick="selectShipping('${escapeAttr(q.id)}')"><span class="ship-opt-main"><b>${escapeAttr(q.name)}</b><small>${escapeAttr(q.carrier)} · ${q.deliveryDays?`entrega em até ${q.deliveryDays} dias úteis`:'prazo combinado após a compra'}</small></span><span class="disc">${q.price===0?'Grátis':money(q.price)}</span></div>`).join('')+note;
-}
-function selectShipping(serviceId){
-  selectedShippingService=serviceId;
-  shipMethod='delivery';
-  renderCheckout();
-}
-/* ============ CEP: MÁSCARA + AUTOCOMPLETE ============ */
-function maskCEP(el){
-  let v=el.value.replace(/\D/g,'').slice(0,8);
-  if(v.length>5) v=v.slice(0,5)+'-'+v.slice(5);
-  el.value=v;
-  checkoutForm.cep=v;
-  if(v.replace('-','').length===8){
-    buscarCEP(v.replace('-',''));
-  }else{
-    shippingState={status:'idle',quotes:[],preview:false,error:'',code:'',sandbox:false,cep:''};
-    selectedShippingService='';
-  }
-}
-
-async function buscarCEP(cep){
-  const requestId=++shippingRequestId;
-  const fA=document.getElementById('fA');
-  shippingState={status:'loading',quotes:[],preview:false,error:'',code:'',sandbox:false,cep};
-  selectedShippingService='';
-  renderCheckout();
-  try{
-    const [addressResult,quoteResult]=await Promise.allSettled([
-      fetch(`https://viacep.com.br/ws/${cep}/json/`).then(r=>r.json()),
-      fetch('/api/shipping-quote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({cep,items:cart.map(i=>({id:i.id,qty:i.qty}))})}).then(async r=>{const data=await r.json();if(!r.ok){const error=new Error(data.error||'Não foi possível calcular o frete');error.code=data.code||'SHIPPING_ERROR';error.sandbox=Boolean(data.sandbox);throw error}return data;})
-    ]);
-    if(requestId!==shippingRequestId)return;
-    if(addressResult.status==='fulfilled'&&!addressResult.value.erro){
-      const data=addressResult.value;
-      const partes=[data.logradouro,data.bairro,`${data.localidade}/${data.uf}`].filter(Boolean);
-      checkoutForm.addr=partes.join(', ');
-    }
-    if(quoteResult.status==='rejected')throw quoteResult.reason;
-    shippingState={status:'ready',quotes:quoteResult.value.quotes||[],preview:Boolean(quoteResult.value.preview),error:'',code:'',sandbox:false,cep};
-    selectedShippingService=shippingState.quotes[0]?.id||'';
-    shipMethod='delivery';
-    renderCheckout();
-    const fNum=document.getElementById('fNum');
-    if(fNum && !fNum.value) fNum.focus();
-  }catch(err){
-    if(requestId!==shippingRequestId)return;
-    shippingState={status:'error',quotes:[],preview:false,error:err.message||'Não foi possível calcular o frete',code:err.code||'SHIPPING_ERROR',sandbox:Boolean(err.sandbox),cep};
-    renderCheckout();
-  }
-}
-
-async function confirmOrder(){
-  const name=$('fN').value.trim(),email=$('fE').value.trim(),cep=$('fC').value.trim(),num=$('fNum').value.trim(),addr=$('fA').value.trim();
-  checkoutForm={name,email,cep,num,addr};
-  if(!name||!email||!$('fE').checkValidity()){toast('Preencha nome e e-mail válidos para continuar');return}
-  if(shipMethod==='delivery'&&(!cep||!addr)){toast('Preencha o endereço de entrega');return}
-  if(shipMethod==='delivery'&&!selectedShippingService){toast('Selecione uma opção de entrega');return}
-  const btn=document.querySelector('#drawerFoot .btn-solid');
-  const original=btn.textContent;
-  btn.disabled=true;btn.textContent='Gerando pagamento…';
-  try{
-    const payload={
-      items:cart.map(i=>({id:i.id,qty:i.qty,frag:i.frag})),
-      payMethod,
-      shipping:{method:shipMethod,serviceId:selectedShippingService},
-      payer:{name,email,cep,num,addr}
-    };
-    const resp=await fetch('/api/create-preference',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(payload)
-    });
-    const data=await resp.json().catch(()=>({}));
-    if(!resp.ok||!data.init_point){
-      toast(data.error||'Não foi possível iniciar o pagamento. Tente novamente.');
-      btn.disabled=false;btn.textContent=original;
-      return;
-    }
-    if(data.order_id)sessionStorage.setItem('liora_checkout_order',data.order_id);
-    window.location.href=data.init_point;
-  }catch(err){
-    toast('Erro de conexão. Tente novamente.');
-    btn.disabled=false;btn.textContent=original;
-  }
-}
-function renderSuccess(){
-  $('drawerTitle').textContent='Pedido confirmado';
-  $('drawerBody').innerHTML=`
-    <div class="success">
-      <div class="ok-ring"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></div>
-      <h3>Obrigada pelo seu pedido ✦</h3>
-      <p>Seu pedido já está sendo preparado com carinho no ateliê.</p>
-      <p class="order">Pedido ${window._order}</p>
-      <button class="btn btn-outline" onclick="cart=[];updateCounts();closeAll()">Ver mais produtos</button>
-    </div>`;
-  $('drawerFoot').innerHTML='';
-}
-
-/* ============ QUICK VIEW ============ */
-function openQuick(id){
-  quick={id,qty:1};
-  renderQuick();
-  $('modal').classList.add('on');$('scrim').classList.add('on');
-  document.body.style.overflow='hidden';
-}
-function stockNote(p){
-  if(p.soldout)return '<p class="stock-note">Esgotado — avise-me quando voltar</p>';
-  if(p.stock===1)return '<p class="stock-note">Atenção, última peça!</p>';
-  if(p.stock&&p.stock<=5)return `<p class="stock-note">Só ${p.stock} em estoque</p>`;
-  return p.stock?`<p class="stock-note" style="color:var(--ink-soft)">${p.stock} em estoque</p>`:'';
-}
-function renderQuick(){
-  const p=prod(quick.id);if(!p)return;
-  const off=offPct(p);
-  $('modalCard').innerHTML=`
-    <button class="modal-close" aria-label="Fechar" onclick="closeAll()"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--ink);fill:none;stroke-width:1.4"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
-    <div class="modal-media"><img src="${p.img}" alt="Vela ${p.name}"></div>
-    <div class="modal-body">
-      <p class="eyebrow">${p.soldout?'Esgotado':(off?off+'% OFF · Frete grátis*':'Coleção Liora')}</p>
-      <h3>${p.name}</h3>
-      <p class="m-variant">${p.cats.join(' · ')||'Liora Aromas de Luxo'}</p>
-      <p class="m-price">${p.old?`<span class="old">${money(p.old)}</span>`:''}${money(p.price)}</p>
-      <p class="m-inst">${instTxt(p)} · Pix com 5% de desconto extra</p>
-      ${stockNote(p)}
-      <p class="m-desc">${p.desc}</p>
-      <div class="pyramid">
-        ${p.dims?`<div class="pyr-row"><span>Dimensões</span><div>${p.dims}</div></div>`:''}
-        ${p.frag?`<div class="pyr-row"><span>Fragrância</span><div>Personalizada pelo cliente — sem custo adicional</div></div>`:''}
-        <div class="pyr-row"><span>Produção</span><div>Artesanal, feita à mão com ceras naturais</div></div>
-      </div>
-      ${p.frag&&!p.soldout?`
-      <p class="opt-label">Qual fragrância você deseja? (opcional)</p>
-      <input class="frag-input" id="fragIn" placeholder="Ex.: lavanda, baunilha, flor de cerejeira…" value="">`:''}
-      <div class="m-actions">
-        <div class="qty" style="height:48px">
-          <button style="width:42px;height:46px" onclick="quick.qty=Math.max(1,quick.qty-1);syncQty()" aria-label="Diminuir">−</button><span id="qQty">${quick.qty}</span><button style="width:42px;height:46px" onclick="quick.qty++;syncQty()" aria-label="Aumentar">+</button>
-        </div>
-        <button class="btn btn-ink" style="flex:1" id="qAdd" ${p.soldout?'disabled':''} onclick="modalAdd('${p.id}')">${p.soldout?'Esgotado':`Comprar · ${money(p.price*quick.qty)}`}</button>
-      </div>
-      <div class="m-specs">
-        <div><svg viewBox="0 0 24 24"><path d="M12 3c3.5 4.2 5.5 7.2 5.5 10a5.5 5.5 0 0 1-11 0c0-2.8 2-5.8 5.5-10z"/></svg>Feito à mão</div>
-        <div><svg viewBox="0 0 24 24"><path d="M1 7h13v10H1zM14 10h5l3 3v4h-8z"/><circle cx="6" cy="18.5" r="1.8"/><circle cx="17.5" cy="18.5" r="1.8"/></svg>Todo o Brasil</div>
-        <div><svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M2.5 10h19"/></svg>Até 3x sem juros</div>
-      </div>
-      <div style="margin-top:26px">
-        <details><summary>Pagamento</summary><p>Mercado Pago com Pix (5% de desconto), cartão em até 3x ou boleto. Como alternativa, use InfinitePay com Pix, cartão em até 12x e carteiras digitais.</p></details>
-        <details><summary>Envio</summary><p>Comparamos opções da SuperFrete pelo CEP, incluindo Correios e outras transportadoras disponíveis. Em Curitiba, a entrega Liora custa R$ 19,90 abaixo de R$ 150. A partir desse valor, aplica-se a gratuidade geral.</p></details>
-        <details><summary>Cuidados com a vela</summary><p>Na primeira queima, deixe acesa por cerca de 2h para nivelar a superfície. Apare o pavio a 5&nbsp;mm antes de cada uso e mantenha longe de correntes de ar.</p></details>
-      </div>
-    </div>`;
-}
-function syncQty(){
-  const p=prod(quick.id);
-  if(p.stock&&quick.qty>p.stock){quick.qty=p.stock;toast(`Só ${p.stock} em estoque`)}
-  $('qQty').textContent=quick.qty;
-  if(!p.soldout)$('qAdd').textContent=`Comprar · ${money(p.price*quick.qty)}`;
-}
-function modalAdd(id){
-  const fragEl=$('fragIn');
-  addToCart(id,quick.qty,fragEl?fragEl.value.trim():'');
-  closeAll();toast('Adicionado ao carrinho!');bump();
-  setTimeout(()=>openDrawer('cart'),350);
-}
-
-/* ============ SEARCH ============ */
-function openSearch(){$('searchOv').classList.add('on');document.body.style.overflow='hidden';setTimeout(()=>$('searchInput').focus(),400);doSearch('')}
-function closeSearch(){$('searchOv').classList.remove('on');document.body.style.overflow=''}
-function doSearch(q){
-  q=q.trim().toLowerCase();
-  const res=PRODUCTS.filter(p=>!q||`${p.name} ${p.cats.join(' ')} ${p.desc}`.toLowerCase().includes(q));
-  $('searchRes').innerHTML=res.length?res.map(p=>`
-    <div class="sr-item" onclick="closeSearch();openQuick('${p.id}')">
-      <img src="${p.img}" alt="${p.name}">
-      <h4>${p.name}</h4><p>${p.old?`<span class="old">${money(p.old)}</span>`:''}${money(p.price)}${p.soldout?' · Esgotado':''}</p>
-    </div>`).join('')
-  :`<p style="grid-column:1/-1;color:var(--ink-soft);font-size:14px">Nenhuma vela encontrada para “${q}”. Tente “lady veil”, “botanique” ou “kit”.</p>`;
-}
-
-/* ============ MENU / OVERLAYS ============ */
-function openMenu(){$('mmenu').classList.add('on');document.body.style.overflow='hidden'}
-function closeAll(){
-  ['drawer','scrim','modal','mmenu'].forEach(i=>$(i).classList.remove('on'));
-  document.body.style.overflow='';
-}
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeAll();closeSearch()}});
-
-/* ============ NEWSLETTER / TOAST ============ */
-function subscribe(e){
-  e.preventDefault();
-  $('newsForm').style.display='none';
-  $('newsOk').style.display='block';
-  toast('Inscrição confirmada ✦');
-  return false;
-}
-let toastT;
-function toast(msg){
-  $('toastMsg').textContent=msg;
-  $('toast').classList.add('on');
-  clearTimeout(toastT);
-  toastT=setTimeout(()=>$('toast').classList.remove('on'),2600);
-}
-
-/* ============ SCROLL FX ============ */
-window.addEventListener('scroll',()=>$('header').classList.toggle('scrolled',scrollY>10),{passive:true});
-const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
-document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
-
-/* init */
-renderTabs();renderGrid();updateCounts();
-
-/* ============ RETORNO DOS CHECKOUTS ============ */
-(async function checkPaymentReturn(){
-  const params=new URLSearchParams(window.location.search);
-  const isInfinitePay=params.get('checkout')==='infinitepay-return'||Boolean(params.get('transaction_nsu')&&params.get('slug'));
-  const paymentId=params.get('payment_id')||params.get('collection_id');
-  const orderId=params.get('order_nsu')||params.get('order_id')||params.get('external_reference')||sessionStorage.getItem('liora_checkout_order');
-  const isReturn=isInfinitePay||params.get('checkout')==='return'||Boolean(paymentId&&orderId);
-  if(!isReturn)return;
-
-  window.history.replaceState({},document.title,window.location.pathname);
-  if(!orderId||(!isInfinitePay&&!paymentId)){
-    toast('Não foi possível confirmar o pagamento. Consulte seu e-mail ou tente novamente.');
-    return;
-  }
-
-  toast('Confirmando pagamento…');
-  try{
-    let statusUrl;
-    if(isInfinitePay){
-      const transactionNsu=params.get('transaction_nsu');
-      const slug=params.get('slug')||params.get('invoice_slug');
-      if(!transactionNsu||!slug)throw new Error('Retorno InfinitePay incompleto');
-      statusUrl=`/api/infinitepay-status?transaction_nsu=${encodeURIComponent(transactionNsu)}&slug=${encodeURIComponent(slug)}&order_id=${encodeURIComponent(orderId)}`;
-    }else{
-      statusUrl=`/api/payment-status?payment_id=${encodeURIComponent(paymentId)}&order_id=${encodeURIComponent(orderId)}`;
-    }
-    const resp=await fetch(statusUrl);
-    const data=await resp.json().catch(()=>({}));
-    if(!resp.ok)throw new Error(data.error||'Falha ao confirmar pagamento');
-
-    if(data.status==='approved'){
-      cart=[];updateCounts();checkoutForm={name:'',email:'',cep:'',num:'',addr:''};
-      sessionStorage.removeItem('liora_checkout_order');
-      toast('Pagamento aprovado ✦ Obrigada pelo seu pedido!');
-    }else if(['pending','in_process','authorized'].includes(data.status)){
-      toast('Pagamento em análise — avisaremos por e-mail assim que confirmado.');
-    }else{
-      sessionStorage.removeItem('liora_checkout_order');
-      toast('Pagamento não concluído. Você pode tentar novamente.');
-    }
-  }catch(err){
-    toast('Não foi possível confirmar o pagamento agora. Consulte seu e-mail.');
-  }
-})();
-</script>
+<script src="/assets/catalog.js" defer></script>
+<script src="/assets/components.js" defer></script>
+<script src="/assets/storefront.js" defer></script>
 </body>
 </html>

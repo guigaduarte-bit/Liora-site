@@ -67,10 +67,7 @@ function validRequest(overrides = {}) {
 }
 
 test('catálogo do servidor corresponde ao catálogo exibido no site', () => {
-  const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
-  const match = html.match(/const PRODUCTS=(\[.*?\]);\nPRODUCTS\.forEach/s);
-  assert.ok(match, 'catálogo do site não encontrado');
-  const frontendProducts = Function(`"use strict"; return ${match[1]}`)();
+  const frontendProducts = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'content/products.json'), 'utf8'));
 
   assert.equal(Object.keys(catalog).length, frontendProducts.length);
   for (const product of frontendProducts) {
