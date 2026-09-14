@@ -256,6 +256,7 @@ footer li a:hover{color:#E4C98F}
 /* checkout */
 .chk-step{font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold-deep);margin:0 0 18px}
 .chk-step.mt{margin-top:26px}
+.production-note{font-size:12px;line-height:1.6;color:var(--ink-soft);margin:0 0 14px}
 .field{margin-bottom:14px;position:relative}
 .cep-status{display:block;font-size:10px;letter-spacing:.04em;margin-top:5px;color:var(--ink-soft)}
 .cep-status.loading{color:var(--ink-soft)}

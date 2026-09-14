@@ -47,7 +47,7 @@ A chamada HTTP externa continua em 302/login com noindex, e o acesso conectado a
 ## Pendências para concluir a revisão
 
 - Configurar e validar os provedores em Preview/sandbox: SuperFrete está demonstrativa e os status de Mercado Pago/InfinitePay retornaram 500. Não copiar credenciais de produção; manter a proteção da implantação.
-- Fichas de produto: peso e dimensões de produto versus embalagem; materiais; conteúdo e apresentação dos kits; produção; cores disponíveis e cuidados por modelo. Ver `docs/seo-inventory.md`.
+- Fichas de produto: peso e dimensões de produto versus embalagem; materiais; conteúdo e apresentação dos kits; cores disponíveis e cuidados por modelo. O prazo geral de produção foi confirmado na rodada operacional abaixo. Ver `docs/seo-inventory.md`.
 - Pequeno Amor: regras antigas de volume e prazo precisam de confirmação; não foram transformadas em desconto automático.
 - Canal comercial autorizado e identificação empresarial para as políticas; o preview não deve ser promovido com avisos provisórios. Perfil social atual no HTML diverge do handle informado para o cartão de visitas e precisa de confirmação.
 - O conector Vercel atual só expõe o projeto Círculo de Cuidado. Leitura direta de Liora e do deployment conhecido retornou 404 nesse escopo; não alterar o projeto não relacionado.
@@ -70,3 +70,11 @@ A chamada HTTP externa continua em 302/login com noindex, e o acesso conectado a
 - [Vercel: prévias e noindex](https://vercel.com/kb/guide/are-vercel-preview-deployment-indexed-by-search-engines).
 - [Vercel: funções no diretório api](https://vercel.com/docs/functions/runtimes/node-js).
 - [Google: dados estruturados de produto no HTML inicial](https://developers.google.com/search/docs/appearance/structured-data/product-snippet).
+
+## Atualização operacional — 14/09/2026
+
+A responsável confirmou produção de 10 dias úteis, iniciada quando pagamento e personalização estiverem ambos confirmados. O transporte calculado pelo CEP é acrescido à produção. Essa informação foi aplicada aos 27 produtos, à página de personalização, ao checkout e aos termos; as modalidades exibem o transporte como etapa posterior à produção. Não foi criado cálculo de data nem alterado preço, desconto, estoque ou função de pagamento/frete.
+
+Os termos agora descrevem a operação como pessoa física. A política registra acesso administrativo interno exclusivo da responsável e diferencia o tratamento necessário pelos prestadores. A identificação pessoal foi recebida de forma reservada, mas não foi inserida no repositório ou no preview. A responsável informou que ainda não possui e-mail comercial; o canal permanece pendente, sem contato fictício. O acesso exclusivo declarado ainda precisa ser conferido nas permissões reais das contas externas.
+
+Validação local desta rodada: build com 41 páginas e `npm test` com 43 testes aprovados, sem chamadas reais aos provedores. `git diff --check` passou. A revisão hospedada desta atualização será registrada no plano de continuidade após o deploy da branch. Os resultados HTTP e as capturas anteriores são históricos e não devem ser apresentados como uma nova homologação dos provedores.

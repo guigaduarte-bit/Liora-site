@@ -50,3 +50,12 @@ node --test --test-name-pattern='páginas legais existem|preview omite|conteúdo
 Resultado: quatro testes aprovados; dois testes de integração com a página inicial não selecionados neste comando. Foram verificados estrutura acessível, links internos, ausência de contatos pessoais nas páginas legais e preservação do conteúdo essencial recuperado.
 
 O conjunto completo deve ainda conferir o rodapé e a remoção da newsletter simulada, junto ao build e ao preview do site.
+
+## Confirmações operacionais posteriores — 14/09/2026
+
+- Operação por pessoa física, com acesso administrativo interno exclusivo da responsável. O texto distingue esse acesso dos tratamentos necessários pelos fornecedores de pagamento, logística e infraestrutura.
+- Produção: 10 dias úteis a partir da confirmação conjunta do pagamento e da personalização; se ocorrerem em momentos diferentes, vale a última confirmação. O prazo de transporte da cotação pelo CEP é acrescido à produção.
+- Identificação pessoal recebida fora do repositório. Nenhum nome pessoal, CPF ou endereço foi incorporado ao código, a esta documentação ou ao preview nesta rodada.
+- A responsável ainda não possui e-mail comercial. Os textos não afirmam a existência de um canal ativo; sua implantação e teste continuam pendentes.
+- O conjunto completo foi executado nesta rodada: 43 testes aprovados, incluindo integração das páginas legais com o rodapé. Isso encerra a pendência de teste local acima; não comprova as permissões das contas externas nem o procedimento real de atendimento.
+- Permanecem pendentes canal funcional, verificação das permissões, retenção/locais reais de guarda e fechamento da versão cadastral antes de produção aprovada.

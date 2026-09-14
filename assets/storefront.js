@@ -230,6 +230,7 @@ function renderCheckout(){
     </div>
     <div class="field"><label for="fA">Endereço</label><input id="fA" placeholder="Rua, bairro — cidade/UF" value="${escapeAttr(checkoutForm.addr)}" oninput="checkoutForm.addr=this.value"></div>
     <p class="chk-step mt">2 · Meio de envio</p>
+    <p class="production-note"><strong>Produção: 10 dias úteis.</strong> A contagem começa quando pagamento e personalização estiverem confirmados. Some o prazo de transporte calculado pelo CEP.</p>
     ${shippingOptionsHTML(st)}
     <p class="chk-step mt">3 · Pagamento</p>
     <div class="pay-opt ${payMethod==='pix'?'sel':''}" onclick="payMethod='pix';renderCheckout()"><span>Pix</span><span class="disc">5% de desconto extra</span></div>
@@ -254,7 +255,7 @@ function shippingOptionsHTML(st){
   }
   if(!shippingState.quotes.length) return `<div class="pay-opt" aria-disabled="true"><span>Informe o CEP para calcular</span><span class="disc">Prazo e valor</span></div>`;
   const note=shippingState.preview?`<p class="ship-preview-note">Opções demonstrativas da SuperFrete neste preview. Valores e prazos reais aparecerão após conectar o token da loja.</p>`:'';
-  return shippingState.quotes.map(q=>`<div class="pay-opt ship-opt ${shipMethod==='delivery'&&selectedShippingService===q.id?'sel':''}" onclick="selectShipping('${escapeAttr(q.id)}')"><span class="ship-opt-main"><b>${escapeAttr(q.name)}</b><small>${escapeAttr(q.carrier)} · ${q.deliveryDays?`entrega em até ${q.deliveryDays} dias úteis`:'prazo combinado após a compra'}</small></span><span class="disc">${q.price===0?'Grátis':money(q.price)}</span></div>`).join('')+note;
+  return shippingState.quotes.map(q=>`<div class="pay-opt ship-opt ${shipMethod==='delivery'&&selectedShippingService===q.id?'sel':''}" onclick="selectShipping('${escapeAttr(q.id)}')"><span class="ship-opt-main"><b>${escapeAttr(q.name)}</b><small>${escapeAttr(q.carrier)} · ${q.deliveryDays?`transporte em até ${q.deliveryDays} dias úteis após a produção`:'prazo de transporte combinado após a compra'}</small></span><span class="disc">${q.price===0?'Grátis':money(q.price)}</span></div>`).join('')+note;
 }
 function selectShipping(serviceId){
   selectedShippingService=serviceId;
