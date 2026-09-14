@@ -1,7 +1,110 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta name="robots" content="noindex,nofollow"><title>Verificação do preview Liora</title><style>body{margin:0;background:#e9dfc9;color:#2b2118;font:14px system-ui}form{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:16px;position:sticky;top:0;background:#fbf6ec;z-index:2}select,button{font:inherit;padding:8px}main{padding:20px;overflow:auto}iframe{border:1px solid #b08a47;background:#fbf6ec;width:390px;height:844px;display:block;margin:auto}output{padding:10px 16px;display:block}</style></head><body><form><label>Página <select id="route"><option value="/">Home</option><option value="/velas-aromaticas/">Catálogo</option><option value="/produtos/vela-escultural-lady-veil-phie3/">Lady Veil</option><option value="/catalogo-de-aromas/">Aromas</option><option value="/trocas-e-devolucoes.html">Trocas e devoluções</option></select></label><label>Largura <select id="width"><option>360</option><option selected>390</option><option>768</option><option>1366</option></select> px</label><button type="button" id="inspect">Medir página</button></form><output id="result" aria-live="polite">Aguardando a página</output><main><iframe id="site" title="Preview responsivo Liora" src="/"></iframe></main><script>
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta name="robots" content="noindex,nofollow"><title>Verificação do preview Liora</title><style>body{margin:0;background:#e9dfc9;color:#2b2118;font:14px system-ui}form{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:16px;position:sticky;top:0;background:#fbf6ec;z-index:2}select,button{font:inherit;padding:8px}main{padding:20px;overflow:auto}iframe{border:1px solid #b08a47;background:#fbf6ec;width:390px;height:844px;display:block;margin:auto}output{padding:10px 16px;display:block}details{margin:0 16px 12px;background:#fbf6ec;padding:12px}summary{cursor:pointer}pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:440px;overflow:auto}</style></head><body><form><label>Página <select id="route"><option value="/">Home</option><option value="/velas-aromaticas/">Catálogo</option><option value="/produtos/vela-escultural-lady-veil-phie3/">Lady Veil</option><option value="/catalogo-de-aromas/">Aromas</option><option value="/trocas-e-devolucoes.html">Trocas e devoluções</option></select></label><label>Largura <select id="width"><option>360</option><option selected>390</option><option>768</option><option>1366</option></select> px</label><button type="button" id="inspect">Medir página</button><button type="button" id="http-check">Verificar HTTP</button></form><output id="result" aria-live="polite">Aguardando a página</output><output id="http-summary" aria-live="polite">HTTP ainda não verificado.</output><details id="http-details"><summary>Resultados HTTP do preview</summary><pre id="http-result">Aguardando verificação manual.</pre></details><main><iframe id="site" title="Preview responsivo Liora" src="/"></iframe></main><script>
 const frame=document.getElementById('site');
 document.getElementById('route').addEventListener('change',e=>frame.src=e.target.value);
 document.getElementById('width').addEventListener('change',e=>frame.style.width=e.target.value+'px');
 function inspect(){const d=frame.contentDocument,w=frame.contentWindow;const excluded='.drawer,.modal,.search-ov,.mmenu,.scrim,.toast,.marquee,.hero img,.quick-add,.skip-link';const overflow=[...d.querySelectorAll('main *')].filter(el=>!el.closest(excluded)).filter(el=>{const b=el.getBoundingClientRect(),s=w.getComputedStyle(el);return s.display!=='none'&&s.visibility!=='hidden'&&b.width>0&&(b.left < -1||b.right>w.innerWidth+1)}).map(el=>el.tagName+'.'+el.className);document.getElementById('result').textContent=JSON.stringify({url:w.location.pathname,width:w.innerWidth,overflow:overflow.slice(0,15),h1:d.querySelector('h1')?.textContent,brokenImages:[...d.images].filter(i=>i.complete&&!i.naturalWidth).length});}
 frame.addEventListener('load',inspect);document.getElementById('inspect').addEventListener('click',inspect);
+
+const httpButton=document.getElementById('http-check');
+const httpSummary=document.getElementById('http-summary');
+const httpResult=document.getElementById('http-result');
+const safeHeader=value=>String(value||'').replace(/[\u0000-\u001f\u007f]/g,'').slice(0,200);
+function sameOriginUrl(path){
+  const target=new URL(location.origin);
+  target.pathname=path;
+  return target;
+}
+async function inspectHttp(task){
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),15000);
+  try{
+    const response=await fetch(sameOriginUrl(task.path),{
+      method:task.method,
+      credentials:'same-origin',
+      mode:'same-origin',
+      redirect:'follow',
+      cache:'no-store',
+      signal:controller.signal
+    });
+    const finalUrl=new URL(response.url);
+    const pathname=finalUrl.origin===location.origin?finalUrl.pathname:null;
+    return {
+      path:task.path,
+      method:task.method,
+      status:response.status,
+      contentType:safeHeader(response.headers.get('content-type')),
+      xRobotsTag:safeHeader(response.headers.get('x-robots-tag')),
+      redirected:response.redirected,
+      finalPathname:pathname,
+      expectedStatus:task.expectedStatus,
+      ...(task.expectedPath?{expectedPath:task.expectedPath}:{}),
+      passed:task.expectedStatus.includes(response.status)&&pathname!==null&&(!task.expectedPath||pathname===task.expectedPath)
+    };
+  }catch(error){
+    return {path:task.path,method:task.method,status:null,contentType:null,xRobotsTag:null,redirected:null,finalPathname:null,expectedStatus:task.expectedStatus,passed:false,error:error.name==='AbortError'?'Tempo limite de 15 segundos':'Requisição indisponível ou redirecionamento para outra origem'};
+  }finally{clearTimeout(timer);}
+}
+async function sitemapPaths(){
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),15000);
+  try{
+    const response=await fetch(sameOriginUrl('/sitemap.xml'),{method:'GET',credentials:'same-origin',mode:'same-origin',redirect:'follow',cache:'no-store',signal:controller.signal});
+    if(!response.ok||new URL(response.url).pathname!=='/sitemap.xml')throw new Error('Sitemap indisponível');
+    const xml=new DOMParser().parseFromString(await response.text(),'application/xml');
+    if(xml.querySelector('parsererror')||!xml.documentElement||xml.documentElement.localName!=='urlset')throw new Error('Sitemap inválido');
+    const paths=[...new Set([...xml.getElementsByTagNameNS('*','loc')].map(node=>new URL(node.textContent.trim(),location.origin).pathname))];
+    if(!paths.length||paths.length>250||paths.some(path=>!path.startsWith('/')||path.startsWith('/api/')||path.startsWith('/__preview-qa')))throw new Error('Rotas inválidas');
+    return paths;
+  }finally{clearTimeout(timer);}
+}
+httpButton.addEventListener('click',async()=>{
+  if(httpButton.disabled)return;
+  httpButton.disabled=true;
+  httpSummary.textContent='Lendo sitemap e verificando apenas esta origem…';
+  httpResult.textContent='Verificação em andamento.';
+  const report={sitemapExpectedRoutes:41,sitemapRoutes:0,sitemapRead:null,results:[]};
+  try{
+    let paths=[];
+    try{
+      paths=await sitemapPaths();
+      report.sitemapRoutes=paths.length;
+      report.sitemapRead=paths.length===41?'41 rotas encontradas':'Quantidade de rotas diferente das 41 esperadas';
+    }catch(error){
+      report.sitemapRead=error.name==='AbortError'?'Sitemap: tempo limite de 15 segundos':'Não foi possível obter um sitemap XML válido da mesma origem';
+    }
+    const tasks=[
+      ...paths.map(path=>({path,method:'HEAD',expectedStatus:[200],expectedPath:path})),
+      {path:'/sitemap.xml',method:'HEAD',expectedStatus:[200],expectedPath:'/sitemap.xml'},
+      {path:'/robots.txt',method:'HEAD',expectedStatus:[200],expectedPath:'/robots.txt'},
+      {path:'/pagina-inexistente-validacao-seo/',method:'HEAD',expectedStatus:[404]},
+      {path:'/trocas-e-devolucoes',method:'HEAD',expectedStatus:[200],expectedPath:'/trocas-e-devolucoes.html'},
+      {path:'/termos-de-uso',method:'HEAD',expectedStatus:[200],expectedPath:'/termos-de-uso.html'},
+      {path:'/privacidade',method:'HEAD',expectedStatus:[200],expectedPath:'/politica-de-privacidade.html'},
+      {path:'/esculturas',method:'HEAD',expectedStatus:[200],expectedPath:'/velas-decorativas/'},
+      {path:'/api/shipping-quote',method:'GET',expectedStatus:[405]},
+      {path:'/api/create-preference',method:'GET',expectedStatus:[405]},
+      {path:'/api/payment-status',method:'GET',expectedStatus:[400]},
+      {path:'/api/infinitepay-status',method:'GET',expectedStatus:[400]}
+    ];
+    const results=new Array(tasks.length);
+    let next=0,finished=0;
+    async function worker(){
+      while(next<tasks.length){
+        const index=next++;
+        results[index]=await inspectHttp(tasks[index]);
+        finished++;
+        httpSummary.textContent=`Verificação HTTP: ${finished} de ${tasks.length} concluídas.`;
+      }
+    }
+    await Promise.all(Array.from({length:Math.min(4,tasks.length)},worker));
+    report.results=results;
+    report.passed=results.filter(result=>result.passed).length;
+    report.requiresReview=results.length-report.passed+(report.sitemapRoutes===41?0:1);
+    httpResult.textContent=JSON.stringify(report,null,2);
+    httpSummary.textContent=`HTTP: ${report.passed} de ${results.length} verificações com resultado esperado. ${report.requiresReview} item(ns) para revisão. Sitemap: ${report.sitemapRoutes} de 41 rotas.`;
+  }catch(error){
+    httpResult.textContent=JSON.stringify({error:'Não foi possível concluir a verificação HTTP.'},null,2);
+    httpSummary.textContent='Verificação HTTP incompleta. Tente novamente.';
+  }finally{httpButton.disabled=false;}
+});
 </script></body></html>

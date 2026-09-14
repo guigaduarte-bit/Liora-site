@@ -96,7 +96,8 @@ Pendências comuns a validar com a responsável pela marca:
 
 | Grupo/página | Intenção e recorte | Destino proposto | Observações |
 |---|---|---|---|
-| Essenciais | Modelos em recipiente e seleção essencial da marca | /velas-aromaticas/ | Validar a curadoria; aroma específico depende do modelo e disponibilidade. |
+| Catálogo completo | Todos os modelos disponíveis no catálogo de referência | /velas-aromaticas/ | Preserva os 27 IDs e não comprova disponibilidade em tempo real. |
+| Essenciais | Modelos em recipiente e seleção essencial da marca | /essenciais/ | Validar a curadoria; aroma específico depende do modelo e disponibilidade. |
 | Esculturas | Peças com formas, motivos e relevos decorativos | /velas-decorativas/ | Preservar coleções secundárias existentes; não afirmar que Lumina inclui vela sem confirmar. |
 | Kits | Produtos vendidos com nome de kit | /kits-e-presentes/ | Apenas Kit Silhouette e Kit Boho Glass; composição pendente. Outros itens podem ser sugeridos para presente sem chamá-los de kit. |
 | Aromas | Famílias, notas e referências de arquivo | /catalogo-de-aromas/ | Preservar nomes e notas atuais, separar arquivo de aromas atuais. |

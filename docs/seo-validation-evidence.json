@@ -37,5 +37,10 @@
   "production_promoted": false,
   "next_action": "Obtain authorized access to existing preview, run visual and purchase-flow checks, resolve commercial policy facts, then request production approval.",
   "implementation_initial_commit": "bd7db434b9d8bd560638a7d0ea761dd67454a397",
-  "followup_fix": "Invalidate in-flight address/shipping responses after deleting a CEP digit; regression failed before fix and passed after fix."
+  "followup_fix": "Invalidate in-flight address/shipping responses after deleting a CEP digit; regression failed before fix and passed after fix.",
+  "browser_followup": {
+    "status": "Browser session can now open preview; representative UI/commerce checks completed",
+    "evidence_file": "docs/seo-browser-evidence.json",
+    "http_checks": "External anonymous HTTP still 302; authenticated QA HTTP panel added for next preview build"
+  }
 }

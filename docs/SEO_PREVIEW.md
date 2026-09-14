@@ -36,11 +36,17 @@ Os testes comerciais usam respostas simuladas, sem criar pedidos ou cobranças r
 
 O rastreio estático verificou as 41 páginas: um H1, title/description únicos, canonical próprio, destinos internos existentes e imagens essenciais com src/alt. Product/Offer foi comparado com o catálogo para todos os 27 IDs. Isso não equivale a validação pelo Rich Results Test do Google.
 
-O navegador remoto não acessa o servidor local (ERR_BLOCKED_BY_CLIENT). Ao abrir o preview publicado, foi redirecionado para “Login – Vercel”; o GET público não fornece o conteúdo da aplicação. Uma requisição HEAD recebeu 302 para autenticação, com `x-robots-tag: noindex`. O acesso conectado retornou 404 para o projeto Liora, inclusive usando o ID confirmado pelo bot da Vercel, e não conseguiu gerar link temporário de revisão. Portanto a revisão visual, o fluxo real no navegador e a confirmação de status HTTP/APIs da aplicação estão bloqueados por acesso, sem resultado aprovado. O painel `/__preview-qa/` só é gerado em ambiente Preview e permite conferir o mesmo site em quadros de 360, 390, 768 e 1366 px. Não entra no sitemap nem no build de produção.
+A sessão existente do navegador passou a abrir a prévia em 14/09/2026. Foram verificadas 20 combinações: home, catálogo, Lady Veil, aromas e trocas em 360, 390, 768 e 1366 px, sem elementos excedendo a largura na medição do conteúdo principal e sem imagens quebradas reportadas. A verificação usa iframe com largura CSS real; não equivale a dispositivo físico ou Core Web Vitals. Desktop e celular tiveram capturas de referência.
+
+O fluxo produto → fragrância/quantidade → carrinho → início da compra foi exercitado. Carrinho e fragrância sobreviveram à troca de página e ao recarregamento; CEP e endereço ficaram vazios. Menu móvel, busca com três versões Botanique, favoritos e bloqueio do produto esgotado passaram. As miniaturas do carrinho terminaram de carregar corretamente.
+
+A interface hospedada mostrou subtotal de R$ 124,00, frete Curitiba de R$ 19,90, total Pix de R$ 137,70 e total cartão/boleto de R$ 143,90. Para R$ 186,00 em produtos, mostrou frete grátis e Pix de R$ 176,70. A SuperFrete informa explicitamente cotações demonstrativas. Nenhum pedido, pagamento ou boleto foi criado; os itens simulados foram removidos ao terminar.
+
+A chamada HTTP externa continua em 302/login com noindex, e o acesso conectado ao projeto não conseguiu gerar link temporário. O painel `/__preview-qa/` recebeu um botão Verificar HTTP para conferir os destinos por meio da sessão autenticada da própria aplicação. A execução hospedada desse novo botão está pendente do próximo build. O painel é excluído do build de produção e do sitemap.
 
 ## Pendências para concluir a revisão
 
-- Acesso autenticado à implantação já criada: obter link temporário de revisão ou conexão com acesso ao projeto Liora. Em seguida, validar páginas/APIs, `noindex` após autenticação, redirects/404 e revisão visual em 360, 390, 768 e 1366 px.
+- Concluir status HTTP, `noindex` das respostas finais e redirects/404 no painel de QA após o próximo build. A revisão visual e do carrinho já foi realizada na sessão autenticada.
 - Fichas de produto: peso e dimensões de produto versus embalagem; materiais; conteúdo e apresentação dos kits; produção; cores disponíveis e cuidados por modelo. Ver `docs/seo-inventory.md`.
 - Pequeno Amor: regras antigas de volume e prazo precisam de confirmação; não foram transformadas em desconto automático.
 - Canal comercial autorizado e identificação empresarial para as políticas; o preview não deve ser promovido com avisos provisórios. Perfil social atual no HTML diverge do handle informado para o cartão de visitas e precisa de confirmação.
@@ -51,13 +57,13 @@ O navegador remoto não acessa o servidor local (ERR_BLOCKED_BY_CLIENT). Ao abri
 ## Como continuar
 
 1. `npm test` e `LIORA_PREVIEW_QA=1 npm run build` para a prévia de revisão local.
-2. Retomar o [PR #7](https://github.com/guigaduarte-bit/Liora-site/pull/7) e o [preview existente](https://liora-site-git-preview-seo-2026-09-14-circulo-de-cuidado.vercel.app). Obter acesso autorizado para testar home → categoria → produto → carrinho, aromas e políticas, sem merge em main.
+2. Retomar o [PR #7](https://github.com/guigaduarte-bit/Liora-site/pull/7) e o [preview existente](https://liora-site-git-preview-seo-2026-09-14-circulo-de-cuidado.vercel.app). Manter a sessão autorizada para concluir os checks HTTP no painel, sem merge em main.
 3. Fechar pendências factuais e operacionais antes de solicitar aprovação de produção.
 4. Após aprovação explícita: publicar, conferir os destinos finais e só então ativar a migração externa e enviar sitemap no Search Console.
 
 ## Evidências e limite da entrega
 
-`docs/seo-validation-evidence.json` registra o commit da implementação, contagens de testes e resultado sanitizado do acesso ao preview. A base de produção não recebeu merge nem promoção deste pacote. Build Ready não equivale a revisão visual ou homologação dos provedores. O painel de QA não foi aberto no preview devido à autenticação.
+`docs/seo-validation-evidence.json` registra o commit da implementação, contagens de testes e resultado sanitizado do acesso ao preview. A base de produção não recebeu merge nem promoção deste pacote. `docs/seo-browser-evidence.json` registra a revisão visual e os fluxos efetivamente exercitados. `docs/seo-migration-evidence.md` fundamenta o mapa de 30 URLs candidatas, com correspondência proposta de Essenciais e duas categorias ainda sem destino confirmado. Build Ready e teste do carrinho não equivalem a homologação dos provedores.
 
 ## Referências técnicas consultadas
 

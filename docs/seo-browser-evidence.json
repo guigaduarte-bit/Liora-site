@@ -1,0 +1,210 @@
+{
+  "date": "2026-09-14",
+  "tested_application_commit": "aac4dd0fc7b654ed64d5c9700807d6bfcea8217b",
+  "preview_url": "https://liora-site-git-preview-seo-2026-09-14-circulo-de-cuidado.vercel.app/",
+  "browser_access": "Available in existing authenticated browser session; external unauthenticated HTTP still redirects to Vercel login.",
+  "responsive_method": "Same-origin iframe of hosted application at CSS widths 360/390/768/1366; not emulation of physical devices or measured Core Web Vitals.",
+  "responsive_results": [
+    {
+      "url": "/",
+      "width": 360,
+      "overflow": [],
+      "h1": "A esculturaque perfuma.",
+      "brokenImages": 0
+    },
+    {
+      "url": "/",
+      "width": 390,
+      "overflow": [],
+      "h1": "A esculturaque perfuma.",
+      "brokenImages": 0
+    },
+    {
+      "url": "/",
+      "width": 768,
+      "overflow": [],
+      "h1": "A esculturaque perfuma.",
+      "brokenImages": 0
+    },
+    {
+      "url": "/",
+      "width": 1366,
+      "overflow": [],
+      "h1": "A esculturaque perfuma.",
+      "brokenImages": 0
+    },
+    {
+      "url": "/produtos/vela-escultural-lady-veil-phie3/",
+      "width": 360,
+      "overflow": [],
+      "h1": "Vela escultural Lady Veil",
+      "brokenImages": 0
+    },
+    {
+      "url": "/produtos/vela-escultural-lady-veil-phie3/",
+      "width": 390,
+      "overflow": [],
+      "h1": "Vela escultural Lady Veil",
+      "brokenImages": 0
+    },
+    {
+      "url": "/produtos/vela-escultural-lady-veil-phie3/",
+      "width": 768,
+      "overflow": [],
+      "h1": "Vela escultural Lady Veil",
+      "brokenImages": 0
+    },
+    {
+      "url": "/produtos/vela-escultural-lady-veil-phie3/",
+      "width": 1366,
+      "overflow": [],
+      "h1": "Vela escultural Lady Veil",
+      "brokenImages": 0
+    },
+    {
+      "url": "/velas-aromaticas/",
+      "width": 360,
+      "overflow": [],
+      "h1": "Velas artesanais aromáticas e decorativas",
+      "brokenImages": 0
+    },
+    {
+      "url": "/velas-aromaticas/",
+      "width": 390,
+      "overflow": [],
+      "h1": "Velas artesanais aromáticas e decorativas",
+      "brokenImages": 0
+    },
+    {
+      "url": "/velas-aromaticas/",
+      "width": 768,
+      "overflow": [],
+      "h1": "Velas artesanais aromáticas e decorativas",
+      "brokenImages": 0
+    },
+    {
+      "url": "/velas-aromaticas/",
+      "width": 1366,
+      "overflow": [],
+      "h1": "Velas artesanais aromáticas e decorativas",
+      "brokenImages": 0
+    },
+    {
+      "url": "/catalogo-de-aromas/",
+      "width": 360,
+      "overflow": [],
+      "h1": "Catálogo de Aromas",
+      "brokenImages": 0
+    },
+    {
+      "url": "/catalogo-de-aromas/",
+      "width": 390,
+      "overflow": [],
+      "h1": "Catálogo de Aromas",
+      "brokenImages": 0
+    },
+    {
+      "url": "/catalogo-de-aromas/",
+      "width": 768,
+      "overflow": [],
+      "h1": "Catálogo de Aromas",
+      "brokenImages": 0
+    },
+    {
+      "url": "/catalogo-de-aromas/",
+      "width": 1366,
+      "overflow": [],
+      "h1": "Catálogo de Aromas",
+      "brokenImages": 0
+    },
+    {
+      "url": "/trocas-e-devolucoes.html",
+      "width": 360,
+      "overflow": [],
+      "h1": "Trocas e devoluções",
+      "brokenImages": 0
+    },
+    {
+      "url": "/trocas-e-devolucoes.html",
+      "width": 390,
+      "overflow": [],
+      "h1": "Trocas e devoluções",
+      "brokenImages": 0
+    },
+    {
+      "url": "/trocas-e-devolucoes.html",
+      "width": 768,
+      "overflow": [],
+      "h1": "Trocas e devoluções",
+      "brokenImages": 0
+    },
+    {
+      "url": "/trocas-e-devolucoes.html",
+      "width": 1366,
+      "overflow": [],
+      "h1": "Trocas e devoluções",
+      "brokenImages": 0
+    }
+  ],
+  "flows": [
+    {
+      "check": "Desktop product page -> fragrance and quantity -> cart",
+      "result": "pass",
+      "evidence": "Lady Veil, Lavanda Sofisticada, quantity 3, subtotal BRL 186.00"
+    },
+    {
+      "check": "Cart survives navigation and reload",
+      "result": "pass",
+      "evidence": "Same quantity/fragrance after visiting aromas and reloading"
+    },
+    {
+      "check": "Checkout address does not persist across pages",
+      "result": "pass",
+      "evidence": "CEP and address fields blank after navigation/reload; no name or email supplied"
+    },
+    {
+      "check": "Mobile product form and multiple fragrances",
+      "result": "pass",
+      "evidence": "2 Lavanda Sofisticada + 1 Cloé shown as separate lines, subtotal BRL 186.00; images loaded at naturalWidth 560"
+    },
+    {
+      "check": "Mobile search -> product",
+      "result": "pass",
+      "evidence": "Botanique search returned three models; 250 g result opened its own page"
+    },
+    {
+      "check": "Mobile menu -> catalog",
+      "result": "pass"
+    },
+    {
+      "check": "Add and remove favorite",
+      "result": "pass"
+    },
+    {
+      "check": "Sold-out item",
+      "result": "pass",
+      "evidence": "Jardim Encantado flores em vaso has disabled purchase button"
+    },
+    {
+      "check": "Hosted shipping route and Pix/card/boleto totals",
+      "result": "pass with demonstration quotes",
+      "evidence": "BRL 124.00 products + BRL 19.90 Curitiba shipping; Pix total BRL 137.70; card/boleto total BRL 143.90. BRL 186.00 products showed free shipping and Pix total BRL 176.70."
+    }
+  ],
+  "provider_validation": "SuperFrete explicitly displays demonstration quotes. No order/payment/boleto created; full provider sandbox remains pending.",
+  "screenshots": [
+    "liora-preview-home-desktop-2026-09-14.jpg",
+    "liora-preview-produto-desktop-2026-09-14.jpg",
+    "liora-preview-produto-mobile-2026-09-14.jpg",
+    "liora-preview-carrinho-mobile-2026-09-14.jpg"
+  ],
+  "http_validation": "Pending preview-only HTTP check through authenticated session; external HEAD root returned 302 and x-robots-tag noindex.",
+  "remaining": [
+    "Provider sandbox configuration",
+    "Rich Results Test",
+    "Lab/field performance metrics",
+    "Authorized commercial contact/business details and product facts",
+    "Full source-domain URL inventory and approved migration",
+    "Explicit production approval"
+  ]
+}
