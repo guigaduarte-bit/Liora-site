@@ -198,7 +198,17 @@
     "liora-preview-produto-mobile-2026-09-14.jpg",
     "liora-preview-carrinho-mobile-2026-09-14.jpg"
   ],
-  "http_validation": "Pending preview-only HTTP check through authenticated session; external HEAD root returned 302 and x-robots-tag noindex.",
+  "http_validation": {
+    "tested_commit": "9fefa1ec826835c6f8152e5f7310e060232a365f",
+    "checks": 52,
+    "passed": 50,
+    "requires_review": 2,
+    "pages_status_200": 41,
+    "noindex_all_responses": true,
+    "real_404": true,
+    "redirect_destinations": 4,
+    "evidence_file": "docs/seo-http-evidence.json"
+  },
   "remaining": [
     "Provider sandbox configuration",
     "Rich Results Test",
@@ -206,5 +216,6 @@
     "Authorized commercial contact/business details and product facts",
     "Full source-domain URL inventory and approved migration",
     "Explicit production approval"
-  ]
+  ],
+  "test_cart_cleanup": "Simulated cart and favorites emptied after QA; no orders, charges or boletos created."
 }

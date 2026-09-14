@@ -41,6 +41,7 @@
   "browser_followup": {
     "status": "Browser session can now open preview; representative UI/commerce checks completed",
     "evidence_file": "docs/seo-browser-evidence.json",
-    "http_checks": "External anonymous HTTP still 302; authenticated QA HTTP panel added for next preview build"
+    "http_checks": "52 checks completed on 9fefa1e: 50 expected responses, two payment-status JSON 500 errors requiring preview configuration review; all 52 noindex",
+    "http_evidence_file": "docs/seo-http-evidence.json"
   }
 }
