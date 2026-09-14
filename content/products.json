@@ -1,0 +1,396 @@
+[
+  {
+    "id": "vela-escultural-lady-veil-phie3",
+    "name": "Vela escultural Lady Veil",
+    "price": 62.0,
+    "old": 65.0,
+    "stock": 10,
+    "soldout": false,
+    "cats": [
+      "Essenciais",
+      "Esculturas",
+      "Clássico",
+      "Kits e Presentes"
+    ],
+    "desc": "Vela decorativa feminina em formato de busto com véu e flores, perfeita para dar sofisticação ao seu ambiente.",
+    "dims": "Peso: 110gr",
+    "frag": true
+  },
+  {
+    "id": "vela-decorativa-anjo-em-vitral-1sbe9",
+    "name": "Vela Decorativa Anjo em vitral",
+    "price": 55.0,
+    "old": 59.0,
+    "stock": 20,
+    "soldout": false,
+    "cats": [
+      "Essenciais",
+      "Esculturas",
+      "Kits e Presentes"
+    ],
+    "desc": "Vela decorativa com anjo e criança, ornamentos florais e moldura detalhada. Perfeita para decorar ou presentear.",
+    "dims": "Peso: 100 gr · Medidas: 11cm x 6,2 cm",
+    "frag": true
+  },
+  {
+    "id": "botanique",
+    "name": "Botanique - 250gr",
+    "price": 75.0,
+    "old": 80.0,
+    "stock": 2,
+    "soldout": false,
+    "cats": [
+      "Essenciais",
+      "Flora Linea",
+      "Kits e Presentes"
+    ],
+    "desc": "Vela em vidro, luminária,com tampa metálica, decorada com pássaros e flores, perfeita para decorar e ambientar. Aproveite e compre já!",
+    "dims": "",
+    "frag": true
+  },
+  {
+    "id": "botanique-150-gr-1gyzj",
+    "name": "Botanique - 150gr",
+    "price": 52.0,
+    "old": 55.0,
+    "stock": 12,
+    "soldout": false,
+    "cats": [
+      "Essenciais",
+      "Flora Linea"
+    ],
+    "desc": "Conjunto de velas decorativas em copo de vidro com tampa de madeira, estampas florais e de pássaro. Decore e aromatize seu ambiente. Compre já!",
+    "dims": "",
+    "frag": true
+  },
+  {
+    "id": "botanique-70-ml-1dqj4",
+    "name": "Botanique - 70gr",
+    "price": 25.0,
+    "old": 28.0,
+    "stock": 5,
+    "soldout": false,
+    "cats": [
+      "Essenciais",
+      "Flora Linea",
+      "Kits e Presentes"
+    ],
+    "desc": "Vela perfumada em copo de vidro com tampa de madeira e estampa floral delicada. Decore e aromatize seu ambiente com charme. Compre já!",
+    "dims": "Peso 70gr | Medidas: 9cm x 9cm x 7cm (C x L x A) · Medidas: 9cm x 9cm x 7cm (C x L x A)",
+    "frag": true
+  },
+  {
+    "id": "ursinho",
+    "name": "PEQUENO AMOR",
+    "price": 10.0,
+    "old": 12.0,
+    "stock": 30,
+    "soldout": false,
+    "cats": [
+      "Essenciais"
+    ],
+    "desc": "Pedidos acima de 20 unidades: 10% de desconto\nPedidos acima de 30 unidades: 15% de desconto\nPedidos acima de 50 unidades: 20% de desconto\nPeças feitas a mão, com intenção.\nPrazo confecção - 5 a 7 dias.",
+    "dims": "Peso: 40gr · Medidas: 4cmX4cmX5cm (CXLXA)",
+    "frag": true
+  },
+  {
+    "id": "flordevenus",
+    "name": "FLOR DE VÊNUS",
+    "price": 55.0,
+    "old": 59.0,
+    "stock": 5,
+    "soldout": false,
+    "cats": [
+      "Flora Linea"
+    ],
+    "desc": "Vela decorativa em formato de rosto feminino com flores, perfeita para uma decoração charmosa e delicada.",
+    "dims": "Peso: 120gr · Medidas: 8cmX4cmX10cm (CXLXA)",
+    "frag": true
+  },
+  {
+    "id": "abraco-em-luz",
+    "name": "ABRAÇO EM LUZ",
+    "price": 42.0,
+    "old": 46.0,
+    "stock": 10,
+    "soldout": false,
+    "cats": [
+      "Flora Linea"
+    ],
+    "desc": "Escultura decorativa de anjo com asas grandes segurando criança, em material translúcido. Ideal para decoração elegante. Compre já!",
+    "dims": "Peso: 65gr · Medidas: 8cmX4cmX10cm (CXLXA)",
+    "frag": true
+  },
+  {
+    "id": "mini-bubble",
+    "name": "MINI BUBBLE",
+    "price": 16.0,
+    "old": 18.0,
+    "stock": 30,
+    "soldout": false,
+    "cats": [
+      "Essenciais"
+    ],
+    "desc": "Vela decorativa bolinhas pequena com textura em relevo e acabamento liso para um toque acolhedor. Ideal para decorar ambientes.",
+    "dims": "Peso: 40gr · Medidas: 4cmX4cmX4cm (CXLXA)",
+    "frag": true
+  },
+  {
+    "id": "bolhas",
+    "name": "BOLHAS",
+    "price": 30.0,
+    "old": 32.0,
+    "stock": 10,
+    "soldout": false,
+    "cats": [
+      "Clássico"
+    ],
+    "desc": "Esfera decorativa com textura de bolhas, perfeita para realçar ambientes com estilo e charme. Compre já e transforme seu espaço!",
+    "dims": "Peso: 88gr · Medidas: 7cmX5cmX6cm (CXLXA)",
+    "frag": true
+  },
+  {
+    "id": "no-deluz",
+    "name": "NÓ DE LUZ",
+    "price": 32.0,
+    "old": 36.0,
+    "stock": 5,
+    "soldout": false,
+    "cats": [
+      "Essenciais"
+    ],
+    "desc": "Decore seu ambiente com a vela nó entrelaçada. Textura artesanal única e exclusiva.",
+    "dims": "Peso: 55gr · Medidas: 8cmX8cmX8cm (CXLXA)",
+    "frag": true
+  },
+  {
+    "id": "lioracoral",
+    "name": "LIORA CORAL",
+    "price": 32.0,
+    "old": 36.0,
+    "stock": 10,
+    "soldout": false,
+    "cats": [
+      "Esculturas"
+    ],
+    "desc": "Realce a beleza natural e sofisticada da sua decoração com a vela Liora Coral escultural.. Inspirada na delicadeza das formas orgânicas, esta coleção traz pe...",
+    "dims": "Peso: 65gr · Medidas: 7cmX7cmX7cm (CXLXA)",
+    "frag": true
+  },
+  {
+    "id": "essenza-cube",
+    "name": "ESSENZA CUBE",
+    "price": 42.0,
+    "old": 45.0,
+    "stock": 4,
+    "soldout": false,
+    "cats": [
+      "Esculturas"
+    ],
+    "desc": "Realce a beleza e a originalidade da sua decoração com a Escultura Essenza cube , uma vela artesanal que une arte, design e emoção em uma peça única. Com seu...",
+    "dims": "Peso: 125gr · Medidas: 7cmX7cmX7cm (CXLXA)",
+    "frag": true
+  },
+  {
+    "id": "kit-silhouette",
+    "name": "KIT SILHOUETTE",
+    "price": 75.0,
+    "old": 80.0,
+    "stock": 3,
+    "soldout": false,
+    "cats": [
+      "Esculturas"
+    ],
+    "desc": "Realce a originalidade e o impacto visual da sua decoração com o Kit Silhouette da Linha Esculturas. Esta coleção exclusiva traz peças que combinam design in...",
+    "dims": "Peso: 253gr · Medidas: 8cmX6cmX13cm (CXLXA)",
+    "frag": true
+  },
+  {
+    "id": "trevo",
+    "name": "TREVO",
+    "price": 42.0,
+    "old": 46.0,
+    "stock": 4,
+    "soldout": false,
+    "cats": [
+      "Esculturas"
+    ],
+    "desc": "Realce sua decoração com a Escultura Trevo Cilindro, uma peça que une design contemporâneo e simbolismo em um formato único e marcante. Inspirada na forma do...",
+    "dims": "Peso: 120gr · Medidas: 5cmX5cmX12cm (CXLXA)",
+    "frag": true
+  },
+  {
+    "id": "perolas",
+    "name": "PÉROLAS",
+    "price": 42.0,
+    "old": 46.0,
+    "stock": 4,
+    "soldout": false,
+    "cats": [
+      "Clássico"
+    ],
+    "desc": "Vela decorativa cilíndrica com textura em bolinhas, perfeita para decorar e criar aconchego. Compre agora e transforme seu espaço!",
+    "dims": "Peso: 130gr · Medidas: 7cmX7cmX8cm (CXLXA)",
+    "frag": true
+  },
+  {
+    "id": "kit-boho-glass",
+    "name": "KIT BOHO GLASS",
+    "price": 75.0,
+    "old": 80.0,
+    "stock": 2,
+    "soldout": false,
+    "cats": [
+      "Boho Glass",
+      "Kits e Presentes"
+    ],
+    "desc": "Vela perfumada em vidro listrado com tampa bolinhas para ambientes aromatizados com estilo. Compre já!",
+    "dims": "Peso: 350gr · Medidas: 8cmX8cmX10cm (CXLXA)",
+    "frag": false
+  },
+  {
+    "id": "lumina",
+    "name": "LUMINA",
+    "price": 46.0,
+    "old": 49.0,
+    "stock": 5,
+    "soldout": false,
+    "cats": [
+      "Clássico"
+    ],
+    "desc": "Vaso decorativo arredondado com textura geométrica, perfeito para valorizar sua decoração interna. Compre agora e transforme seu ambiente!",
+    "dims": "Peso: 130gr · Medidas: 7cmX7cmX9cm (CXLXA)",
+    "frag": true
+  },
+  {
+    "id": "gota-de-luz1",
+    "name": "GOTA DE LUZ",
+    "price": 42.0,
+    "old": 46.0,
+    "stock": 10,
+    "soldout": false,
+    "cats": [
+      "Esculturas"
+    ],
+    "desc": "Vela artesanal esculturas redonda espiral. Compre agora e dê charme ao seu espaço!",
+    "dims": "Peso: 108gr · Medidas: 7cmX7cmX8cm (CXLXA).",
+    "frag": true
+  },
+  {
+    "id": "geometricafacetada",
+    "name": "LIORA ELEGANCE",
+    "price": 32.0,
+    "old": 36.0,
+    "stock": 5,
+    "soldout": false,
+    "cats": [
+      "Esculturas"
+    ],
+    "desc": "Vela aromática esculturas em formato geométrico facetado, perfeito para decorar e dar charme ao seu ambiente. Compre agora e transforme seu espaço.",
+    "dims": "Peso: 100gr · Medidas: 6cmX6cmX5cm (CXLXA).",
+    "frag": true
+  },
+  {
+    "id": "cilindro-mosaico",
+    "name": "CILINDRO MOSAICO",
+    "price": 42.0,
+    "old": 46.0,
+    "stock": 5,
+    "soldout": false,
+    "cats": [
+      "Esculturas"
+    ],
+    "desc": "Vela decorativa com textura geométrica e aroma suave para ambientação moderna. Decore seu espaço com estilo e aconchego.",
+    "dims": "Peso: 130gr · Medidas: 6cmX6cmX8cm (CXLXA)",
+    "frag": true
+  },
+  {
+    "id": "chama-esculpida",
+    "name": "CHAMA ESCULPIDA",
+    "price": 62.0,
+    "old": 65.0,
+    "stock": 5,
+    "soldout": false,
+    "cats": [
+      "Clássico"
+    ],
+    "desc": "Vela decorativa cilíndrica com relevo em ondas, perfeita para transformar ambientes internos. Adquira já e decore com estilo!",
+    "dims": "Peso: 208gr · Medidas: 7cmX7cmX13cm (CXLXA)",
+    "frag": true
+  },
+  {
+    "id": "jardim-encantado",
+    "name": "JARDIM ENCANTADO",
+    "price": 85.0,
+    "old": 89.9,
+    "stock": 3,
+    "soldout": false,
+    "cats": [
+      "Flora Linea",
+      "Kits e Presentes"
+    ],
+    "desc": "Decore ambientes com arranjo de velas florais em vaso decorativo. Ideal para trazer charme e aroma suave.",
+    "dims": "Peso: 700gr · Medidas: 15cmX15cmX18cm (CXLXA)",
+    "frag": true
+  },
+  {
+    "id": "camafeufada",
+    "name": "CAMAFEU FADA",
+    "price": 8.0,
+    "old": 12.0,
+    "stock": 30,
+    "soldout": false,
+    "cats": [
+      "Essenciais",
+      "Esculturas",
+      "Clássico",
+      "Kits e Presentes"
+    ],
+    "desc": "Presente decorativo com fita e relevo de fada com flores para um ambiente delicado e clássico. Decore com charme, compre agora!",
+    "dims": "Peso: 50gr · Medidas: 10cmX8cmX11cm (CXLXA).",
+    "frag": true
+  },
+  {
+    "id": "botanicavasogesso",
+    "name": "JARDIM ENCANTADO",
+    "price": 75.0,
+    "old": 79.9,
+    "stock": 0,
+    "soldout": true,
+    "cats": [
+      "Flora Linea"
+    ],
+    "desc": "Vela artesanal em vaso com flores detalhadas, perfeita para decorar com charme e delicadeza. Adquira já a sua!",
+    "dims": "Peso: 200gr · Medidas: 12cmX12cmX12cm (CXLXA)",
+    "frag": true
+  },
+  {
+    "id": "peonia",
+    "name": "FLOR DE VÊNUS",
+    "price": 12.0,
+    "old": 15.0,
+    "stock": 8,
+    "soldout": false,
+    "cats": [
+      "Flora Linea"
+    ],
+    "desc": "Vela decorativa em forma de flor com base texturizada. Decore seu ambiente com charme.",
+    "dims": "Peso 100gr · Medidas: 10cmX10cmX7cm (CXLXA).",
+    "frag": true
+  },
+  {
+    "id": "sagrada-familia",
+    "name": "Sagrada Familia",
+    "price": 52.0,
+    "old": 55.0,
+    "stock": 5,
+    "soldout": false,
+    "cats": [
+      "Essenciais",
+      "Esculturas"
+    ],
+    "desc": "Escultura Família Sagrada em material liso, ideal para decoração religiosa. Adquira já e valorize seu ambiente com arte e fé.",
+    "dims": "Peso: 200g · Medidas: 12cm x 8cm x 15cm (C x L x A)",
+    "frag": true
+  }
+]

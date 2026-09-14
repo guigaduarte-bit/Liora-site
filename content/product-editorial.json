@@ -1,0 +1,164 @@
+[
+  {
+    "id": "vela-escultural-lady-veil-phie3",
+    "displayName": "Vela escultural Lady Veil",
+    "description": "Vela decorativa em formato de busto feminino, com véu e flores esculpidos. Lady Veil reúne esses detalhes em uma peça da linha Esculturas.",
+    "specs": [{"label": "Formato", "value": "Busto feminino"}, {"label": "Detalhes", "value": "Véu e flores"}]
+  },
+  {
+    "id": "vela-decorativa-anjo-em-vitral-1sbe9",
+    "displayName": "Vela decorativa Anjo em Vitral",
+    "description": "Vela decorativa com anjo e criança em uma moldura detalhada. Os ornamentos florais completam o desenho da peça Anjo em Vitral.",
+    "specs": [{"label": "Motivo", "value": "Anjo e criança"}, {"label": "Detalhes", "value": "Moldura e ornamentos florais"}]
+  },
+  {
+    "id": "botanique",
+    "displayName": "Botanique — 250 g",
+    "description": "Vela em recipiente de vidro com tampa metálica e decoração de pássaros e flores. Esta é a versão Botanique identificada como 250 g no catálogo Liora.",
+    "specs": [{"label": "Recipiente", "value": "Vidro"}, {"label": "Tampa", "value": "Metálica"}, {"label": "Decoração", "value": "Pássaros e flores"}]
+  },
+  {
+    "id": "botanique-150-gr-1gyzj",
+    "displayName": "Botanique — 150 g",
+    "description": "Botanique em copo de vidro, com tampa de madeira e decoração floral e de pássaro. Esta página apresenta a versão identificada como 150 g no catálogo.",
+    "specs": [{"label": "Recipiente", "value": "Copo de vidro"}, {"label": "Tampa", "value": "Madeira"}, {"label": "Decoração", "value": "Flores e pássaro"}]
+  },
+  {
+    "id": "botanique-70-ml-1dqj4",
+    "displayName": "Botanique — 70 g",
+    "description": "Vela perfumada em copo de vidro, com tampa de madeira e estampa floral. É a versão Botanique identificada como 70 g no catálogo atual.",
+    "specs": [{"label": "Recipiente", "value": "Copo de vidro"}, {"label": "Tampa", "value": "Madeira"}, {"label": "Decoração", "value": "Estampa floral"}]
+  },
+  {
+    "id": "ursinho",
+    "displayName": "Pequeno Amor",
+    "description": "Pequeno Amor é uma peça feita à mão da coleção Essenciais. O modelo integra o catálogo de velas decorativas Liora.",
+    "specs": [{"label": "Produção", "value": "Peça feita à mão"}]
+  },
+  {
+    "id": "flordevenus",
+    "displayName": "Flor de Vênus — rosto com flores",
+    "description": "Vela decorativa em formato de rosto feminino com flores. Esta versão de Flor de Vênus pertence à coleção Flora Linea.",
+    "specs": [{"label": "Formato", "value": "Rosto feminino com flores"}]
+  },
+  {
+    "id": "abraco-em-luz",
+    "displayName": "Abraço em Luz",
+    "description": "Peça decorativa de um anjo com asas grandes segurando uma criança. Abraço em Luz apresenta esse motivo na coleção Flora Linea.",
+    "specs": [{"label": "Motivo", "value": "Anjo segurando uma criança"}, {"label": "Detalhe", "value": "Asas grandes"}]
+  },
+  {
+    "id": "mini-bubble",
+    "displayName": "Mini Bubble",
+    "description": "Vela decorativa pequena formada por bolinhas em relevo. Mini Bubble combina essa textura com acabamento liso na coleção Essenciais.",
+    "specs": [{"label": "Textura", "value": "Bolinhas em relevo"}, {"label": "Acabamento", "value": "Liso"}]
+  },
+  {
+    "id": "bolhas",
+    "displayName": "Bolhas",
+    "description": "Peça decorativa em formato de esfera com textura de bolhas. O modelo Bolhas faz parte da coleção Clássico da Liora.",
+    "specs": [{"label": "Formato", "value": "Esfera"}, {"label": "Textura", "value": "Bolhas"}]
+  },
+  {
+    "id": "no-deluz",
+    "displayName": "Nó de Luz",
+    "description": "Vela decorativa em formato de nó entrelaçado, com textura artesanal. Nó de Luz integra a coleção Essenciais.",
+    "specs": [{"label": "Formato", "value": "Nó entrelaçado"}, {"label": "Textura", "value": "Artesanal"}]
+  },
+  {
+    "id": "lioracoral",
+    "displayName": "Liora Coral",
+    "description": "Vela escultural inspirada em formas orgânicas. Liora Coral integra a linha Esculturas do catálogo da marca.",
+    "specs": [{"label": "Desenho", "value": "Inspirado em formas orgânicas"}]
+  },
+  {
+    "id": "essenza-cube",
+    "displayName": "Essenza Cube",
+    "description": "Vela artesanal da linha Esculturas. Essenza Cube é apresentada no catálogo Liora como uma peça decorativa que aproxima vela e escultura.",
+    "specs": [{"label": "Produção", "value": "Artesanal"}]
+  },
+  {
+    "id": "kit-silhouette",
+    "displayName": "Kit Silhouette",
+    "description": "Kit decorativo da linha Esculturas, apresentado no catálogo Liora com o nome Silhouette.",
+    "specs": [{"label": "Linha", "value": "Esculturas"}]
+  },
+  {
+    "id": "trevo",
+    "displayName": "Trevo",
+    "description": "Peça decorativa da linha Esculturas, apresentada no catálogo como Trevo Cilindro. O modelo traz desenho contemporâneo para a coleção.",
+    "specs": [{"label": "Modelo", "value": "Trevo Cilindro"}]
+  },
+  {
+    "id": "perolas",
+    "displayName": "Pérolas",
+    "description": "Vela decorativa cilíndrica com textura de bolinhas. Pérolas integra a coleção Clássico da Liora.",
+    "specs": [{"label": "Formato", "value": "Cilíndrico"}, {"label": "Textura", "value": "Bolinhas"}]
+  },
+  {
+    "id": "kit-boho-glass",
+    "displayName": "Kit Boho Glass",
+    "description": "Kit Boho Glass apresenta vela perfumada em vidro listrado, com tampa de bolinhas. O recipiente e sua tampa compõem o desenho descrito no catálogo.",
+    "specs": [{"label": "Recipiente", "value": "Vidro listrado"}, {"label": "Tampa", "value": "Bolinhas"}]
+  },
+  {
+    "id": "lumina",
+    "displayName": "Lumina",
+    "description": "Vaso decorativo arredondado com textura geométrica. Lumina faz parte da coleção Clássico do catálogo Liora.",
+    "specs": [{"label": "Formato", "value": "Arredondado"}, {"label": "Textura", "value": "Geométrica"}]
+  },
+  {
+    "id": "gota-de-luz1",
+    "displayName": "Gota de Luz",
+    "description": "Vela artesanal de formato arredondado com desenho em espiral. Gota de Luz integra a linha Esculturas da Liora.",
+    "specs": [{"label": "Formato", "value": "Arredondado"}, {"label": "Desenho", "value": "Espiral"}, {"label": "Produção", "value": "Artesanal"}]
+  },
+  {
+    "id": "geometricafacetada",
+    "displayName": "Liora Elegance",
+    "description": "Vela aromática em formato geométrico facetado. Liora Elegance é um modelo decorativo da linha Esculturas.",
+    "specs": [{"label": "Formato", "value": "Geométrico facetado"}]
+  },
+  {
+    "id": "cilindro-mosaico",
+    "displayName": "Cilindro Mosaico",
+    "description": "Vela decorativa com textura geométrica. Cilindro Mosaico integra a linha Esculturas do catálogo Liora.",
+    "specs": [{"label": "Textura", "value": "Geométrica"}]
+  },
+  {
+    "id": "chama-esculpida",
+    "displayName": "Chama Esculpida",
+    "description": "Vela decorativa cilíndrica com relevo em ondas. Chama Esculpida traz esse acabamento à coleção Clássico da Liora.",
+    "specs": [{"label": "Formato", "value": "Cilíndrico"}, {"label": "Relevo", "value": "Ondas"}]
+  },
+  {
+    "id": "jardim-encantado",
+    "displayName": "Jardim Encantado — arranjo floral",
+    "description": "Arranjo de velas florais em vaso decorativo. Esta versão de Jardim Encantado reúne as formas das flores em uma composição para decoração.",
+    "specs": [{"label": "Composição visual", "value": "Arranjo de velas florais"}, {"label": "Apresentação", "value": "Vaso decorativo"}]
+  },
+  {
+    "id": "camafeufada",
+    "displayName": "Camafeu Fada",
+    "description": "Peça decorativa com fita e relevo de fada com flores. Camafeu Fada integra as coleções Essenciais, Esculturas e Clássico.",
+    "specs": [{"label": "Motivo", "value": "Fada com flores em relevo"}, {"label": "Detalhe", "value": "Fita"}]
+  },
+  {
+    "id": "botanicavasogesso",
+    "displayName": "Jardim Encantado — flores em vaso",
+    "description": "Vela artesanal em vaso, com flores detalhadas. Esta versão de Jardim Encantado pertence à coleção Flora Linea.",
+    "specs": [{"label": "Apresentação", "value": "Vaso com flores detalhadas"}, {"label": "Produção", "value": "Artesanal"}]
+  },
+  {
+    "id": "peonia",
+    "displayName": "Flor de Vênus — flor com base texturizada",
+    "description": "Vela decorativa em forma de flor com base texturizada. Esta versão de Flor de Vênus integra a coleção Flora Linea.",
+    "specs": [{"label": "Formato", "value": "Flor"}, {"label": "Base", "value": "Texturizada"}]
+  },
+  {
+    "id": "sagrada-familia",
+    "displayName": "Sagrada Família",
+    "description": "Escultura decorativa com o motivo da Sagrada Família e acabamento liso. A peça integra as coleções Essenciais e Esculturas da Liora.",
+    "specs": [{"label": "Motivo", "value": "Sagrada Família"}, {"label": "Acabamento", "value": "Liso"}]
+  }
+]
