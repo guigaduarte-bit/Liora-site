@@ -270,6 +270,7 @@ function maskCEP(el){
   if(v.replace('-','').length===8){
     buscarCEP(v.replace('-',''));
   }else{
+    shippingRequestId++;
     shippingState={status:'idle',quotes:[],preview:false,error:'',code:'',sandbox:false,cep:''};
     selectedShippingService='';
   }

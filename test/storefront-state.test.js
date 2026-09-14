@@ -113,6 +113,33 @@ test('mudança de carrinho invalida serviço, preço e requisição de frete ant
   assert.ok(app.run('shippingRequestId') > 10);
 });
 
+test('resposta atrasada de frete não repõe endereço e cotação depois de apagar um dígito do CEP', async () => {
+  const requests = new Map();
+  const app = storefront({
+    fetch: (url) => new Promise((resolve) => requests.set(url, resolve))
+  });
+  await app.done;
+  app.run("addToCart('botanique',1); checkoutForm.cep='80000-000'; checkoutForm.addr='Endereço informado pelo cliente';");
+  const quoteDone = app.run("buscarCEP('80000000')");
+  assert.equal(requests.size, 2);
+  app.run("maskCEP({value:'80000-00'})");
+
+  requests.get('https://viacep.com.br/ws/80000000/json/')({
+    json: async () => ({ logradouro: 'Rua anterior', bairro: 'Centro', localidade: 'Curitiba', uf: 'PR' })
+  });
+  requests.get('/api/shipping-quote')({
+    ok: true,
+    json: async () => ({ quotes: [{ id: 'curitiba-fixed', price: 19.9 }] })
+  });
+  await quoteDone;
+
+  assert.equal(app.run('checkoutForm.cep'), '80000-00');
+  assert.equal(app.run('checkoutForm.addr'), 'Endereço informado pelo cliente');
+  assert.equal(app.run('shippingState.status'), 'idle');
+  assert.equal(app.run('shippingState.quotes.length'), 0);
+  assert.equal(app.run('selectedShippingService'), '');
+});
+
 test('fragrância é exibida como texto e não altera os comandos do carrinho', async () => {
   const app = storefront();
   await app.done;
