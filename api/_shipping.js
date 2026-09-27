@@ -1,5 +1,7 @@
 'use strict';
 
+const { buildShippingProducts } = require('./_shipping-products');
+
 const SHIP_FREE = 150;
 const CURITIBA_SHIPPING_COST = 19.9;
 const SUPERFRETE_ENDPOINT = '/api/v0/calculator';
@@ -26,16 +28,6 @@ function cleanZip(value) {
 function isCuritibaZip(zipCode) {
   const numericZip = Number(cleanZip(zipCode));
   return numericZip >= 80000000 && numericZip <= 82999999;
-}
-
-function packageFor(cart) {
-  const quantity = cart.reduce((sum, item) => sum + item.quantity, 0);
-  return {
-    width: 20,
-    height: Math.min(60, 12 + quantity * 3),
-    length: 20,
-    weight: roundCurrency(Math.max(0.3, quantity * 0.35))
-  };
 }
 
 function previewQuotes(zipCode) {
@@ -106,7 +98,7 @@ function providerErrors(data) {
   return [...new Set(messages)].slice(0, 8);
 }
 
-async function requestSuperFrete({ baseUrl, token, destination, cart, subtotal, services }) {
+async function requestSuperFrete({ baseUrl, token, destination, products, subtotal, services }) {
   const origin = cleanZip(process.env.SHIP_ORIGIN_CEP);
   const response = await fetch(`${baseUrl.replace(/\/$/, '')}${SUPERFRETE_ENDPOINT}`, {
     method: 'POST',
@@ -126,7 +118,7 @@ async function requestSuperFrete({ baseUrl, token, destination, cart, subtotal, 
         insurance_value: subtotal,
         use_insurance_value: subtotal > 0
       },
-      package: packageFor(cart)
+      products
     })
   });
   const data = await response.json().catch(() => null);
@@ -138,6 +130,7 @@ async function superFreteQuotes({ destination, cart, subtotal }) {
   const token = String(process.env.SUPERFRETE_TOKEN || '').trim();
   if (!origin || !token) return { preview: true, quotes: previewQuotes(destination) };
 
+  const products = buildShippingProducts(cart);
   const baseUrl = process.env.SUPERFRETE_BASE_URL || 'https://api.superfrete.com';
   const sandbox = /sandbox\.superfrete\.com/i.test(baseUrl);
   const requestedServices = process.env.SUPERFRETE_SERVICES || DEFAULT_SERVICES;
@@ -147,7 +140,7 @@ async function superFreteQuotes({ destination, cart, subtotal }) {
     baseUrl,
     token,
     destination,
-    cart,
+    products,
     subtotal,
     services: requestedServices
   }));
@@ -158,7 +151,7 @@ async function superFreteQuotes({ destination, cart, subtotal }) {
       baseUrl,
       token,
       destination,
-      cart,
+      products,
       subtotal,
       services: '1,2'
     }));
@@ -242,4 +235,3 @@ module.exports = {
   quoteShipping,
   roundCurrency
 };
-

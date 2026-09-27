@@ -5,8 +5,13 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { afterEach, test } = require('node:test');
 
-const createPreference = require('../api/create-preference');
-const shippingQuote = require('../api/shipping-quote');
+const { loadApi, confirmedShipping } = require('./helpers/isolated-api.cjs');
+const shippingProducts = {
+  botanique: confirmedShipping(),
+  peonia: confirmedShipping({ weightGrams: 100 })
+};
+const createPreference = loadApi('create-preference.js', { shippingProducts });
+const shippingQuote = loadApi('shipping-quote.js', { shippingProducts });
 const paymentStatus = require('../api/payment-status');
 const infinitePayStatus = require('../api/infinitepay-status');
 const catalog = require('../api/catalog');
@@ -41,7 +46,7 @@ async function invoke(handler, req) {
     body: null,
     setHeader(name, value) { this.headers[name.toLowerCase()] = value; },
     status(code) { this.statusCode = code; return this; },
-    json(body) { this.body = body; return this; }
+    json(body) { this.body = JSON.parse(JSON.stringify(body)); return this; }
   };
   await handler(req, res);
   return res;

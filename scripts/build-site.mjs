@@ -2,12 +2,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
 import {createRequire} from 'node:module';
+import {normalizeBusinessIdentity,applyBusinessIdentity} from './business-identity.mjs';
 const require=createRequire(import.meta.url);
 const catalog=require('../api/catalog.js');
 const {lioraEscape:e,lioraMoney:money,lioraImage,lioraCardHTML,lioraTabsHTML,lioraAromasHTML}=require('../assets/components.js');
 const root=path.resolve(import.meta.dirname||path.dirname(new URL(import.meta.url).pathname),'..');
 const read=f=>fs.readFileSync(path.join(root,f),'utf8');
 const json=f=>JSON.parse(read(f));
+const businessIdentity=normalizeBusinessIdentity(json('content/business.json'));
 const base='https://lioraaromasdeluxo.com.br';
 const out=path.join(root,'dist');
 fs.rmSync(out,{recursive:true,force:true});fs.mkdirSync(out,{recursive:true});
@@ -40,7 +42,7 @@ const crumbSchema=(items)=>({'@context':'https://schema.org','@type':'Breadcrumb
 function metadata({url,title,description,img='/assets/images/eiffel.jpg',schemas=[]}){
  return `<title>${e(title)}</title>\n<meta name="description" content="${e(description)}">\n<link rel="canonical" href="${base+url}">\n<meta property="og:type" content="website">\n<meta property="og:locale" content="pt_BR">\n<meta property="og:site_name" content="Liora Aromas de Luxo">\n<meta property="og:title" content="${e(title)}">\n<meta property="og:description" content="${e(description)}">\n<meta property="og:url" content="${base+url}">\n<meta property="og:image" content="${base+img}">\n<meta name="twitter:card" content="summary_large_image">\n${schemas.map(s=>`<script type="application/ld+json">${JSON.stringify(s).replace(/</g,'\\u003c')}</script>`).join('\n')}`;
 }
-let template=read('index.html').replace('<link rel="icon" id="fav" href="">','<link rel="icon" id="fav" href="/assets/images/responsive/logo-96.webp">');
+let template=applyBusinessIdentity(read('index.html'),businessIdentity).replace('<link rel="icon" id="fav" href="">','<link rel="icon" id="fav" href="/assets/images/responsive/logo-96.webp">');
 template=template.replace(/<ul id="footCats"><\/ul>/,`<ul id="footCats">${categories.slice(1).map(c=>`<li><a href="${c.path}">${c.name}</a></li>`).join('')}<li><a href="/catalogo-de-aromas/">Catálogo de Aromas</a></li><li><a href="/velas-personalizadas/">Personalização</a></li></ul>`);
 // All essential image resources are present before JavaScript executes.
 template=template.replace(/<img([^>]*?)data-([ip])="([^"]+)"([^>]*)>/g,(all,a,kind,id,b)=>{
@@ -85,7 +87,7 @@ const infoPages=[
 ];
 for(const p of infoPages)page({...p,title:`${p.title} | Liora`,schemas:[crumbSchema([{name:p.title,path:p.url}])]},`<section class="wrap">${crumbs([{name:p.title}])}<div class="page-intro"><p class="eyebrow">Liora · Aromas de Luxo</p><h1 class="display">${p.title}</h1><p>${p.description}</p></div><div class="prose">${p.body}</div></section>`);
 for(const file of ['trocas-e-devolucoes.html','termos-de-uso.html','politica-de-privacidade.html']){
- let html=read(file);const title=html.match(/<title>(.*?)<\/title>/)[1],description=html.match(/<meta name="description" content="([^"]+)"/)[1];
+ let html=applyBusinessIdentity(read(file),businessIdentity);const title=html.match(/<title>(.*?)<\/title>/)[1],description=html.match(/<meta name="description" content="([^"]+)"/)[1];
  html=html.replace(/<title>.*?<\/title>/,metadata({url:`/${file}`,title,description})).replace(/(<meta name="description"[^>]+>)([\s\S]*?)<meta name="description"[^>]+>/,'$1$2');
  html=html.replace(/<link rel="canonical"[^>]+>/g,'').replace('</head>',`<link rel="canonical" href="${base}/${file}">\n</head>`);
  emit('/'+file,html);

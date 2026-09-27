@@ -5,6 +5,7 @@ const fs=require('node:fs');
 const path=require('node:path');
 const vm=require('node:vm');
 const catalog=require('../api/catalog');
+const business=require('../content/business.json');
 const routes=require('../docs/seo-routes.json');
 const root=path.join(__dirname,'../dist');
 const read=url=>fs.readFileSync(path.join(root,url.endsWith('/')?url.slice(1)+'index.html':url.slice(1)),'utf8');
@@ -20,7 +21,14 @@ test('todas as páginas têm conteúdo inicial, metadados únicos e destinos rea
   assert.ok(!titles.has(title),`duplicate title ${url}`);titles.add(title);
   assert.ok(!descriptions.has(desc),`duplicate description ${url}`);descriptions.add(desc);
   assert.doesNotMatch(html,/<meta name="robots"[^>]+noindex/,url);
-  assert.doesNotMatch(html,/mailto:|wa\.me\/|jullianas@gmail|Juliana Straatmann|id="newsForm"/,url);
+  // CNPJ and registered business name were explicitly supplied for display on
+  // 27/09/2026. Personal contact channels and CPF remain outside this preview.
+  assert.doesNotMatch(html,/mailto:|wa\.me\/|jullianas@gmail|id="newsForm"|\b\d{3}\.\d{3}\.\d{3}-\d{2}\b/,url);
+  if(business.cnpj){
+   const footer=html.match(/<footer\b[\s\S]*?<\/footer>/)[0];
+   assert.ok(footer.includes(`CNPJ ${business.cnpj}`),`missing business CNPJ ${url}`);
+   assert.ok(footer.includes(business.legalName),`missing business name ${url}`);
+  }
   for(const [,value] of html.matchAll(/(?:href|src)="(\/[^"?]*)"/g)){
    const p=value.split('#')[0];
    assert.ok(fs.existsSync(path.join(root,p.endsWith('/')?p.slice(1)+'index.html':p.slice(1))),`${url}: ${p}`);

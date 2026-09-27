@@ -333,6 +333,9 @@ module.exports = async function handler(req, res) {
     if (error instanceof SyntaxError) {
       return res.status(400).json({ error: 'Dados do checkout inválidos' });
     }
+    if (error && error.code === 'SHIPPING_DATA_INCOMPLETE') {
+      return res.status(503).json({ error: error.message, code: error.code });
+    }
     if (error && /Carrinho|produto|Quantidade|Estoque/i.test(error.message)) {
       return res.status(400).json({ error: error.message });
     }
