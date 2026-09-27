@@ -77,15 +77,30 @@ function normalizeQuotes(data) {
     .slice(0, 6);
 }
 
-function providerErrors(data) {
+function providerErrors(data, privateValues = []) {
   const messages = [];
-  const add = (value) => {
-    if (typeof value === 'string' && value.trim()) messages.push(value.trim().slice(0, 180));
-    if (value && typeof value === 'object') {
-      add(value.message);
-      add(value.error);
-      add(value.description);
-      add(value.error_description);
+  const add = (value, depth = 0) => {
+    if (depth > 4 || messages.length >= 16) return;
+    if (typeof value === 'string' && value.trim()) {
+      // Redact before truncating so part of a credential cannot survive the cut.
+      let message = value;
+      for (const privateValue of privateValues) {
+        if (privateValue) message = message.split(String(privateValue)).join('[redacted]');
+      }
+      message = message
+        .replace(/Bearer\s+\S+/gi, 'Bearer [redacted]')
+        .replace(/https?:\/\/\S+/gi, '[url]')
+        .replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, '[email]')
+        .replace(/\b\d{5}-?\d{3}\b/g, '[cep]')
+        .replace(/\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b/g, '[document]')
+        .replace(/[\r\n\t]+/g, ' ');
+      messages.push(message.trim().slice(0, 300));
+    } else if (Array.isArray(value)) {
+      value.slice(0, 16).forEach(item => add(item, depth + 1));
+    } else if (value && typeof value === 'object') {
+      for (const key of ['message', 'error', 'description', 'error_description']) {
+        add(value[key], depth + 1);
+      }
     }
   };
   if (Array.isArray(data)) {
@@ -179,12 +194,17 @@ async function superFreteQuotes({ destination, cart, subtotal, estimatedParcel }
   const diagnostics = attempts.map((attempt) => ({
     status: attempt.status,
     services: attempt.services,
-    messages: providerErrors(attempt.data)
+    responseType: Array.isArray(attempt.data) ? 'array' : attempt.data === null ? 'null' : typeof attempt.data,
+    resultCount: Array.isArray(attempt.data) ? attempt.data.length : null,
+    messages: providerErrors(attempt.data, [token, origin, destination])
   }));
   const hadAcceptedRequest = attempts.some((attempt) => attempt.ok);
 
   if (hadAcceptedRequest) {
-    console.warn('SuperFrete não retornou modalidades', { sandbox, attempts: diagnostics });
+    console.warn(JSON.stringify({
+      event: 'shipping_provider_no_options', sandbox, attempts: diagnostics,
+      originZipValid: /^\d{8}$/.test(origin), destinationZipValid: /^\d{8}$/.test(destination)
+    }));
     throw new ShippingQuoteError(
       'NO_SHIPPING_OPTIONS',
       sandbox
@@ -194,7 +214,7 @@ async function superFreteQuotes({ destination, cart, subtotal, estimatedParcel }
     );
   }
 
-  console.error('SuperFrete recusou a cotação', { sandbox, attempts: diagnostics });
+  console.error(JSON.stringify({ event: 'shipping_provider_rejected', sandbox, attempts: diagnostics }));
   throw new ShippingQuoteError(
     'SHIPPING_PROVIDER_UNAVAILABLE',
     sandbox
