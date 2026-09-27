@@ -2,6 +2,8 @@
 
 const CATALOG = require('./catalog');
 const SHIPPING_PRODUCTS = require('../content/shipping-products.json');
+const EDITORIAL = require('../content/product-editorial.json');
+const DISPLAY_NAMES = new Map(EDITORIAL.map((product) => [product.id, product.displayName]));
 const { estimateCartPackaging, isShippingEstimatePreview } = require('./_shipping-estimate');
 
 // This endpoint estimates packaging only. It does not create quotes, labels,
@@ -14,7 +16,7 @@ module.exports = async function handler(req, res) {
   if (req.method === 'GET') {
     return res.status(200).json({
       products: Object.entries(CATALOG).map(([id, product]) => ({
-        id, name: product.name, stock: product.stock,
+        id, name: DISPLAY_NAMES.get(id) || product.name, stock: product.stock,
         weightGrams: SHIPPING_PRODUCTS[id]?.weightGrams ?? null,
         dimensionsCm: SHIPPING_PRODUCTS[id]?.dimensionsCm ?? null
       }))
