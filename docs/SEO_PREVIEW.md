@@ -92,3 +92,9 @@ Na revisão visual hospedada, o logo do rodapé conservava a altura HTML origina
 ## Correção do Instagram — 27/09/2026
 
 A responsável informou o perfil como “liora aromas de luxo _candles”. O endereço e o rótulo do link no rodapé foram corrigidos para `@lioraaromasdeluxo_candles`, removendo os espaços e preservando o sublinhado antes de candles. O build propaga essa alteração às páginas que usam o rodapé da loja. O destino foi configurado conforme informado; buscas públicas não retornaram o perfil e não comprovam sua disponibilidade. Alteração somente no preview; sem publicação em produção.
+
+## Botanique 250 g — peso total e medidas confirmados em 27/09/2026
+
+A responsável confirmou a peça como vela luminária, com peso total de **475 g**, altura de **16 cm** e diâmetro de **9 cm**. O nome comercial Botanique 250 g foi mantido; o peso de frete da peça passa a ser 475 g. O cadastro de produto, a ficha pública e a logística usam os dados confirmados, com dimensões C 9 × L 9 × A 16 cm. Proteção/embalagem e dimensões protegidas continuam sem medição, portanto `confirmedForShipping` permanece falso. A confirmação substitui a interpretação anterior de 250 g como possível peso total, sem inventar o peso separado da cera. Alteração somente no preview.
+
+Validação desta atualização: `npm test` com 63 testes aprovados, build de 41 páginas e `git diff --check` sem erros. Dados da peça confirmados; cotações reais continuam dependentes de proteção/embalagem e credenciais.

@@ -14,7 +14,9 @@ Os Correios também podem considerar o peso cúbico: comprimento × largura × a
 
 `content/shipping-products.json` é o cadastro de logística do servidor. Os dados originais de `content/products.json` são referências do catálogo, não uma medição de expedição. `confirmedForShipping` só pode ser ativado depois de revisar peso da peça completa, proteção, três dimensões efetivas e acondicionamento para pedidos mistos.
 
-Não preencher dados ausentes a partir de fotografias. Não usar os nomes Botanique 250 g / 150 g como prova do peso do conjunto com vidro e tampa. Lady Veil não tem três dimensões cadastradas; Anjo em Vitral tem apenas duas. Há 25 pesos explícitos e 23 conjuntos completos de dimensões no catálogo de 27 itens.
+Não preencher dados ausentes a partir de fotografias. Não usar os nomes Botanique 250 g / 150 g como prova do peso do conjunto com vidro e tampa. A responsável confirmou que a Botanique 250 g (`botanique`) é uma vela luminária com peso total da peça de 475 g, altura de 16 cm e diâmetro de 9 cm; o cadastro considera comprimento de 9 cm, largura de 9 cm e altura de 16 cm. Ainda faltam o peso da proteção/acondicionamento e as dimensões da unidade protegida, por isso `confirmedForShipping` permanece `false`.
+
+A Botanique 150 g continua sem peso total ou dimensões confirmados. Lady Veil não tem três dimensões cadastradas; Anjo em Vitral tem apenas duas. Há 26 pesos explícitos e 24 conjuntos completos de dimensões no catálogo de 27 itens. A confirmação dos dados da peça não substitui a homologação da expedição.
 
 Com credenciais de transportadora configuradas, um carrinho com qualquer SKU incompleto não deve gerar cotação parcial ou valor fictício. A entrega local mantém suas condições independentes. Sem credenciais, as opções demonstrativas continuam identificadas e bloqueadas para pagamento.
 

@@ -51,8 +51,8 @@ async function invoke(handler, body) {
 
 test('dados extraídos cobrem todos os SKUs e não aprovam pesos comerciais para expedição', () => {
   assert.deepEqual(Object.keys(shippingData).sort(), Object.keys(catalog).sort());
-  assert.equal(Object.values(shippingData).filter((item) => item.weightGrams !== null).length, 25);
-  assert.equal(Object.values(shippingData).filter((item) => item.dimensionsCm !== null).length, 23);
+  assert.equal(Object.values(shippingData).filter((item) => item.weightGrams !== null).length, 26);
+  assert.equal(Object.values(shippingData).filter((item) => item.dimensionsCm !== null).length, 24);
   for (const product of products) {
     const data = shippingData[product.id];
     assert.equal(data.confirmedForShipping, false);
@@ -60,7 +60,8 @@ test('dados extraídos cobrem todos os SKUs e não aprovam pesos comerciais para
     assert.equal(data.shippingDimensionsCm, null);
     assert.deepEqual(data.source, { file: 'content/products.json', field: 'dims', text: product.dims });
   }
-  assert.equal(shippingData.botanique.weightGrams, null);
+  assert.equal(shippingData.botanique.weightGrams, 475);
+  assert.deepEqual(shippingData.botanique.dimensionsCm, { length: 9, width: 9, height: 16 });
   assert.equal(shippingData['botanique-150-gr-1gyzj'].weightGrams, null);
   assert.equal(shippingData['vela-decorativa-anjo-em-vitral-1sbe9'].dimensionsCm, null, 'duas medidas não definem um volume');
   assert.deepEqual(shippingData['kit-silhouette'].dimensionsCm, { length: 8, width: 6, height: 13 });

@@ -24,15 +24,19 @@
     }
   },
   "botanique": {
-    "weightGrams": null,
-    "dimensionsCm": null,
+    "weightGrams": 475,
+    "dimensionsCm": {
+      "length": 9,
+      "width": 9,
+      "height": 16
+    },
     "packingWeightGrams": null,
     "shippingDimensionsCm": null,
     "confirmedForShipping": false,
     "source": {
       "file": "content/products.json",
       "field": "dims",
-      "text": ""
+      "text": "Peso total: 475 g · Altura: 16 cm · Diâmetro: 9 cm"
     }
   },
   "botanique-150-gr-1gyzj": {

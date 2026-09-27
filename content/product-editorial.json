@@ -14,8 +14,8 @@
   {
     "id": "botanique",
     "displayName": "Botanique — 250 g",
-    "description": "Vela em recipiente de vidro com tampa metálica e decoração de pássaros e flores. Esta é a versão Botanique identificada como 250 g no catálogo Liora.",
-    "specs": [{"label": "Recipiente", "value": "Vidro"}, {"label": "Tampa", "value": "Metálica"}, {"label": "Decoração", "value": "Pássaros e flores"}]
+    "description": "Vela luminária em recipiente de vidro com tampa metálica e decoração de pássaros e flores. Esta é a versão Botanique identificada como 250 g no catálogo Liora.",
+    "specs": [{"label": "Recipiente", "value": "Vidro"}, {"label": "Tampa", "value": "Metálica"}, {"label": "Decoração", "value": "Pássaros e flores"}, {"label": "Peso total da peça", "value": "475 g"}, {"label": "Altura", "value": "16 cm"}, {"label": "Diâmetro", "value": "9 cm"}]
   },
   {
     "id": "botanique-150-gr-1gyzj",
