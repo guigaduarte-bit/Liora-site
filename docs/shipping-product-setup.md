@@ -1,42 +1,58 @@
-# Frete por produto — Liora
+# Frete por carrinho — Liora
 
-Atualização: 27/09/2026. Preparação em preview, sem homologação de transportadora e sem publicação em produção.
+Atualização: 27/09/2026. Estimador implementado no preview. Embalagens e transportadora ainda não homologadas; publicação em produção depende de aprovação.
 
-## Regra de cálculo
+## Dados separados
 
-O peso das peças é a soma do peso unitário de cada SKU multiplicado por sua quantidade. Fragrâncias diferentes do mesmo SKU não mudam esse peso. A integração deve enviar `products` à SuperFrete, com quantidade, peso em kg e três dimensões em cm por unidade, sem o antigo `package` fixo. A API calcula o acondicionamento e devolve o preço conforme os CEPs de origem/destino, serviço e contrato.
+- `content/shipping-products.json`: peso total e dimensões de cada peça. A Botanique 250 g foi confirmada com 475 g, altura 16 cm e diâmetro 9 cm. Os demais dados são referências do catálogo, sem confirmação automática para postagem. Lady Veil e Anjo em Vitral não têm três dimensões; Botanique 150 g também não tem peso completo. São 26 pesos e 24 conjuntos completos de dimensões em 27 SKUs.
+- `content/shipping-packaging-estimate.json`: nove modelos RPC dos Correios, taras provisórias e parâmetros de proteção. Nenhuma estimativa deve ser gravada como peso medido.
+- `api/_shipping-estimate.js`: compõe caixas conforme os produtos e quantidades. A responsável não precisa medir todas as combinações de compra; validar caixas e regras com amostras representativas.
 
-O cadastro guarda o peso da peça separado do acréscimo de proteção/acondicionamento. A informação destinada à transportadora precisa representar o peso efetivamente postado, incluindo recipiente, tampa, proteção e embalagem. Não usar somente o peso de cera de um produto em vidro. A distribuição do peso de acondicionamento por unidade precisa ser conferida com pedidos reais, simples e mistos; não inventar uma margem universal.
+## Cálculo de estimativa
 
-Os Correios também podem considerar o peso cúbico: comprimento × largura × altura em centímetros ÷ 6.000. A fórmula não calcula preço em reais. Não implementar tabela ou limiar de cubagem local; o provedor aplica as condições do serviço/contrato. A API direta dos Correios recebe peso em gramas; a SuperFrete recebe em kg.
+Peso por volume = soma(peso total da peça × quantidade) + tara da caixa + 50 g por peça + 50 g por caixa.
 
-## Dados e liberação
+A tara é somada uma vez por caixa. Fragrâncias do mesmo SKU são agrupadas. Somente dados do servidor fornecem pesos e dimensões; valores enviados pelo navegador são ignorados.
 
-`content/shipping-products.json` é o cadastro de logística do servidor. Os dados originais de `content/products.json` são referências do catálogo, não uma medição de expedição. `confirmedForShipping` só pode ser ativado depois de revisar peso da peça completa, proteção, três dimensões efetivas e acondicionamento para pedidos mistos.
+Hipóteses editáveis, sem certificação: proteção de 1,5 cm por face; parede de 0,5 cm por face. As dimensões RPC são tratadas como externas no modelo; as internas ficam 1 cm menores em cada eixo. A massa de proteção e sua espessura são hipóteses independentes. A Botanique ocupa 12 × 12 × 19 cm protegida e fica no limite da altura interna estimada da G20. Com 2 cm por face, é necessária caixa mais alta para manter a peça em pé.
 
-Não preencher dados ausentes a partir de fotografias. Não usar os nomes Botanique 250 g / 150 g como prova do peso do conjunto com vidro e tampa. A responsável confirmou que a Botanique 250 g (`botanique`) é uma vela luminária com peso total da peça de 475 g, altura de 16 cm e diâmetro de 9 cm; o cadastro considera comprimento de 9 cm, largura de 9 cm e altura de 16 cm. Ainda faltam o peso da proteção/acondicionamento e as dimensões da unidade protegida, por isso `confirmedForShipping` permanece `false`.
+A acomodação usa milímetros inteiros, peças em pé, rotação somente da base, sem empilhamento. Retângulos livres não se sobrepõem. Tenta a menor caixa por volume que comporta o conjunto; quando nenhuma comporta tudo, divide em volumes usando a caixa que recebe mais peças. É uma heurística conservadora, não uma solução ótima de empacotamento. Pode utilizar mais caixas que uma montagem manual. Limites: 100 peças e 20 volumes.
 
-A Botanique 150 g continua sem peso total ou dimensões confirmados. Lady Veil não tem três dimensões cadastradas; Anjo em Vitral tem apenas duas. Há 26 pesos explícitos e 24 conjuntos completos de dimensões no catálogo de 27 itens. A confirmação dos dados da peça não substitui a homologação da expedição.
+Qualquer produto incompleto ou que não cabe impede um resultado parcial silencioso. Jardim Encantado precisa de caixa maior neste modelo. Não deduzir dimensões ausentes a partir de fotografias.
 
-Com credenciais de transportadora configuradas, um carrinho com qualquer SKU incompleto não deve gerar cotação parcial ou valor fictício. A entrega local mantém suas condições independentes. Sem credenciais, as opções demonstrativas continuam identificadas e bloqueadas para pagamento.
+## Isolamento do preview e integração
 
-## Homologação
+O modo de estimativa só é ativado por `VERCEL_ENV=preview` no servidor; campos do cliente não podem ativá-lo.
 
-1. Medir e confirmar os dados de cada SKU e sua proteção. Conferir principalmente itens com vidro, tampa e kits.
-2. Configurar token Sandbox, origem, endpoint e contato técnico funcional no Preview. Os segredos não entram em arquivos públicos.
-3. Comparar a API com o painel SuperFrete usando os mesmos itens, quantidades, CEPs, valor declarado e serviços.
-4. Conferir se o acondicionamento proposto pela API é viável para velas frágeis. Registrar as dimensões retornadas e reproduzi-las ao emitir a etiqueta; caso o pacote real seja diferente, recalcular antes de cobrar/postar.
-5. Cobrir uma peça, duas iguais, produtos mistos, kit, item com medidas ausentes, rota sem modalidade e alteração do carrinho/CEP. Conferir Curitiba R$ 19,90 e gratuidade em subtotal de produtos ≥ R$ 150 antes do desconto Pix.
-6. Concluir consulta de preço real no ambiente correto, sem compra de etiqueta, antes de afirmar preço/cobertura homologados. Pagamentos e emissão de etiquetas continuam etapas separadas.
+- `/__preview-frete/`: ferramenta de conferência, gerada somente no build de preview (ou build local de QA). Permite testar os 27 modelos e carrinhos hipotéticos, inclusive quantidades maiores que o estoque, sem fazer compra nem alterar estoque.
+- `/api/preview-shipping-estimate`: GET de dados públicos do catálogo e POST de estimativa; retorna 404 fora do ambiente Preview. Sem chamadas a transportadoras ou pagamentos.
+- `/api/shipping-quote`: continua validando o estoque real do checkout. No Preview acrescenta o resumo da embalagem. Com um volume e credenciais disponíveis, envia à SuperFrete apenas `package`, com dimensões externas e peso total convertido de g para kg. Não envia `products` junto, pois `package` prevalece na API.
+- Cotações externas com embalagem estimada recebem `preview: true` e `estimated: true`. São bloqueadas no botão de pagamento e revalidadas/bloqueadas no servidor antes de qualquer criação de pagamento.
+- Sem credenciais ou com falha do provedor, a embalagem permanece visível com aviso; não são inventadas tarifas para esta estimativa. Múltiplos volumes são mostrados separadamente e ainda não geram cotação conjunta. Não tratá-los como um único pacote fictício.
+- A entrega local de Curitiba mantém sua regra independente. Frete grátis a partir de R$ 150 em produtos, antes do Pix, continua com o mesmo alcance do código existente; não foi limitado a Curitiba. Pix mantém 5% de desconto. Produção: 10 dias úteis após pagamento e personalização confirmados, acrescidos do transporte.
+- Fora do Preview, permanece o caminho anterior `buildShippingProducts`, que exige dados logísticos confirmados por SKU. A promoção do código para produção não ativa a estimativa automaticamente. A migração definitiva para caixas por pedido é uma próxima etapa após validação.
 
-## Identificação comercial
+## Evidências locais
 
-`content/business.json` reúne a identificação comercial para o build. O CNPJ e o nome empresarial foram informados pela responsável em 27/09/2026 no pedido de inclusão da identificação no site. O nome fantasia continua Liora Aromas de Luxo. A identificação fornecida aparece no rodapé e nas políticas. A validação local não consulta nem comprova situação cadastral. A autorização para a identificação empresarial não autoriza divulgar CPF, endereço residencial ou outros dados pessoais.
+Suite atual: 142 testes aprovados, com build de 41 páginas. Inclui 27 modelos (23 estimáveis, três incompletos e um sem caixa), conservação de todos os 23 modelos completos no mesmo carrinho, colisões/limites, rotação, tara por volume, conversão para kg, estoque, falsificação de dados, bloqueio de cobrança estimada, preservação das regras existentes e isolamento de produção. Chamadas de provedores foram simuladas em memória; não homologam as contas externas.
 
-## Fontes oficiais consultadas
+| Exemplo | Resultado |
+|---|---|
+| Uma Botanique | G20, 875 g |
+| Duas Botanique | G20, 1.400 g |
+| Quatro Mini Bubble | M08, 530 g |
+| Uma Botanique e dois Ursinhos | G20, 1.055 g |
+| Quatro Botanique, hipótese no simulador | Duas G20 de 1.400 g; checkout continua recusando quantidade acima do estoque |
 
-- [SuperFrete — Cotação por produtos](https://superfrete.readme.io/reference/calculator)
-- [SuperFrete — Peso real e cubagem dos Correios](https://ajuda.superfrete.com/artigo/como-funciona-o-calculo-dos-correios/)
-- [Correios — Manual da API Preço](https://www.correios.com.br/atendimento/developers/manuais/manual-api-preco-1)
+## Próximas etapas de homologação
 
-O procedimento de emissão de etiquetas não foi implementado nesta mudança. A produção continua dependendo de preview testado e aprovação explícita.
+1. Confirmar os modelos de caixa realmente adotados, suas dimensões internas/externas e tara; calibrar proteção com uma peça, duas iguais e um pedido misto. Não exigir todas as combinações.
+2. Completar os dados faltantes de peças e revisar pesos totais de outros vidros/kits. Nunca presumir que o nome do produto é o peso completo.
+3. Configurar credenciais e origem no Preview sem gravar segredos no repositório. Comparar cotação da API com painel usando peso, caixa, CEPs, valor declarado e serviços iguais.
+4. Implementar/homologar cotações e etiquetas para múltiplos volumes antes de liberar esse caso para cobrança. A etiqueta deve reproduzir o pacote real.
+5. Revisar a regra operacional aprovada, ativar apenas dados conferidos e testar pagamento/retorno antes da aprovação de produção.
+
+## Fontes
+
+- Correios: https://www.correios.com.br/Plone/enviar/encomendas/arquivo/nacional/guia-tecnico-embalagens-rpc_v1-1.pdf — dimensões dos modelos RPC. Resistência não é tara; o guia não confirma estoque de caixas em uma agência.
+- SuperFrete: https://superfrete.readme.io/reference/cotacao-de-frete — `products`, `package`, unidades e consistência com a etiqueta.

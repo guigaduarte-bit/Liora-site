@@ -55,7 +55,7 @@ let cart=[], wish=new Set(), drawerView='cart', currentTab=document.body.dataset
 let quick={id:null,qty:1};
 let payMethod='pix', shipMethod='delivery', selectedShippingService='';
 let checkoutForm={name:'',email:'',cep:'',num:'',addr:''};
-let shippingState={status:'idle',quotes:[],preview:false,error:'',code:'',sandbox:false,cep:''};
+let shippingState={status:'idle',quotes:[],preview:false,packaging:null,notice:'',error:'',code:'',sandbox:false,cep:''};
 let shippingRequestId=0;
 
 const $=id=>document.getElementById(id);
@@ -140,7 +140,7 @@ function restoreCart(){
 function updateCounts(){
   const next=JSON.stringify(cart.map(({id,qty,frag})=>({id,qty,frag})));
   if(next!==cartFingerprint){
-    shippingState={status:'idle',quotes:[],preview:false,error:'',code:'',sandbox:false,cep:''};
+    shippingState={status:'idle',quotes:[],preview:false,packaging:null,notice:'',error:'',code:'',sandbox:false,cep:''};
     selectedShippingService='';shippingRequestId++;cartFingerprint=next;
   }
   saveCart();
@@ -206,7 +206,11 @@ function renderDrawer(){
 /* ============ CHECKOUT ============ */
 function checkoutCepStatus(){
   if(shippingState.status==='loading')return 'Calculando entrega…';
-  if(shippingState.status==='ready')return 'Entrega calculada para este CEP ✓';
+  if(shippingState.status==='ready'){
+    if(!shippingState.quotes.length)return 'CEP consultado; entrega ainda não disponível.';
+    if(shippingState.quotes.every(q=>q.preview))return 'Simulação de entrega para este CEP.';
+    return 'Entrega calculada para este CEP ✓';
+  }
   if(shippingState.status==='error'&&shippingState.code==='NO_SHIPPING_OPTIONS')return 'CEP localizado; sem modalidade automática nesta rota.';
   if(shippingState.status==='error')return 'CEP localizado; cotação temporariamente indisponível.';
   return '';
@@ -215,7 +219,8 @@ function renderCheckout(){
   $('drawerTitle').textContent='Finalizar compra';
   const st=subtotal();
   const selectedQuote=shippingState.quotes.find(q=>q.id===selectedShippingService);
-  const checkoutReady=shipMethod!=='delivery'||Boolean(selectedQuote);
+  const previewOnly=shipMethod==='delivery'&&Boolean(selectedQuote?.preview);
+  const checkoutReady=shipMethod!=='delivery'||Boolean(selectedQuote&&!previewOnly);
   const ship=shipMethod==='delivery'&&selectedQuote?selectedQuote.price:0;
   const disc=payMethod==='pix'?roundCurrency(st*0.05):0;
   const total=roundCurrency(st+ship-disc);
@@ -225,13 +230,14 @@ function renderCheckout(){
     <div class="field"><label for="fN">Nome completo</label><input id="fN" placeholder="Seu nome" value="${escapeAttr(checkoutForm.name)}" oninput="checkoutForm.name=this.value"></div>
     <div class="field"><label for="fE">E-mail</label><input id="fE" type="email" placeholder="voce@email.com" value="${escapeAttr(checkoutForm.email)}" oninput="checkoutForm.email=this.value"></div>
     <div class="f-row">
-      <div class="field"><label for="fC">CEP</label><input id="fC" placeholder="80000-000" inputmode="numeric" maxlength="9" value="${escapeAttr(checkoutForm.cep)}" oninput="checkoutForm.cep=this.value;maskCEP(this)"><span id="cepStatus" class="cep-status ${shippingState.status==='error'?'error':shippingState.status==='ready'?'ok':shippingState.status==='loading'?'loading':''}">${escapeAttr(checkoutCepStatus())}</span></div>
+      <div class="field"><label for="fC">CEP</label><input id="fC" placeholder="80000-000" inputmode="numeric" maxlength="9" value="${escapeAttr(checkoutForm.cep)}" oninput="checkoutForm.cep=this.value;maskCEP(this)"><span id="cepStatus" class="cep-status ${shippingState.status==='error'?'error':shippingState.status==='ready'&&shippingState.quotes.some(q=>!q.preview)?'ok':shippingState.status==='loading'?'loading':''}">${escapeAttr(checkoutCepStatus())}</span></div>
       <div class="field"><label for="fNum">Número</label><input id="fNum" placeholder="100" value="${escapeAttr(checkoutForm.num)}" oninput="checkoutForm.num=this.value"></div>
     </div>
     <div class="field"><label for="fA">Endereço</label><input id="fA" placeholder="Rua, bairro — cidade/UF" value="${escapeAttr(checkoutForm.addr)}" oninput="checkoutForm.addr=this.value"></div>
     <p class="chk-step mt">2 · Meio de envio</p>
     <p class="production-note"><strong>Produção: 10 dias úteis.</strong> A contagem começa quando pagamento e personalização estiverem confirmados. Some o prazo de transporte calculado pelo CEP.</p>
     ${shippingOptionsHTML(st)}
+    ${packagingEstimateHTML()}
     <p class="chk-step mt">3 · Pagamento</p>
     <div class="pay-opt ${payMethod==='pix'?'sel':''}" onclick="payMethod='pix';renderCheckout()"><span>Pix</span><span class="disc">5% de desconto extra</span></div>
     <div class="pay-opt ${payMethod==='card'?'sel':''}" onclick="payMethod='card';renderCheckout()"><span>Cartão de crédito</span><span class="disc">até 3x sem juros</span></div>
@@ -241,8 +247,8 @@ function renderCheckout(){
     <div class="sum-row"><span>Subtotal</span><span>${money(st)}</span></div>
     <div class="sum-row"><span>Frete</span><span>${shipMethod==='delivery'&&!selectedQuote?'A calcular':ship?money(ship):'<span class="free">Grátis</span>'}</span></div>
     ${disc?`<div class="sum-row"><span>Desconto Pix (5%)</span><span style="color:var(--gold-deep)">− ${money(disc)}</span></div>`:''}
-    <div class="sum-row total"><span>${checkoutReady?'Total':'Total parcial'}</span><span>${money(total)}</span></div>
-    <button class="btn btn-solid w-full" style="margin-top:14px" onclick="confirmOrder()" ${checkoutReady?'':'disabled'}>${checkoutReady?`${payMethod==='pix'?'Pagar com Pix':payMethod==='boleto'?'Gerar boleto':payMethod==='infinitepay'?'Pagar com InfinitePay':'Confirmar pedido'} · ${money(total)}`:'Calcule o frete para continuar'}</button>
+    <div class="sum-row total"><span>${previewOnly?'Total estimado':checkoutReady?'Total':'Total parcial'}</span><span>${money(total)}</span></div>
+    <button class="btn btn-solid w-full" style="margin-top:14px" onclick="confirmOrder()" ${checkoutReady?'':'disabled'}>${checkoutReady?`${payMethod==='pix'?'Pagar com Pix':payMethod==='boleto'?'Gerar boleto':payMethod==='infinitepay'?'Pagar com InfinitePay':'Confirmar pedido'} · ${money(total)}`:previewOnly?'Simulação · pagamento indisponível':'Calcule o frete para continuar'}</button>
     <p style="text-align:center;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin-top:12px">Você será redirecionado ao ambiente seguro ${payMethod==='infinitepay'?'da InfinitePay':'do Mercado Pago'}</p>`;
 }
 function shippingOptionsHTML(st){
@@ -253,9 +259,41 @@ function shippingOptionsHTML(st){
     const action=shippingState.sandbox?'Ambiente de teste':'Tente novamente';
     return `<div class="pay-opt" aria-disabled="true"><span class="ship-opt-main"><b>${title}</b><small>${escapeAttr(shippingState.error)}</small></span><span class="disc">${action}</span></div>`;
   }
-  if(!shippingState.quotes.length) return `<div class="pay-opt" aria-disabled="true"><span>Informe o CEP para calcular</span><span class="disc">Prazo e valor</span></div>`;
-  const note=shippingState.preview?`<p class="ship-preview-note">Opções demonstrativas da SuperFrete neste preview. Valores e prazos reais aparecerão após conectar o token da loja.</p>`:'';
-  return shippingState.quotes.map(q=>`<div class="pay-opt ship-opt ${shipMethod==='delivery'&&selectedShippingService===q.id?'sel':''}" onclick="selectShipping('${escapeAttr(q.id)}')"><span class="ship-opt-main"><b>${escapeAttr(q.name)}</b><small>${escapeAttr(q.carrier)} · ${q.deliveryDays?`transporte em até ${q.deliveryDays} dias úteis após a produção`:'prazo de transporte combinado após a compra'}</small></span><span class="disc">${q.price===0?'Grátis':money(q.price)}</span></div>`).join('')+note;
+  if(!shippingState.quotes.length){
+    if(shippingState.status==='ready')return `<div class="pay-opt" aria-disabled="true"><span class="ship-opt-main"><b>Entrega ainda não disponível</b><small>${escapeAttr(shippingState.notice||'Não foi possível obter uma opção de entrega para este pedido. Tente novamente mais tarde.')}</small></span></div>`;
+    return `<div class="pay-opt" aria-disabled="true"><span>Informe o CEP para calcular</span><span class="disc">Prazo e valor</span></div>`;
+  }
+  const estimated=shippingState.quotes.some(q=>q.estimated);
+  const note=estimated?`<p class="ship-preview-note">Cotação de teste com peso e embalagem estimados. O pagamento desta opção fica indisponível até a conferência.</p>`:shippingState.quotes.some(q=>q.preview)?`<p class="ship-preview-note">Opções demonstrativas da SuperFrete neste preview. Valores e prazos reais aparecerão após conectar o token da loja.</p>`:'';
+  return shippingState.quotes.map(q=>`<div class="pay-opt ship-opt ${shipMethod==='delivery'&&selectedShippingService===q.id?'sel':''}" onclick="selectShipping('${escapeAttr(q.id)}')"><span class="ship-opt-main"><b>${escapeAttr(q.name)}${q.estimated?' · estimativa':''}</b><small>${escapeAttr(q.carrier)} · ${q.deliveryDays?`transporte em até ${q.deliveryDays} dias úteis após a produção`:'prazo de transporte combinado após a compra'}</small></span><span class="disc">${q.price===0?'Grátis':money(q.price)}</span></div>`).join('')+note;
+}
+function packagingEstimateHTML(){
+  const packaging=shippingState.packaging;
+  if(!packaging)return '';
+  const title='Estimativa de embalagem · conferência pendente';
+  const weight=value=>`${Number(value).toLocaleString('pt-BR',{maximumFractionDigits:1})} g`;
+  if(packaging.status!=='estimated'){
+    const issues=Array.isArray(packaging.issues)?packaging.issues:[];
+    const explanation=packaging.status==='incomplete'?'Faltam dados para estimar a embalagem de todo o pedido.':'Não foi possível definir uma embalagem para todo o pedido.';
+    const issuesHTML=issues.map(issue=>{
+      const product=prod(issue.id);
+      const name=product?.displayName||product?.name;
+      return `<li>${name?`<strong>${escapeAttr(name)}:</strong> `:''}${escapeAttr(issue.message||'Medidas e peso precisam de conferência.')}</li>`;
+    }).join('');
+    return `<section class="packaging-estimate" aria-label="Estimativa de embalagem"><p class="packaging-label">${title}</p><p>${explanation}</p>${issuesHTML?`<ul class="packaging-issues">${issuesHTML}</ul>`:''}</section>`;
+  }
+  const parcels=Array.isArray(packaging.parcels)?packaging.parcels:[];
+  if(!parcels.length||!Number.isFinite(packaging.totalWeightGrams)||packaging.totalWeightGrams<=0)return '';
+  return `<section class="packaging-estimate" aria-label="Estimativa de embalagem">
+    <p class="packaging-label">${title}</p>
+    <p class="packaging-total">${parcels.length} ${parcels.length===1?'caixa':'caixas'} · ${weight(packaging.totalWeightGrams)} no total</p>
+    <p>Calculada para as peças e quantidades deste carrinho. Peso e encaixe ainda precisam ser conferidos com a embalagem real.</p>
+    <details><summary>Ver composição da embalagem</summary>${parcels.map((parcel,index)=>{
+      const dimensions=parcel.dimensionsCm||{};
+      const sizes=[dimensions.length,dimensions.width,dimensions.height].map(value=>Number(value).toLocaleString('pt-BR')).join(' × ');
+      return `<div class="packaging-parcel"><p><strong>Caixa ${index+1} · ${escapeAttr(parcel.boxCode)}</strong><span>${escapeAttr(sizes)} cm</span></p><dl><div><dt>Peças</dt><dd>${weight(parcel.itemsWeightGrams)}</dd></div><div><dt>Caixa vazia</dt><dd>${weight(parcel.boxWeightGrams)}</dd></div><div><dt>Proteção e fechamento</dt><dd>${weight(parcel.protectionWeightGrams)}</dd></div><div class="packaging-parcel-total"><dt>Total da caixa</dt><dd>${weight(parcel.totalWeightGrams)}</dd></div></dl></div>`;
+    }).join('')}</details>
+  </section>`;
 }
 function selectShipping(serviceId){
   selectedShippingService=serviceId;
@@ -272,21 +310,25 @@ function maskCEP(el){
     buscarCEP(v.replace('-',''));
   }else{
     shippingRequestId++;
-    shippingState={status:'idle',quotes:[],preview:false,error:'',code:'',sandbox:false,cep:''};
+    shippingState={status:'idle',quotes:[],preview:false,packaging:null,notice:'',error:'',code:'',sandbox:false,cep:''};
     selectedShippingService='';
+    // Retira imediatamente valores antigos, sem interromper a digitação do CEP.
+    const cursor=el.selectionStart;
+    renderCheckout();
+    const input=$('fC');input?.focus();
+    if(typeof input?.setSelectionRange==='function'&&Number.isInteger(cursor))input.setSelectionRange(cursor,cursor);
   }
 }
 
 async function buscarCEP(cep){
   const requestId=++shippingRequestId;
-  const fA=document.getElementById('fA');
-  shippingState={status:'loading',quotes:[],preview:false,error:'',code:'',sandbox:false,cep};
+  shippingState={status:'loading',quotes:[],preview:false,packaging:null,notice:'',error:'',code:'',sandbox:false,cep};
   selectedShippingService='';
   renderCheckout();
   try{
     const [addressResult,quoteResult]=await Promise.allSettled([
       fetch(`https://viacep.com.br/ws/${cep}/json/`).then(r=>r.json()),
-      fetch('/api/shipping-quote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({cep,items:cart.map(i=>({id:i.id,qty:i.qty}))})}).then(async r=>{const data=await r.json();if(!r.ok){const error=new Error(data.error||'Não foi possível calcular o frete');error.code=data.code||'SHIPPING_ERROR';error.sandbox=Boolean(data.sandbox);throw error}return data;})
+      fetch('/api/shipping-quote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({cep,items:cart.map(i=>({id:i.id,qty:i.qty}))})}).then(async r=>{const data=await r.json();if(!r.ok){const error=new Error(data.error||'Não foi possível calcular o frete');error.code=data.code||'SHIPPING_ERROR';error.sandbox=Boolean(data.sandbox);error.packaging=data.packaging||null;throw error}return data;})
     ]);
     if(requestId!==shippingRequestId)return;
     if(addressResult.status==='fulfilled'&&!addressResult.value.erro){
@@ -295,7 +337,7 @@ async function buscarCEP(cep){
       checkoutForm.addr=partes.join(', ');
     }
     if(quoteResult.status==='rejected')throw quoteResult.reason;
-    shippingState={status:'ready',quotes:quoteResult.value.quotes||[],preview:Boolean(quoteResult.value.preview),error:'',code:'',sandbox:false,cep};
+    shippingState={status:'ready',quotes:quoteResult.value.quotes||[],preview:Boolean(quoteResult.value.preview),packaging:quoteResult.value.packaging||null,notice:quoteResult.value.notice||'',error:'',code:quoteResult.value.code||'',sandbox:false,cep};
     selectedShippingService=shippingState.quotes[0]?.id||'';
     shipMethod='delivery';
     renderCheckout();
@@ -303,17 +345,19 @@ async function buscarCEP(cep){
     if(fNum && !fNum.value) fNum.focus();
   }catch(err){
     if(requestId!==shippingRequestId)return;
-    shippingState={status:'error',quotes:[],preview:false,error:err.message||'Não foi possível calcular o frete',code:err.code||'SHIPPING_ERROR',sandbox:Boolean(err.sandbox),cep};
+    shippingState={status:'error',quotes:[],preview:false,packaging:err.packaging||null,notice:'',error:err.message||'Não foi possível calcular o frete',code:err.code||'SHIPPING_ERROR',sandbox:Boolean(err.sandbox),cep};
     renderCheckout();
   }
 }
 
 async function confirmOrder(){
+  const selectedQuote=shippingState.quotes.find(q=>q.id===selectedShippingService);
+  if(shipMethod==='delivery'&&selectedQuote?.preview){toast('Esta opção é uma simulação. O pagamento ficará disponível após a conferência do frete.');return}
   const name=$('fN').value.trim(),email=$('fE').value.trim(),cep=$('fC').value.trim(),num=$('fNum').value.trim(),addr=$('fA').value.trim();
   checkoutForm={name,email,cep,num,addr};
   if(!name||!email||!$('fE').checkValidity()){toast('Preencha nome e e-mail válidos para continuar');return}
   if(shipMethod==='delivery'&&(!cep||!addr)){toast('Preencha o endereço de entrega');return}
-  if(shipMethod==='delivery'&&!selectedShippingService){toast('Selecione uma opção de entrega');return}
+  if(shipMethod==='delivery'&&!selectedQuote){toast('Selecione uma opção de entrega');return}
   const btn=document.querySelector('#drawerFoot .btn-solid');
   const original=btn.textContent;
   btn.disabled=true;btn.textContent='Gerando pagamento…';

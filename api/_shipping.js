@@ -1,6 +1,7 @@
 'use strict';
 
 const { buildShippingProducts } = require('./_shipping-products');
+const { estimateCartPackaging, isShippingEstimatePreview } = require('./_shipping-estimate');
 
 const SHIP_FREE = 150;
 const CURITIBA_SHIPPING_COST = 19.9;
@@ -98,7 +99,7 @@ function providerErrors(data) {
   return [...new Set(messages)].slice(0, 8);
 }
 
-async function requestSuperFrete({ baseUrl, token, destination, products, subtotal, services }) {
+async function requestSuperFrete({ baseUrl, token, destination, products, package: parcel, subtotal, services }) {
   const origin = cleanZip(process.env.SHIP_ORIGIN_CEP);
   const response = await fetch(`${baseUrl.replace(/\/$/, '')}${SUPERFRETE_ENDPOINT}`, {
     method: 'POST',
@@ -118,19 +119,29 @@ async function requestSuperFrete({ baseUrl, token, destination, products, subtot
         insurance_value: subtotal,
         use_insurance_value: subtotal > 0
       },
-      products
+      ...(parcel ? { package: parcel } : { products })
     })
   });
   const data = await response.json().catch(() => null);
   return { ok: response.ok, status: response.status, data, services };
 }
 
-async function superFreteQuotes({ destination, cart, subtotal }) {
+async function superFreteQuotes({ destination, cart, subtotal, estimatedParcel }) {
   const origin = cleanZip(process.env.SHIP_ORIGIN_CEP);
   const token = String(process.env.SUPERFRETE_TOKEN || '').trim();
-  if (!origin || !token) return { preview: true, quotes: previewQuotes(destination) };
+  if (!origin || !token) {
+    if (estimatedParcel) return {
+      preview: true, quotes: [], code: 'SHIPPING_CONFIGURATION_REQUIRED',
+      notice: 'Embalagem estimada. A cotação por CEP depende da configuração da transportadora no preview.'
+    };
+    return { preview: true, quotes: previewQuotes(destination) };
+  }
 
-  const products = buildShippingProducts(cart);
+  const products = estimatedParcel ? undefined : buildShippingProducts(cart);
+  const parcel = estimatedParcel ? {
+    ...estimatedParcel.dimensionsCm,
+    weight: estimatedParcel.totalWeightGrams / 1000
+  } : undefined;
   const baseUrl = process.env.SUPERFRETE_BASE_URL || 'https://api.superfrete.com';
   const sandbox = /sandbox\.superfrete\.com/i.test(baseUrl);
   const requestedServices = process.env.SUPERFRETE_SERVICES || DEFAULT_SERVICES;
@@ -141,6 +152,7 @@ async function superFreteQuotes({ destination, cart, subtotal }) {
     token,
     destination,
     products,
+    package: parcel,
     subtotal,
     services: requestedServices
   }));
@@ -152,13 +164,17 @@ async function superFreteQuotes({ destination, cart, subtotal }) {
       token,
       destination,
       products,
+      package: parcel,
       subtotal,
       services: '1,2'
     }));
     quotes = attempts[1].ok ? normalizeQuotes(attempts[1].data) : [];
   }
 
-  if (quotes.length) return { preview: false, quotes };
+  if (quotes.length) return {
+    preview: Boolean(estimatedParcel),
+    quotes: estimatedParcel ? quotes.map((quote) => ({ ...quote, preview: true, estimated: true })) : quotes
+  };
 
   const diagnostics = attempts.map((attempt) => ({
     status: attempt.status,
@@ -200,13 +216,39 @@ async function quoteShipping({ zipCode, cart, subtotal }) {
     deliveryDays: null,
     preview: false
   }] : [];
+  // Estimates are enabled only by the deployment environment, never by a client
+  // flag. Production retains the validated shipping-product path.
+  const packaging = isShippingEstimatePreview() ? estimateCartPackaging(cart) : null;
   let superFrete;
   try {
-    superFrete = await superFreteQuotes({ destination, cart, subtotal });
+    if (packaging && packaging.status !== 'estimated') {
+      superFrete = {
+        preview: true, quotes: [], code: 'SHIPPING_PACKAGING_PENDING',
+        notice: packaging.status === 'incomplete'
+          ? 'Faltam dados de um ou mais produtos para estimar a embalagem completa.'
+          : 'Este pedido precisa de uma embalagem diferente das caixas disponíveis na simulação.'
+      };
+    } else if (packaging && packaging.parcels.length !== 1) {
+      superFrete = {
+        preview: true, quotes: [], code: 'SHIPPING_MULTIPLE_PACKAGES',
+        notice: 'O pedido foi dividido em volumes. A cotação conjunta desses volumes ainda precisa ser homologada.'
+      };
+    } else {
+      superFrete = await superFreteQuotes({
+        destination, cart, subtotal,
+        ...(packaging ? { estimatedParcel: packaging.parcels[0] } : {})
+      });
+    }
   } catch (error) {
-    if (!localQuotes.length) throw error;
-    console.warn('Cotação externa indisponível; mantendo entrega local', { code: error.code || 'UNKNOWN' });
-    superFrete = { preview: false, quotes: [] };
+    if (!localQuotes.length && !packaging) throw error;
+    console.warn('Cotação externa indisponível', { code: error.code || 'UNKNOWN' });
+    superFrete = {
+      preview: Boolean(packaging), quotes: [],
+      ...(packaging ? {
+        code: error.code || 'SHIPPING_PROVIDER_UNAVAILABLE',
+        notice: 'A embalagem foi estimada, mas a transportadora não retornou uma cotação para este CEP. Tente novamente mais tarde.'
+      } : {})
+    };
   }
   const freeShipping = subtotal >= SHIP_FREE;
   const quotes = [...localQuotes, ...superFrete.quotes]
@@ -218,10 +260,11 @@ async function quoteShipping({ zipCode, cart, subtotal }) {
     }));
 
   return {
-    preview: quotes.some((quote) => quote.preview),
+    preview: Boolean(packaging) || quotes.some((quote) => quote.preview),
     freeShipping,
     provider: 'superfrete',
-    quotes
+    quotes,
+    ...(packaging ? { packaging, notice: superFrete.notice || '', code: superFrete.code || '' } : {})
   };
 }
 

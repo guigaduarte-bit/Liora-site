@@ -212,7 +212,12 @@ module.exports = async function handler(req, res) {
       selectedQuote = quoteResult.quotes.find((quote) => quote.id === serviceId);
       if (!selectedQuote) return res.status(400).json({ error: 'Selecione novamente a opção de entrega' });
       if (selectedQuote.preview) {
-        return res.status(503).json({ error: 'A cotação real da SuperFrete precisa ser conectada antes do pagamento' });
+        return res.status(503).json({
+          error: selectedQuote.estimated
+            ? 'A embalagem estimada precisa ser conferida antes de liberar o pagamento com este frete.'
+            : 'A cotação real da SuperFrete precisa ser conectada antes do pagamento',
+          code: selectedQuote.estimated ? 'SHIPPING_ESTIMATE_NOT_VALIDATED' : 'SHIPPING_PREVIEW_ONLY'
+        });
       }
       shippingCost = subtotal >= SHIP_FREE ? 0 : selectedQuote.price;
     }

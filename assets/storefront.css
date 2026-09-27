@@ -275,6 +275,18 @@ footer li a:hover{color:#E4C98F}
 .ship-opt-main{display:flex;flex-direction:column;gap:4px}
 .ship-opt-main small{font-size:10.5px;color:var(--ink-soft);letter-spacing:.03em}
 .ship-preview-note{font-size:10.5px;line-height:1.5;color:var(--ink-soft);margin:-2px 0 12px;padding:10px 12px;border-left:2px solid var(--gold)}
+.packaging-estimate{border:1px solid var(--line);background:rgba(176,138,71,.04);padding:14px 16px;margin:14px 0 0;font-size:11.5px;line-height:1.6;color:var(--ink-soft);overflow-wrap:anywhere}
+.packaging-estimate .packaging-label{font-size:10px;letter-spacing:.09em;color:var(--gold-deep);margin:0 0 7px}
+.packaging-estimate .packaging-total{font-size:14px;color:var(--ink);margin:0 0 5px}
+.packaging-estimate summary{cursor:pointer;color:var(--ink);padding-top:12px;text-underline-offset:3px}
+.packaging-estimate summary:focus-visible{outline:1px solid var(--gold-deep);outline-offset:4px}
+.packaging-parcel{border-top:1px solid var(--line);margin-top:12px;padding-top:10px}
+.packaging-parcel p{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2px 12px;color:var(--ink);margin-bottom:6px}
+.packaging-parcel dl>div{display:flex;justify-content:space-between;gap:12px}
+.packaging-parcel dd{margin:0;white-space:nowrap}
+.packaging-parcel-total{margin-top:5px;color:var(--ink)}
+.packaging-issues{padding-left:17px;margin-top:7px}
+.packaging-issues li+li{margin-top:5px}
 .ship-loading{display:flex;align-items:center;gap:9px;color:var(--ink-soft)}
 .ship-loading::before{content:'';width:13px;height:13px;border:1px solid var(--line);border-top-color:var(--gold-deep);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}

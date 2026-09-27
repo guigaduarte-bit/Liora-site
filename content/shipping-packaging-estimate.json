@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "estimateOnly": true,
+  "confirmedForShipping": false,
+  "protectionPerFaceCm": 1.5,
+  "wallPerFaceCm": 0.5,
+  "protectionWeightPerPieceGrams": 50,
+  "protectionWeightPerParcelGrams": 50,
+  "maxPieces": 100,
+  "maxParcels": 20,
+  "source": {
+    "dimensions": "https://www.correios.com.br/Plone/enviar/encomendas/arquivo/nacional/guia-tecnico-embalagens-rpc_v1-1.pdf",
+    "assumptions": "ESTIMATIVA_EMBALAGEM_FRETE_LIORA.md, versão 0.1, 27/09/2026",
+    "weightStatus": "Taras, massas de proteção e espessuras são hipóteses de planejamento; não são pesos medidos nem especificações dos Correios."
+  },
+  "boxes": [
+    { "code": "P04", "dimensionsCm": { "length": 16, "width": 12, "height": 4 }, "weightGrams": 60 },
+    { "code": "C08", "dimensionsCm": { "length": 32, "width": 12, "height": 8 }, "weightGrams": 120 },
+    { "code": "C12", "dimensionsCm": { "length": 32, "width": 12, "height": 12 }, "weightGrams": 150 },
+    { "code": "M08", "dimensionsCm": { "length": 24, "width": 16, "height": 8 }, "weightGrams": 120 },
+    { "code": "M12", "dimensionsCm": { "length": 24, "width": 16, "height": 12 }, "weightGrams": 150 },
+    { "code": "G08", "dimensionsCm": { "length": 32, "width": 24, "height": 8 }, "weightGrams": 200 },
+    { "code": "G12", "dimensionsCm": { "length": 32, "width": 24, "height": 12 }, "weightGrams": 240 },
+    { "code": "G16", "dimensionsCm": { "length": 32, "width": 24, "height": 16 }, "weightGrams": 270 },
+    { "code": "G20", "dimensionsCm": { "length": 32, "width": 24, "height": 20 }, "weightGrams": 300 }
+  ]
+}

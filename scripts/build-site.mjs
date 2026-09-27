@@ -101,4 +101,8 @@ console.log(`Generated ${pages.length} pages, 27 products, sitemap and robots in
 if(process.env.VERCEL_ENV==='preview'||process.env.LIORA_PREVIEW_QA==='1'){
  fs.mkdirSync(path.join(out,'__preview-qa'),{recursive:true});
  fs.copyFileSync(path.join(root,'scripts/preview-qa.html'),path.join(out,'__preview-qa/index.html'));
+ if(process.env.VERCEL_ENV!=='production'){
+  fs.mkdirSync(path.join(out,'__preview-frete'),{recursive:true});
+  fs.copyFileSync(path.join(root,'scripts/shipping-preview.html'),path.join(out,'__preview-frete/index.html'));
+ }
 }
