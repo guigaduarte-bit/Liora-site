@@ -51,7 +51,7 @@ template=template.replace(/<img([^>]*?)data-([ip])="([^"]+)"([^>]*)>/g,(all,a,ki
  const priority=id==='eiffel';
  const src=id==='logo'?(m.variants.find(v=>v.width===192)?.src||img):img;
  const variants=[...(m.variants||[]),{src:img,width:m.width}].filter((v,i,list)=>list.findIndex(x=>x.width===v.width)===i);
- return `<img${a}data-${kind}="${id}"${b} src="${src}" width="${m.width}" height="${m.height}" ${variants.length>1?`srcset="${variants.map(v=>`${v.src} ${v.width}w`).join(', ')}" sizes="${id==='logo'?'96px':priority?'100vw':'(max-width: 768px) 100vw, 50vw'}"`:''} ${priority?'fetchpriority="high"':'loading="lazy"'} decoding="async">`;
+ return `<img${a}data-${kind}="${id}"${b} src="${src}" width="${m.width}" height="${m.height}" ${variants.length>1?`srcset="${variants.map(v=>`${v.src} ${v.width}w`).join(', ')}" sizes="${id==='logo'?'150px':priority?'100vw':'(max-width: 768px) 100vw, 50vw'}"`:''} ${priority?'fetchpriority="high"':'loading="lazy"'} decoding="async">`;
 });
 const pages=[];
 function emit(url,html){const filename=url.endsWith('/')?`${url.slice(1)}index.html`:url.slice(1);fs.mkdirSync(path.dirname(path.join(out,filename)),{recursive:true});fs.writeFileSync(path.join(out,filename),html);pages.push(url);}

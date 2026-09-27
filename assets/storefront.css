@@ -201,7 +201,7 @@ nav.main a:hover::after{width:100%}
 /* ---------- footer ---------- */
 footer{background:var(--umber);color:rgba(251,246,236,.78);font-size:13px}
 .foot-top{display:grid;grid-template-columns:1.3fr 1fr 1fr 1.1fr;gap:clamp(32px,4vw,64px);padding:clamp(56px,7vw,90px) 0 48px}
-.foot-logo{width:150px;border-radius:50%;mix-blend-mode:screen;opacity:.95;margin-bottom:20px}
+.foot-logo{width:150px;height:auto;border-radius:50%;mix-blend-mode:screen;opacity:.95;margin-bottom:20px}
 .foot-brand p{max-width:34ch;line-height:1.8;font-size:12.5px}
 footer h5{font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;color:#E4C98F;font-weight:400;margin-bottom:20px}
 footer ul{list-style:none}
