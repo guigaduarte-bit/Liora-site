@@ -2,6 +2,7 @@
 
 const { buildShippingProducts } = require('./_shipping-products');
 const { estimateCartPackaging, isShippingEstimatePreview } = require('./_shipping-estimate');
+const { automaticCoverageBRL } = require('../content/shipping-insurance.json');
 
 const SHIP_FREE = 150;
 const CURITIBA_SHIPPING_COST = 19.9;
@@ -114,7 +115,19 @@ function providerErrors(data, privateValues = []) {
   return [...new Set(messages)].slice(0, 8);
 }
 
-async function requestSuperFrete({ baseUrl, token, destination, products, package: parcel, subtotal, services }) {
+function minimumInsuranceRetryServices(attempt, subtotal) {
+  if (!attempt.ok || !Array.isArray(attempt.data) || !(subtotal > 0)) return [];
+  const requested = new Set(attempt.services.split(',').map(id => id.trim()));
+  return [...new Set(attempt.data.filter(quote => {
+    const id = String(quote && (quote.id || quote.service) || '');
+    const coverage = automaticCoverageBRL[id];
+    const message = providerErrors([quote]).join(' ');
+    return requested.has(id) && coverage && subtotal <= coverage
+      && /valor segurado.*abaixo.*limite m[ií]nimo/i.test(message);
+  }).map(quote => String(quote.id || quote.service)))];
+}
+
+async function requestSuperFrete({ baseUrl, token, destination, products, package: parcel, subtotal, services, additionalInsurance = true }) {
   const origin = cleanZip(process.env.SHIP_ORIGIN_CEP);
   const response = await fetch(`${baseUrl.replace(/\/$/, '')}${SUPERFRETE_ENDPOINT}`, {
     method: 'POST',
@@ -131,14 +144,14 @@ async function requestSuperFrete({ baseUrl, token, destination, products, packag
       options: {
         own_hand: false,
         receipt: false,
-        insurance_value: subtotal,
-        use_insurance_value: subtotal > 0
+        insurance_value: additionalInsurance ? subtotal : 0,
+        use_insurance_value: additionalInsurance && subtotal > 0
       },
       ...(parcel ? { package: parcel } : { products })
     })
   });
   const data = await response.json().catch(() => null);
-  return { ok: response.ok, status: response.status, data, services };
+  return { ok: response.ok, status: response.status, data, services, additionalInsurance };
 }
 
 async function superFreteQuotes({ destination, cart, subtotal, estimatedParcel }) {
@@ -173,7 +186,7 @@ async function superFreteQuotes({ destination, cart, subtotal, estimatedParcel }
   }));
 
   let quotes = attempts[0].ok ? normalizeQuotes(attempts[0].data) : [];
-  if (!quotes.length && requestedServices !== '1,2') {
+  if (!quotes.length && !minimumInsuranceRetryServices(attempts[0], subtotal).length && requestedServices !== '1,2') {
     attempts.push(await requestSuperFrete({
       baseUrl,
       token,
@@ -186,6 +199,36 @@ async function superFreteQuotes({ destination, cart, subtotal, estimatedParcel }
     quotes = attempts[1].ok ? normalizeQuotes(attempts[1].data) : [];
   }
 
+  // Retry only the explicitly rejected PAC/SEDEX services and only when the
+  // actual merchandise value fits their verified automatic coverage. Never
+  // inflate the declaration, remove insurance from a higher-value order, or
+  // retry unrelated failures without insurance.
+  const retryServices = [...new Set(attempts.flatMap(attempt => minimumInsuranceRetryServices(attempt, subtotal)))];
+  if (retryServices.length) {
+    try {
+      const retry = await requestSuperFrete({
+        baseUrl, token, destination, products, package: parcel, subtotal,
+        services: retryServices.join(','), additionalInsurance: false
+      });
+      attempts.push(retry);
+      const recovered = retry.ok ? normalizeQuotes(retry.data)
+        .filter(quote => retryServices.includes(quote.id))
+        .map(quote => ({ ...quote, insurance: {
+          additional: false, declaredValue: 0, reason: 'WITHIN_AUTOMATIC_COVERAGE'
+        } })) : [];
+      quotes = [...quotes, ...recovered]
+        .filter((quote, index, all) => all.findIndex(item => item.id === quote.id) === index)
+        .sort((a, b) => a.price - b.price).slice(0, 6);
+      console.info(JSON.stringify({
+        event: 'shipping_minimum_insurance_retry', sandbox,
+        services: retryServices.join(','), status: retry.status, recoveredQuotes: recovered.length
+      }));
+    } catch {
+      // Keep any already-valid insured services if this optional recovery fails.
+      console.warn(JSON.stringify({ event: 'shipping_minimum_insurance_retry_failed', sandbox }));
+    }
+  }
+
   if (quotes.length) return {
     preview: Boolean(estimatedParcel),
     quotes: estimatedParcel ? quotes.map((quote) => ({ ...quote, preview: true, estimated: true })) : quotes
@@ -194,6 +237,7 @@ async function superFreteQuotes({ destination, cart, subtotal, estimatedParcel }
   const diagnostics = attempts.map((attempt) => ({
     status: attempt.status,
     services: attempt.services,
+    additionalInsurance: attempt.additionalInsurance,
     responseType: Array.isArray(attempt.data) ? 'array' : attempt.data === null ? 'null' : typeof attempt.data,
     resultCount: Array.isArray(attempt.data) ? attempt.data.length : null,
     messages: providerErrors(attempt.data, [token, origin, destination])
