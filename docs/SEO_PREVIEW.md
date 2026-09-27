@@ -88,3 +88,7 @@ O frete passa a enviar `products` com peso e dimensões por SKU, quantidade agru
 `npm test`: 63 verificações aprovadas, build com 41 páginas e `git diff --check` sem erros. Provedores foram simulados em memória nos testes; não houve cobrança ou etiqueta. As credenciais externas e a homologação real continuam pendentes. Procedimento e fontes: [frete por produto](shipping-product-setup.md). Esta alteração pertence somente ao preview; produção continua dependendo de aprovação explícita.
 
 Na revisão visual hospedada, o logo do rodapé conservava a altura HTML original enquanto o CSS fixava somente a largura, causando distorção. A correção acrescenta `height: auto` e ajusta `sizes` para 150 px, preservando a proporção e a identidade visual. A nova identificação foi conferida na home e nas políticas; a revisão em iframe de 360 px não reportou transbordamento horizontal nem imagens quebradas. O checkout para o CEP de teste 95900-180 continua identificando as opções como demonstrativas; não houve pagamento.
+
+## Correção do Instagram — 27/09/2026
+
+A responsável informou o perfil como “liora aromas de luxo _candles”. O endereço e o rótulo do link no rodapé foram corrigidos para `@lioraaromasdeluxo_candles`, removendo os espaços e preservando o sublinhado antes de candles. O build propaga essa alteração às páginas que usam o rodapé da loja. O destino foi configurado conforme informado; buscas públicas não retornaram o perfil e não comprovam sua disponibilidade. Alteração somente no preview; sem publicação em produção.
