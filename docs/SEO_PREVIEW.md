@@ -120,3 +120,9 @@ Referências de continuidade: [revisão legal atualizada](legal-review.md) e [im
 - Política de privacidade atualizada para descrever comprovante temporário e validade. Nenhum novo contato ou dado residencial foi publicado.
 - Roteiros: [pagamentos](payment-setup.md), [e-mail](email-setup.md), [frete](shipping-product-setup.md). Persistência de pedidos e webhooks ainda precisam de serviço de dados autorizado e implementação antes de produção.
 - Preview e evidências hospedadas desta rodada ficam registrados no plano principal após o deployment. Produção continua sujeita à conclusão das dependências e à aprovação expressa da responsável.
+
+### Validação hospedada e ajuste de recotação
+
+Preview `dde19b8824a55271be315687633bc53e92767424`, deployment `GZhfKX3vns4gZnabk5jLMhaSoDD3`, Ready em 12 s. Checkout com destino de teste 95900-180: três flores/duas caixas de 940 g → PAC R$ 57,96 e SEDEX R$ 109,33; uma Botanique + duas flores/1.465 g → PAC R$ 60,22 e SEDEX R$ 111,29; duas Botanique + duas flores/subtotal R$ 174 → ambas grátis, total Pix R$ 165,30 e 1.990 g em duas caixas. Todos mantiveram pagamento de estimativa bloqueado. Não são tarifas de produção.
+
+A conferência identificou que, após alterar quantidades, o CEP permanecia preenchido mas exigia redigitação para recotar. O checkout agora inicia nova cotação com o CEP existente e os itens atuais, sem duplicar consultas durante a renderização. Novo teste funcional; suíte final 176/176 aprovada, build de 41 páginas. O plano principal registra o deployment corretivo e a prova hospedada dessa correção.

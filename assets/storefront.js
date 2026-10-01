@@ -216,6 +216,12 @@ function checkoutCepStatus(){
   return '';
 }
 function renderCheckout(){
+  const savedCep=checkoutForm.cep.replace(/\D/g,'');
+  if(shippingState.status==='idle'&&savedCep.length===8&&cart.length){
+    // buscarCEP enters loading synchronously before rendering again, so a
+    // preserved CEP is requoted for the new cart without duplicate requests.
+    return buscarCEP(savedCep);
+  }
   $('drawerTitle').textContent='Finalizar compra';
   const st=subtotal();
   const selectedQuote=shippingState.quotes.find(q=>q.id===selectedShippingService);

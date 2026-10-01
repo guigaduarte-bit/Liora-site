@@ -140,6 +140,27 @@ test('resposta atrasada de frete não repõe endereço e cotação depois de apa
   assert.equal(app.run('selectedShippingService'), '');
 });
 
+test('reabrir checkout após mudar quantidade recalcula uma vez com CEP preservado e carrinho atual', async () => {
+  const requests = [];
+  const app = storefront({ fetch: (url, options) => new Promise(resolve => requests.push({ url, options, resolve })) });
+  await app.done;
+  app.run("addToCart('botanique',1); checkoutForm.cep='95900-180'; shippingState={status:'ready',quotes:[{id:'1',price:30.39}],cep:'95900180'}; selectedShippingService='1'; drawerView='cart'; changeQty(cart[0].key,1);");
+  assert.equal(app.run('shippingState.status'), 'idle');
+  const quoteDone = app.run("drawerView='checkout';renderCheckout()");
+  app.run('renderCheckout()');
+  assert.equal(app.run('shippingState.status'), 'loading');
+  const shippingRequests = requests.filter(request => request.url === '/api/shipping-quote');
+  assert.equal(shippingRequests.length, 1);
+  assert.deepEqual(JSON.parse(shippingRequests[0].options.body), { cep: '95900180', items: [{ id: 'botanique', qty: 2 }] });
+  requests.find(request => request.url.includes('viacep')).resolve({ json: async () => ({ erro: true }) });
+  shippingRequests[0].resolve({ ok: true, json: async () => ({ quotes: [{ id: '1', price: 0, preview: true }] }) });
+  await quoteDone;
+  assert.equal(app.run('shippingState.status'), 'ready');
+  assert.equal(app.run('checkoutForm.cep'), '95900-180');
+  assert.equal(app.run('selectedShippingService'), '1');
+  assert.equal(requests.filter(request => request.url === '/api/shipping-quote').length, 1);
+});
+
 test('fragrância é exibida como texto e não altera os comandos do carrinho', async () => {
   const app = storefront();
   await app.done;
