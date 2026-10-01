@@ -1,0 +1,373 @@
+{
+  "/assets/images/abraco-em-luz.webp": {
+    "width": 474,
+    "height": 571,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/abraco-em-luz-360.webp",
+        "width": 360,
+        "height": 434,
+        "bytes": 6490
+      }
+    ],
+    "bytes": 6848
+  },
+  "/assets/images/bolhas.webp": {
+    "width": 560,
+    "height": 336,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/bolhas-360.webp",
+        "width": 360,
+        "height": 216,
+        "bytes": 3424
+      }
+    ],
+    "bytes": 4004
+  },
+  "/assets/images/botanicavasogesso.webp": {
+    "width": 342,
+    "height": 180,
+    "variants": [],
+    "bytes": 5568
+  },
+  "/assets/images/botanique-150-gr-1gyzj.webp": {
+    "width": 560,
+    "height": 478,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/botanique-150-gr-1gyzj-360.webp",
+        "width": 360,
+        "height": 307,
+        "bytes": 15558
+      }
+    ],
+    "bytes": 18806
+  },
+  "/assets/images/botanique-70-ml-1dqj4.webp": {
+    "width": 560,
+    "height": 958,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/botanique-70-ml-1dqj4-360.webp",
+        "width": 360,
+        "height": 616,
+        "bytes": 17668
+      }
+    ],
+    "bytes": 21432
+  },
+  "/assets/images/botanique.webp": {
+    "width": 560,
+    "height": 747,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/botanique-360.webp",
+        "width": 360,
+        "height": 480,
+        "bytes": 14778
+      }
+    ],
+    "bytes": 22354
+  },
+  "/assets/images/camafeufada.webp": {
+    "width": 398,
+    "height": 521,
+    "variants": [],
+    "bytes": 5080
+  },
+  "/assets/images/chama-esculpida.webp": {
+    "width": 398,
+    "height": 525,
+    "variants": [],
+    "bytes": 4304
+  },
+  "/assets/images/cilindro-mosaico.webp": {
+    "width": 393,
+    "height": 492,
+    "variants": [],
+    "bytes": 3780
+  },
+  "/assets/images/eiffel.jpg": {
+    "width": 960,
+    "height": 865,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/eiffel-360.webp",
+        "width": 360,
+        "height": 324,
+        "bytes": 40882
+      },
+      {
+        "src": "/assets/images/responsive/eiffel-720.webp",
+        "width": 720,
+        "height": 649,
+        "bytes": 97866
+      },
+      {
+        "src": "/assets/images/responsive/eiffel-960.webp",
+        "width": 960,
+        "height": 865,
+        "bytes": 132592
+      }
+    ],
+    "bytes": 136385
+  },
+  "/assets/images/essenza-cube.webp": {
+    "width": 560,
+    "height": 342,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/essenza-cube-360.webp",
+        "width": 360,
+        "height": 220,
+        "bytes": 5056
+      }
+    ],
+    "bytes": 5816
+  },
+  "/assets/images/flordevenus.webp": {
+    "width": 445,
+    "height": 299,
+    "variants": [],
+    "bytes": 5106
+  },
+  "/assets/images/geometricafacetada.webp": {
+    "width": 560,
+    "height": 566,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/geometricafacetada-360.webp",
+        "width": 360,
+        "height": 364,
+        "bytes": 3940
+      }
+    ],
+    "bytes": 4628
+  },
+  "/assets/images/gota-de-luz1.webp": {
+    "width": 560,
+    "height": 578,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/gota-de-luz1-360.webp",
+        "width": 360,
+        "height": 372,
+        "bytes": 4592
+      }
+    ],
+    "bytes": 5474
+  },
+  "/assets/images/jardim-encantado.webp": {
+    "width": 560,
+    "height": 746,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/jardim-encantado-360.webp",
+        "width": 360,
+        "height": 480,
+        "bytes": 56736
+      }
+    ],
+    "bytes": 80738
+  },
+  "/assets/images/kit-boho-glass.webp": {
+    "width": 560,
+    "height": 413,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/kit-boho-glass-360.webp",
+        "width": 360,
+        "height": 266,
+        "bytes": 5964
+      }
+    ],
+    "bytes": 7582
+  },
+  "/assets/images/kit-silhouette.webp": {
+    "width": 560,
+    "height": 787,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/kit-silhouette-360.webp",
+        "width": 360,
+        "height": 506,
+        "bytes": 6148
+      }
+    ],
+    "bytes": 8004
+  },
+  "/assets/images/lioracoral.webp": {
+    "width": 479,
+    "height": 561,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/lioracoral-360.webp",
+        "width": 360,
+        "height": 422,
+        "bytes": 6328
+      }
+    ],
+    "bytes": 6642
+  },
+  "/assets/images/logo.jpg": {
+    "width": 960,
+    "height": 944,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/logo-96.webp",
+        "width": 96,
+        "height": 94,
+        "bytes": 2212
+      },
+      {
+        "src": "/assets/images/responsive/logo-192.webp",
+        "width": 192,
+        "height": 189,
+        "bytes": 6804
+      }
+    ],
+    "bytes": 65839
+  },
+  "/assets/images/lumina.webp": {
+    "width": 267,
+    "height": 367,
+    "variants": [],
+    "bytes": 2358
+  },
+  "/assets/images/mini-bubble.webp": {
+    "width": 560,
+    "height": 644,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/mini-bubble-360.webp",
+        "width": 360,
+        "height": 414,
+        "bytes": 4478
+      }
+    ],
+    "bytes": 6028
+  },
+  "/assets/images/no-deluz.webp": {
+    "width": 560,
+    "height": 650,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/no-deluz-360.webp",
+        "width": 360,
+        "height": 418,
+        "bytes": 6660
+      }
+    ],
+    "bytes": 8272
+  },
+  "/assets/images/pair.jpg": {
+    "width": 960,
+    "height": 939,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/pair-360.webp",
+        "width": 360,
+        "height": 352,
+        "bytes": 8790
+      },
+      {
+        "src": "/assets/images/responsive/pair-720.webp",
+        "width": 720,
+        "height": 704,
+        "bytes": 20894
+      }
+    ],
+    "bytes": 48734
+  },
+  "/assets/images/peonia.webp": {
+    "width": 378,
+    "height": 490,
+    "variants": [],
+    "bytes": 6678
+  },
+  "/assets/images/perolas.webp": {
+    "width": 376,
+    "height": 585,
+    "variants": [],
+    "bytes": 5026
+  },
+  "/assets/images/sagrada-familia.webp": {
+    "width": 560,
+    "height": 853,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/sagrada-familia-360.webp",
+        "width": 360,
+        "height": 548,
+        "bytes": 10442
+      }
+    ],
+    "bytes": 12600
+  },
+  "/assets/images/trevo.webp": {
+    "width": 464,
+    "height": 568,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/trevo-360.webp",
+        "width": 360,
+        "height": 441,
+        "bytes": 3876
+      }
+    ],
+    "bytes": 3904
+  },
+  "/assets/images/ursinho.webp": {
+    "width": 560,
+    "height": 391,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/ursinho-360.webp",
+        "width": 360,
+        "height": 251,
+        "bytes": 4388
+      }
+    ],
+    "bytes": 5300
+  },
+  "/assets/images/veiled.jpg": {
+    "width": 679,
+    "height": 1280,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/veiled-360.webp",
+        "width": 360,
+        "height": 679,
+        "bytes": 11152
+      }
+    ],
+    "bytes": 41409
+  },
+  "/assets/images/vela-decorativa-anjo-em-vitral-1sbe9.webp": {
+    "width": 537,
+    "height": 614,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/vela-decorativa-anjo-em-vitral-1sbe9-360.webp",
+        "width": 360,
+        "height": 412,
+        "bytes": 16316
+      }
+    ],
+    "bytes": 19866
+  },
+  "/assets/images/vela-escultural-lady-veil-phie3.webp": {
+    "width": 560,
+    "height": 504,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/vela-escultural-lady-veil-phie3-360.webp",
+        "width": 360,
+        "height": 324,
+        "bytes": 38294
+      }
+    ],
+    "bytes": 47404
+  }
+}

@@ -1,0 +1,422 @@
+{
+  "vela-escultural-lady-veil-phie3": {
+    "weightGrams": 110,
+    "dimensionsCm": null,
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Peso: 110gr"
+    }
+  },
+  "vela-decorativa-anjo-em-vitral-1sbe9": {
+    "weightGrams": 100,
+    "dimensionsCm": null,
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Peso: 100 gr · Medidas: 11cm x 6,2 cm"
+    }
+  },
+  "botanique": {
+    "weightGrams": 475,
+    "dimensionsCm": {
+      "length": 9,
+      "width": 9,
+      "height": 16
+    },
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Peso total: 475 g · Altura: 16 cm · Diâmetro: 9 cm"
+    }
+  },
+  "botanique-150-gr-1gyzj": {
+    "weightGrams": null,
+    "dimensionsCm": null,
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": ""
+    }
+  },
+  "botanique-70-ml-1dqj4": {
+    "weightGrams": 70,
+    "dimensionsCm": {
+      "length": 9,
+      "width": 9,
+      "height": 7
+    },
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Peso 70gr | Medidas: 9cm x 9cm x 7cm (C x L x A) · Medidas: 9cm x 9cm x 7cm (C x L x A)"
+    }
+  },
+  "ursinho": {
+    "weightGrams": 40,
+    "dimensionsCm": {
+      "length": 4,
+      "width": 4,
+      "height": 5
+    },
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Peso: 40gr · Medidas: 4cmX4cmX5cm (CXLXA)"
+    }
+  },
+  "flordevenus": {
+    "weightGrams": 120,
+    "dimensionsCm": {
+      "length": 8,
+      "width": 4,
+      "height": 10
+    },
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Peso: 120gr · Medidas: 8cmX4cmX10cm (CXLXA)"
+    }
+  },
+  "abraco-em-luz": {
+    "weightGrams": 65,
+    "dimensionsCm": {
+      "length": 8,
+      "width": 4,
+      "height": 10
+    },
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Peso: 65gr · Medidas: 8cmX4cmX10cm (CXLXA)"
+    }
+  },
+  "mini-bubble": {
+    "weightGrams": 40,
+    "dimensionsCm": {
+      "length": 4,
+      "width": 4,
+      "height": 4
+    },
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Peso: 40gr · Medidas: 4cmX4cmX4cm (CXLXA)"
+    }
+  },
+  "bolhas": {
+    "weightGrams": 88,
+    "dimensionsCm": {
+      "length": 7,
+      "width": 5,
+      "height": 6
+    },
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Peso: 88gr · Medidas: 7cmX5cmX6cm (CXLXA)"
+    }
+  },
+  "no-deluz": {
+    "weightGrams": 55,
+    "dimensionsCm": {
+      "length": 8,
+      "width": 8,
+      "height": 8
+    },
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Peso: 55gr · Medidas: 8cmX8cmX8cm (CXLXA)"
+    }
+  },
+  "lioracoral": {
+    "weightGrams": 65,
+    "dimensionsCm": {
+      "length": 7,
+      "width": 7,
+      "height": 7
+    },
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Peso: 65gr · Medidas: 7cmX7cmX7cm (CXLXA)"
+    }
+  },
+  "essenza-cube": {
+    "weightGrams": 125,
+    "dimensionsCm": {
+      "length": 7,
+      "width": 7,
+      "height": 7
+    },
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Peso: 125gr · Medidas: 7cmX7cmX7cm (CXLXA)"
+    }
+  },
+  "kit-silhouette": {
+    "weightGrams": 253,
+    "dimensionsCm": {
+      "length": 8,
+      "width": 6,
+      "height": 13
+    },
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Peso: 253gr · Medidas: 8cmX6cmX13cm (CXLXA)"
+    }
+  },
+  "trevo": {
+    "weightGrams": 120,
+    "dimensionsCm": {
+      "length": 5,
+      "width": 5,
+      "height": 12
+    },
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Peso: 120gr · Medidas: 5cmX5cmX12cm (CXLXA)"
+    }
+  },
+  "perolas": {
+    "weightGrams": 130,
+    "dimensionsCm": {
+      "length": 7,
+      "width": 7,
+      "height": 8
+    },
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Peso: 130gr · Medidas: 7cmX7cmX8cm (CXLXA)"
+    }
+  },
+  "kit-boho-glass": {
+    "weightGrams": 350,
+    "dimensionsCm": {
+      "length": 8,
+      "width": 8,
+      "height": 10
+    },
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Peso: 350gr · Medidas: 8cmX8cmX10cm (CXLXA)"
+    }
+  },
+  "lumina": {
+    "weightGrams": 130,
+    "dimensionsCm": {
+      "length": 7,
+      "width": 7,
+      "height": 9
+    },
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Peso: 130gr · Medidas: 7cmX7cmX9cm (CXLXA)"
+    }
+  },
+  "gota-de-luz1": {
+    "weightGrams": 108,
+    "dimensionsCm": {
+      "length": 7,
+      "width": 7,
+      "height": 8
+    },
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Peso: 108gr · Medidas: 7cmX7cmX8cm (CXLXA)."
+    }
+  },
+  "geometricafacetada": {
+    "weightGrams": 100,
+    "dimensionsCm": {
+      "length": 6,
+      "width": 6,
+      "height": 5
+    },
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Peso: 100gr · Medidas: 6cmX6cmX5cm (CXLXA)."
+    }
+  },
+  "cilindro-mosaico": {
+    "weightGrams": 130,
+    "dimensionsCm": {
+      "length": 6,
+      "width": 6,
+      "height": 8
+    },
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Peso: 130gr · Medidas: 6cmX6cmX8cm (CXLXA)"
+    }
+  },
+  "chama-esculpida": {
+    "weightGrams": 208,
+    "dimensionsCm": {
+      "length": 7,
+      "width": 7,
+      "height": 13
+    },
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Peso: 208gr · Medidas: 7cmX7cmX13cm (CXLXA)"
+    }
+  },
+  "jardim-encantado": {
+    "weightGrams": 700,
+    "dimensionsCm": {
+      "length": 15,
+      "width": 15,
+      "height": 18
+    },
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Peso: 700gr · Medidas: 15cmX15cmX18cm (CXLXA)"
+    }
+  },
+  "camafeufada": {
+    "weightGrams": 50,
+    "dimensionsCm": {
+      "length": 10,
+      "width": 8,
+      "height": 11
+    },
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Peso: 50gr · Medidas: 10cmX8cmX11cm (CXLXA)."
+    }
+  },
+  "botanicavasogesso": {
+    "weightGrams": 200,
+    "dimensionsCm": {
+      "length": 12,
+      "width": 12,
+      "height": 12
+    },
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Peso: 200gr · Medidas: 12cmX12cmX12cm (CXLXA)"
+    }
+  },
+  "peonia": {
+    "weightGrams": 100,
+    "dimensionsCm": {
+      "length": 10,
+      "width": 10,
+      "height": 7
+    },
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Peso 100gr · Medidas: 10cmX10cmX7cm (CXLXA)."
+    }
+  },
+  "sagrada-familia": {
+    "weightGrams": 200,
+    "dimensionsCm": {
+      "length": 12,
+      "width": 8,
+      "height": 15
+    },
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Peso: 200g · Medidas: 12cm x 8cm x 15cm (C x L x A)"
+    }
+  }
+}

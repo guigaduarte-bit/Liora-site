@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "build": "node scripts/build-site.mjs",
+    "pretest": "npm run build"
   },
   "engines": {
     "node": ">=18"

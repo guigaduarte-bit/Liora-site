@@ -1,51 +1,40 @@
 'use strict';
 
-function setResponseHeaders(res) {
-  res.setHeader('Cache-Control', 'no-store');
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-}
+const { configuration, verifyProof, providerRequest, fail, respondError, responseHeaders } = require('./_payment');
+const STATUSES = new Set(['approved', 'pending', 'in_process', 'authorized', 'rejected', 'cancelled', 'refunded', 'charged_back', 'in_mediation']);
 
 module.exports = async function handler(req, res) {
-  setResponseHeaders(res);
+  responseHeaders(res);
   if (req.method !== 'GET') {
     res.setHeader('Allow', 'GET');
     return res.status(405).json({ error: 'Método não permitido' });
   }
-
-  const accessToken = process.env.MP_ACCESS_TOKEN;
-  if (!accessToken) {
-    return res.status(500).json({ error: 'Pagamento temporariamente indisponível' });
-  }
-
-  const paymentId = String(req.query && req.query.payment_id || '');
-  const orderId = String(req.query && req.query.order_id || '');
-  if (!/^\d{1,30}$/.test(paymentId) || !/^LIORA-[A-Z0-9-]{10,80}$/.test(orderId)) {
-    return res.status(400).json({ error: 'Identificação do pagamento inválida' });
-  }
-
   try {
-    const mpResponse = await fetch(
-      `https://api.mercadopago.com/v1/payments/${encodeURIComponent(paymentId)}`,
-      { headers: { Authorization: `Bearer ${accessToken}` } }
-    );
-    const payment = await mpResponse.json().catch(() => ({}));
-
-    if (!mpResponse.ok) {
-      console.error('Mercado Pago não retornou o pagamento', { status: mpResponse.status });
-      return res.status(502).json({ error: 'Não foi possível confirmar o pagamento' });
+    const config = configuration('mercadopago');
+    const proof = verifyProof(req, 'mercadopago', config);
+    const paymentId = req.query && req.query.payment_id;
+    const orderId = req.query && req.query.order_id;
+    if (typeof paymentId !== 'string' || !/^\d{1,30}$/.test(paymentId) || orderId !== proof.orderId) {
+      fail('PAYMENT_IDENTIFICATION_INVALID', 'Identificação do pagamento inválida.', 400);
     }
-    if (payment.external_reference !== orderId) {
-      return res.status(409).json({ error: 'Pagamento não corresponde a este pedido' });
-    }
-
-    return res.status(200).json({
-      payment_id: String(payment.id),
-      order_id: orderId,
-      status: payment.status,
-      status_detail: payment.status_detail || null
+    const payment = await providerRequest(`https://api.mercadopago.com/v1/payments/${encodeURIComponent(paymentId)}`, {
+      headers: { Authorization: `Bearer ${config.credential}` }
     });
-  } catch (error) {
-    console.error('Erro ao consultar pagamento', error);
-    return res.status(500).json({ error: 'Erro interno ao confirmar pagamento' });
-  }
+    const amount = payment.transaction_amount;
+    if (!STATUSES.has(payment.status) || typeof amount !== 'number' || !Number.isFinite(amount) || amount <= 0
+      || !Number.isSafeInteger(Math.round(amount * 100)) || Math.abs(amount * 100 - Math.round(amount * 100)) > 0.000001
+      || typeof payment.live_mode !== 'boolean' || typeof payment.currency_id !== 'string') {
+      fail('PAYMENT_PROVIDER_INVALID_RESPONSE', 'Não foi possível validar a resposta do pagamento.', 502);
+    }
+    if (String(payment.id) !== paymentId || payment.external_reference !== proof.orderId
+      || Math.round(amount * 100) !== proof.totalCents || payment.currency_id !== proof.currency
+      || payment.live_mode !== (proof.mode === 'live')) {
+      fail('PAYMENT_ORDER_MISMATCH', 'O pagamento não corresponde aos dados deste pedido.', 409);
+    }
+    const methodMatches = proof.method === 'pix'
+      ? payment.payment_method_id === 'pix'
+      : payment.payment_type_id === (proof.method === 'card' ? 'credit_card' : 'ticket');
+    if (!methodMatches) fail('PAYMENT_METHOD_MISMATCH', 'O meio de pagamento precisa ser conferido pela loja antes de confirmar o pedido.', 409);
+    return res.status(200).json({ payment_id: paymentId, order_id: proof.orderId, status: payment.status, payment_mode: proof.mode });
+  } catch (error) { return respondError(res, error); }
 };
