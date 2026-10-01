@@ -98,3 +98,25 @@ A responsável informou o perfil como “liora aromas de luxo _candles”. O end
 A responsável confirmou a peça como vela luminária, com peso total de **475 g**, altura de **16 cm** e diâmetro de **9 cm**. O nome comercial Botanique 250 g foi mantido; o peso de frete da peça passa a ser 475 g. O cadastro de produto, a ficha pública e a logística usam os dados confirmados, com dimensões C 9 × L 9 × A 16 cm. Proteção/embalagem e dimensões protegidas continuam sem medição, portanto `confirmedForShipping` permanece falso. A confirmação substitui a interpretação anterior de 250 g como possível peso total, sem inventar o peso separado da cera. Alteração somente no preview.
 
 Validação desta atualização: `npm test` com 63 testes aprovados, build de 41 páginas e `git diff --check` sem erros. Dados da peça confirmados; cotações reais continuam dependentes de proteção/embalagem e credenciais.
+
+## Atualização das pendências comerciais — 2026-10-01
+
+As contagens de testes e diagnósticos acima descrevem suas respectivas datas. Esta atualização é documental e não representa nova execução da suíte nem nova homologação de pagamento/frete.
+
+- **Identidade empresarial resolvida:** nome empresarial e CNPJ autorizados já constam de `content/business.json` e são aplicados pelo build. Não solicitar novamente esses dados nem restaurar a classificação anterior de operação por pessoa física. Marca e identidade visual preservadas.
+- **Canal comercial ainda pendente:** não há evidência de caixa criada/testada. Gmail é a preferência confirmada; o roteiro concreto usa Google Workspace com um usuário e alias opcional de privacidade. Não publicar endereço de e-mail apenas sugerido.
+- **DNS consultado em 01/10/2026:** NS da Vercel (`ns1.vercel-dns.com`, `ns2.vercel-dns.com`); MX e TXT da raiz e TXT de `_dmarc` sem registros nas respostas públicas `NOERROR`. A implantação de e-mail exige a conta, seus valores de verificação e ajustes na zona DNS da Vercel. Nenhum ajuste foi executado nesta revisão.
+- **Dados pessoais preservados:** CPF, endereço residencial e contatos pessoais continuam fora da publicação. Falta definir endereço físico comercial autorizado para divulgação; CNPJ/nome autorizados não ampliam essa autorização.
+- **Operação a confirmar:** acessos reais às plataformas e registros, guarda/retenção, atendimento de privacidade, procedimento de devolução/estorno e prazo da entrega local. A política escrita não comprova funcionamento desses processos.
+
+Referências de continuidade: [revisão legal atualizada](legal-review.md) e [implantação do e-mail comercial](email-setup.md). As três páginas legais não foram modificadas para prometer um canal ainda inexistente. Produção permanece sujeita a preview final testado e aprovação explícita.
+
+### Correções técnicas verificadas em 01/10/2026
+
+- 175/175 testes locais aprovados, build de 41 páginas e `git diff --check` sem erros. Inclui os novos testes de confirmação assinada de pagamento e cotação por volume. Provedores financeiros simulados; isso não é homologação das contas.
+- Frete com múltiplos volumes: valor declarado por caixa, interseção de modalidades, soma em centavos, descarte de respostas incompletas e limites de duração/concorrência. Nenhum preço ausente é tratado como zero.
+- Pagamentos: configuração explícita por ambiente, URL de retorno restrita, comprovante HMAC sem dados pessoais, validação server-to-server de pedido/valor/moeda/método/ambiente, timeout e logs mínimos. InfinitePay indisponível no Preview; sem cobrança real.
+- `PAYMENT_MODE=test` e `SITE_URL` foram salvos exclusivamente no Preview da branch. Credencial Mercado Pago de Testes e segredo de assinatura permanecem pendentes; variáveis de Production não foram alteradas.
+- Política de privacidade atualizada para descrever comprovante temporário e validade. Nenhum novo contato ou dado residencial foi publicado.
+- Roteiros: [pagamentos](payment-setup.md), [e-mail](email-setup.md), [frete](shipping-product-setup.md). Persistência de pedidos e webhooks ainda precisam de serviço de dados autorizado e implementação antes de produção.
+- Preview e evidências hospedadas desta rodada ficam registrados no plano principal após o deployment. Produção continua sujeita à conclusão das dependências e à aprovação expressa da responsável.

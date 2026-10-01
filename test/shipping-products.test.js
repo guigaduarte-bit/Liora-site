@@ -8,7 +8,7 @@ const shippingData = require('../content/shipping-products.json');
 const { loadApi, confirmedShipping } = require('./helpers/isolated-api.cjs');
 
 const originalFetch = global.fetch;
-const environmentKeys = ['SUPERFRETE_TOKEN', 'SHIP_ORIGIN_CEP', 'SUPERFRETE_BASE_URL', 'SUPERFRETE_SERVICES', 'SITE_URL', 'MP_ACCESS_TOKEN'];
+const environmentKeys = ['SUPERFRETE_TOKEN', 'SHIP_ORIGIN_CEP', 'SUPERFRETE_BASE_URL', 'SUPERFRETE_SERVICES', 'SITE_URL', 'MP_ACCESS_TOKEN', 'PAYMENT_MODE', 'CHECKOUT_SIGNING_SECRET', 'VERCEL_ENV'];
 const originalEnv = Object.fromEntries(environmentKeys.map((key) => [key, process.env[key]]));
 
 beforeEach(() => {
@@ -188,6 +188,8 @@ test('checkout recusa frete incompleto antes de iniciar pagamento e devolve o er
   configureShipping();
   process.env.SITE_URL = 'https://liora.example';
   process.env.MP_ACCESS_TOKEN = 'fixture-mercadopago';
+  process.env.PAYMENT_MODE = 'test';
+  process.env.CHECKOUT_SIGNING_SECRET = 'synthetic-checkout-signing-key-for-tests-only';
   const response = await invoke(loadApi('create-preference.js'), {
     items: [{ id: 'botanique', qty: 1 }],
     payMethod: 'pix',

@@ -25,17 +25,20 @@ function isolatedApi(filename, options = {}) {
     exports: module.exports,
     Buffer,
     URL,
+    AbortController, setTimeout, clearTimeout,
     console,
     fetch,
     process: {
       env: {
         SITE_URL: 'https://liora.example',
-        MP_ACCESS_TOKEN: 'TEST-token-sintetico'
+        MP_ACCESS_TOKEN: 'TEST-token-sintetico',
+        PAYMENT_MODE: 'test', CHECKOUT_SIGNING_SECRET: 'synthetic-checkout-signing-key-for-tests-only'
       }
     },
     require(specifier) {
       if (specifier === './catalog') return options.catalog || productionCatalog;
       if (specifier === './_shipping') return isolatedApi('_shipping.js', options);
+      if (specifier === './_payment') return isolatedApi('_payment.js', options);
       return nativeRequire(specifier);
     }
   };
@@ -95,7 +98,7 @@ for (const boundary of boundaries) {
           return {
             ok: true,
             status: 201,
-            json: async () => ({ id: 'pref-sintetica', init_point: 'https://pagamento.example/teste' })
+            json: async () => ({ id: 'pref-sintetica', init_point: 'https://www.mercadopago.com.br/teste' })
           };
         }
       });
@@ -123,7 +126,7 @@ test('fragrâncias compartilham estoque: aceita o limite e rejeita excedente na 
       return {
         ok: true,
         status: 201,
-        json: async () => ({ id: 'pref-variantes', init_point: 'https://pagamento.example/teste' })
+        json: async () => ({ id: 'pref-variantes', init_point: 'https://www.mercadopago.com.br/teste' })
       };
     }
   };

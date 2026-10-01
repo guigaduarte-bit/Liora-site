@@ -358,6 +358,9 @@ async function confirmOrder(){
   if(!name||!email||!$('fE').checkValidity()){toast('Preencha nome e e-mail válidos para continuar');return}
   if(shipMethod==='delivery'&&(!cep||!addr)){toast('Preencha o endereço de entrega');return}
   if(shipMethod==='delivery'&&!selectedQuote){toast('Selecione uma opção de entrega');return}
+  try{sessionStorage.setItem('liora_checkout_storage_check','1');sessionStorage.removeItem('liora_checkout_storage_check')}catch{
+    toast('Permita o armazenamento desta sessão no navegador para confirmar o pagamento com segurança.');return;
+  }
   const btn=document.querySelector('#drawerFoot .btn-solid');
   const original=btn.textContent;
   btn.disabled=true;btn.textContent='Gerando pagamento…';
@@ -366,7 +369,8 @@ async function confirmOrder(){
       items:cart.map(i=>({id:i.id,qty:i.qty,frag:i.frag})),
       payMethod,
       shipping:{method:shipMethod,serviceId:selectedShippingService},
-      payer:{name,email,cep,num,addr}
+      payer:{name,email,cep,num,addr},
+      returnOrigin:window.location.origin
     };
     const resp=await fetch('/api/create-preference',{
       method:'POST',
@@ -374,12 +378,13 @@ async function confirmOrder(){
       body:JSON.stringify(payload)
     });
     const data=await resp.json().catch(()=>({}));
-    if(!resp.ok||!data.init_point){
+    if(!resp.ok||!data.init_point||!data.order_id||!data.checkout_proof){
       toast(data.error||'Não foi possível iniciar o pagamento. Tente novamente.');
       btn.disabled=false;btn.textContent=original;
       return;
     }
-    if(data.order_id){try{sessionStorage.setItem('liora_checkout_order',data.order_id)}catch{}}
+    sessionStorage.setItem('liora_checkout_order',data.order_id);
+    sessionStorage.setItem(`liora_checkout_proof:${data.order_id}`,data.checkout_proof);
     window.location.href=data.init_point;
   }catch(err){
     toast('Erro de conexão. Tente novamente.');
@@ -392,7 +397,7 @@ function renderSuccess(){
     <div class="success">
       <div class="ok-ring"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></div>
       <h3>Obrigada pelo seu pedido ✦</h3>
-      <p>Seu pedido já está sendo preparado com carinho no ateliê.</p>
+      <p>Pagamento confirmado. O prazo de produção é de 10 dias úteis após a confirmação do pagamento e da personalização.</p>
       <p class="order">Pedido ${window._order}</p>
       <button class="btn btn-outline" onclick="cart=[];updateCounts();closeAll()">Ver mais produtos</button>
     </div>`;
@@ -515,12 +520,14 @@ restoreCart();renderTabs();renderGrid();updateCounts();
 
   window.history.replaceState({},document.title,window.location.pathname);
   if(!orderId||(!isInfinitePay&&!paymentId)){
-    toast('Não foi possível confirmar o pagamento. Consulte seu e-mail ou tente novamente.');
+    toast('Não foi possível confirmar o pagamento. Confira a situação no provedor antes de tentar pagar novamente.');
     return;
   }
 
   toast('Confirmando pagamento…');
   try{
+    const checkoutProof=sessionStorage.getItem(`liora_checkout_proof:${orderId}`);
+    if(!checkoutProof)throw new Error('Comprovante da sessão não encontrado');
     let statusUrl;
     if(isInfinitePay){
       const transactionNsu=params.get('transaction_nsu');
@@ -530,22 +537,22 @@ restoreCart();renderTabs();renderGrid();updateCounts();
     }else{
       statusUrl=`/api/payment-status?payment_id=${encodeURIComponent(paymentId)}&order_id=${encodeURIComponent(orderId)}`;
     }
-    const resp=await fetch(statusUrl);
+    const resp=await fetch(statusUrl,{headers:{'X-Checkout-Proof':checkoutProof}});
     const data=await resp.json().catch(()=>({}));
     if(!resp.ok)throw new Error(data.error||'Falha ao confirmar pagamento');
 
     if(data.status==='approved'){
       cart=[];updateCounts();checkoutForm={name:'',email:'',cep:'',num:'',addr:''};
-      try{sessionStorage.removeItem('liora_checkout_order')}catch{}
-      toast('Pagamento aprovado ✦ Obrigada pelo seu pedido!');
+      try{sessionStorage.removeItem('liora_checkout_order');sessionStorage.removeItem(`liora_checkout_proof:${orderId}`)}catch{}
+      toast(data.payment_mode==='test'?'Pagamento de teste aprovado. Nenhum pedido será produzido.':'Pagamento aprovado ✦ Obrigada pelo seu pedido!');
     }else if(['pending','in_process','authorized'].includes(data.status)){
-      toast('Pagamento em análise — avisaremos por e-mail assim que confirmado.');
+      toast('Pagamento pendente ou em análise. Acompanhe a confirmação no provedor de pagamento.');
     }else{
-      try{sessionStorage.removeItem('liora_checkout_order')}catch{}
+      try{sessionStorage.removeItem('liora_checkout_order');sessionStorage.removeItem(`liora_checkout_proof:${orderId}`)}catch{}
       toast('Pagamento não concluído. Você pode tentar novamente.');
     }
   }catch(err){
-    toast('Não foi possível confirmar o pagamento agora. Consulte seu e-mail.');
+    toast('Não foi possível confirmar o pagamento agora. Confira a situação no provedor antes de tentar pagar novamente.');
   }
 })();
 

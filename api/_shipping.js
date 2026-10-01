@@ -3,11 +3,17 @@
 const { buildShippingProducts } = require('./_shipping-products');
 const { estimateCartPackaging, isShippingEstimatePreview } = require('./_shipping-estimate');
 const { automaticCoverageBRL } = require('../content/shipping-insurance.json');
+const CATALOG = require('./catalog');
+const { setTimeout, clearTimeout } = require('node:timers');
 
 const SHIP_FREE = 150;
 const CURITIBA_SHIPPING_COST = 19.9;
 const SUPERFRETE_ENDPOINT = '/api/v0/calculator';
 const DEFAULT_SERVICES = '1,2,17,3,33,31';
+const MAX_QUOTE_PARCELS = 20;
+const PARCEL_CONCURRENCY = 3;
+const QUOTE_DEADLINE_MS = 15000;
+const REQUEST_TIMEOUT_MS = 8000;
 
 class ShippingQuoteError extends Error {
   constructor(code, message, { status = 502, sandbox = false } = {}) {
@@ -43,7 +49,11 @@ function previewQuotes(zipCode) {
 }
 
 function parseNumber(value) {
-  if (typeof value === 'string') value = value.replace(',', '.');
+  if (typeof value === 'string') {
+    value = value.trim();
+    if (!/^-?\d+(?:[.,]\d+)?$/.test(value)) return null;
+    value = value.replace(',', '.');
+  } else if (typeof value !== 'number') return null;
   const number = Number(value);
   return Number.isFinite(number) ? number : null;
 }
@@ -68,7 +78,7 @@ function normalizeQuotes(data) {
           || 'Transportadora'
         ).slice(0, 60),
         name: String(quote.name || quote.service_name || 'Entrega').slice(0, 80),
-        price: price === null ? null : roundCurrency(price),
+        price: price === null || price < 0 || !Number.isSafeInteger(Math.round(price * 100)) ? null : roundCurrency(price),
         deliveryDays: deliveryDays === null ? null : Math.max(0, Math.round(deliveryDays)),
         preview: false
       };
@@ -127,34 +137,52 @@ function minimumInsuranceRetryServices(attempt, subtotal) {
   }).map(quote => String(quote.id || quote.service)))];
 }
 
-async function requestSuperFrete({ baseUrl, token, destination, products, package: parcel, subtotal, services, additionalInsurance = true }) {
+async function requestSuperFrete({ baseUrl, token, destination, products, package: parcel, subtotal, services, additionalInsurance = true, deadline }) {
   const origin = cleanZip(process.env.SHIP_ORIGIN_CEP);
-  const response = await fetch(`${baseUrl.replace(/\/$/, '')}${SUPERFRETE_ENDPOINT}`, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-      'User-Agent': process.env.SUPERFRETE_USER_AGENT || 'Liora Aromas/1.0 (contato@lioraaromasdeluxo.com.br)'
-    },
-    body: JSON.stringify({
-      from: { postal_code: origin },
-      to: { postal_code: destination },
-      services,
-      options: {
-        own_hand: false,
-        receipt: false,
-        insurance_value: additionalInsurance ? subtotal : 0,
-        use_insurance_value: additionalInsurance && subtotal > 0
-      },
-      ...(parcel ? { package: parcel } : { products })
-    })
+  const timeoutMs = Math.min(REQUEST_TIMEOUT_MS, deadline - Date.now());
+  if (!(timeoutMs > 0)) throw new ShippingQuoteError('SHIPPING_PROVIDER_TIMEOUT', 'A cotação demorou mais que o esperado. Tente novamente.', { status: 503 });
+  const controller = typeof AbortController === 'function' ? new AbortController() : null;
+  let timeout;
+  const expiry = new Promise((_, reject) => {
+    timeout = setTimeout(() => {
+      reject(new ShippingQuoteError('SHIPPING_PROVIDER_TIMEOUT', 'A cotação demorou mais que o esperado. Tente novamente.', { status: 503 }));
+      if (controller) controller.abort();
+    }, timeoutMs);
   });
-  const data = await response.json().catch(() => null);
-  return { ok: response.ok, status: response.status, data, services, additionalInsurance };
+  const request = (async () => {
+    const response = await fetch(`${baseUrl.replace(/\/$/, '')}${SUPERFRETE_ENDPOINT}`, {
+      method: 'POST',
+      ...(controller ? { signal: controller.signal } : {}),
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        'User-Agent': process.env.SUPERFRETE_USER_AGENT || 'Liora Aromas/1.0 (+https://lioraaromasdeluxo.com.br)'
+      },
+      body: JSON.stringify({
+        from: { postal_code: origin },
+        to: { postal_code: destination },
+        services,
+        options: {
+          own_hand: false,
+          receipt: false,
+          insurance_value: additionalInsurance ? subtotal : 0,
+          use_insurance_value: additionalInsurance && subtotal > 0
+        },
+        ...(parcel ? { package: parcel } : { products })
+      })
+    });
+    const data = await response.json().catch(() => null);
+    return { ok: response.ok, status: response.status, data, services, additionalInsurance };
+  })();
+  try {
+    return await Promise.race([request, expiry]);
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
-async function superFreteQuotes({ destination, cart, subtotal, estimatedParcel }) {
+async function superFreteQuotes({ destination, cart, subtotal, estimatedParcel, deadline = Date.now() + QUOTE_DEADLINE_MS }) {
   const origin = cleanZip(process.env.SHIP_ORIGIN_CEP);
   const token = String(process.env.SUPERFRETE_TOKEN || '').trim();
   if (!origin || !token) {
@@ -182,6 +210,7 @@ async function superFreteQuotes({ destination, cart, subtotal, estimatedParcel }
     products,
     package: parcel,
     subtotal,
+    deadline,
     services: requestedServices
   }));
 
@@ -194,6 +223,7 @@ async function superFreteQuotes({ destination, cart, subtotal, estimatedParcel }
       products,
       package: parcel,
       subtotal,
+      deadline,
       services: '1,2'
     }));
     quotes = attempts[1].ok ? normalizeQuotes(attempts[1].data) : [];
@@ -207,7 +237,7 @@ async function superFreteQuotes({ destination, cart, subtotal, estimatedParcel }
   if (retryServices.length) {
     try {
       const retry = await requestSuperFrete({
-        baseUrl, token, destination, products, package: parcel, subtotal,
+        baseUrl, token, destination, products, package: parcel, subtotal, deadline,
         services: retryServices.join(','), additionalInsurance: false
       });
       attempts.push(retry);
@@ -268,6 +298,98 @@ async function superFreteQuotes({ destination, cart, subtotal, estimatedParcel }
   );
 }
 
+async function multipleParcelQuotes({ destination, cart, subtotal, packaging }) {
+  const failPackaging = () => {
+    throw new ShippingQuoteError('SHIPPING_PACKAGING_PENDING', 'Não foi possível conferir todos os volumes deste pedido.', { status: 503 });
+  };
+  if (!packaging.parcels.length || packaging.parcels.length > MAX_QUOTE_PARCELS) failPackaging();
+
+  // Values and quantities come from the server catalogue. Each declared value
+  // covers only the merchandise inside that parcel, without duplicating the
+  // order total across labels or accepting client-supplied prices.
+  const expected = new Map();
+  for (const item of cart) {
+    if (!Object.hasOwn(CATALOG, item.id) || !Number.isSafeInteger(item.quantity) || item.quantity < 1) failPackaging();
+    expected.set(item.id, (expected.get(item.id) || 0) + item.quantity);
+  }
+  const packed = new Map();
+  const parcelValues = packaging.parcels.map(parcel => {
+    if (!Array.isArray(parcel.items) || !parcel.items.length) failPackaging();
+    let cents = 0;
+    for (const item of parcel.items) {
+      if (!expected.has(item.id) || !Number.isSafeInteger(item.quantity) || item.quantity < 1) failPackaging();
+      const price = CATALOG[item.id].price;
+      if (!Number.isFinite(price) || price < 0) failPackaging();
+      packed.set(item.id, (packed.get(item.id) || 0) + item.quantity);
+      cents += Math.round(price * 100) * item.quantity;
+    }
+    if (!Number.isSafeInteger(cents)) failPackaging();
+    return cents;
+  });
+  if ([...expected].some(([id, quantity]) => packed.get(id) !== quantity)
+    || !Number.isFinite(subtotal)
+    || parcelValues.reduce((sum, cents) => sum + cents, 0) !== Math.round(subtotal * 100)) failPackaging();
+
+  const results = new Array(packaging.parcels.length);
+  const deadline = Date.now() + QUOTE_DEADLINE_MS;
+  let next = 0;
+  let failure;
+  const worker = async () => {
+    while (!failure && next < packaging.parcels.length) {
+      const index = next++;
+      try {
+        const result = await superFreteQuotes({
+          destination, cart, subtotal: parcelValues[index] / 100,
+          estimatedParcel: packaging.parcels[index], deadline
+        });
+        if (!result.quotes.length) {
+          failure = failure || new ShippingQuoteError(result.code || 'SHIPPING_MULTIPLE_PACKAGES_UNAVAILABLE', 'Não foi possível cotar todos os volumes deste pedido.');
+        } else results[index] = result.quotes;
+      } catch (error) {
+        failure = failure || error;
+      }
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(PARCEL_CONCURRENCY, results.length) }, worker));
+  if (failure) throw failure;
+
+  const key = quote => `${quote.id}\u0000${quote.carrier}`;
+  const services = results.map(quotes => {
+    const grouped = new Map();
+    for (const quote of quotes) {
+      const service = key(quote);
+      // Ambiguous duplicate services are not a usable quotation.
+      grouped.set(service, grouped.has(service) ? null : quote);
+    }
+    return grouped;
+  });
+  const quotes = [...services[0]].flatMap(([service, first]) => {
+    if (!first || services.some(options => !options.get(service))) return [];
+    const components = services.map((options, index) => {
+      const quote = options.get(service);
+      return {
+        parcelIndex: index + 1, serviceId: quote.id, carrier: quote.carrier,
+        price: quote.price, deliveryDays: quote.deliveryDays,
+        merchandiseValue: parcelValues[index] / 100,
+        insurance: quote.insurance || { additional: true, declaredValue: parcelValues[index] / 100 }
+      };
+    });
+    const totalCents = components.reduce((sum, component) => sum + Math.round(component.price * 100), 0);
+    if (!Number.isSafeInteger(totalCents)) return [];
+    return [{
+      id: first.id, carrier: first.carrier, name: first.name,
+      price: totalCents / 100,
+      deliveryDays: components.some(component => component.deliveryDays === null)
+        ? null : Math.max(...components.map(component => component.deliveryDays)),
+      parcelCount: components.length, components, preview: true, estimated: true
+    }];
+  }).sort((a, b) => a.price - b.price).slice(0, 6);
+  if (!quotes.length) throw new ShippingQuoteError(
+    'SHIPPING_MULTIPLE_PACKAGES_UNAVAILABLE', 'Não há uma modalidade disponível para todos os volumes deste pedido.', { status: 422 }
+  );
+  return { preview: true, quotes, notice: `Cotação estimada para ${packaging.parcels.length} volumes. O pagamento depende da conferência das embalagens.` };
+}
+
 async function quoteShipping({ zipCode, cart, subtotal }) {
   const destination = cleanZip(zipCode);
   if (destination.length !== 8) throw new Error('CEP inválido');
@@ -293,10 +415,7 @@ async function quoteShipping({ zipCode, cart, subtotal }) {
           : 'Este pedido precisa de uma embalagem diferente das caixas disponíveis na simulação.'
       };
     } else if (packaging && packaging.parcels.length !== 1) {
-      superFrete = {
-        preview: true, quotes: [], code: 'SHIPPING_MULTIPLE_PACKAGES',
-        notice: 'O pedido foi dividido em volumes. A cotação conjunta desses volumes ainda precisa ser homologada.'
-      };
+      superFrete = await multipleParcelQuotes({ destination, cart, subtotal, packaging });
     } else {
       superFrete = await superFreteQuotes({
         destination, cart, subtotal,

@@ -22,7 +22,7 @@ function storefront({ saved = {}, blockedStorage = false, search = '', fetch } =
   const window = {
     LIORA_PRODUCTS: structuredClone(products),
     LIORA_CATEGORIES: [],
-    location: { search, pathname: '/', href: 'https://liora.example/' },
+    location: { search, pathname: '/', href: 'https://liora.example/', origin: 'https://liora.example' },
     history: { replaceState() {} },
     addEventListener() {}
   };
@@ -166,9 +166,10 @@ for (const status of ['approved', 'pending', 'rejected']) {
   test(`retorno ${status} só limpa o carrinho quando a API confirma aprovação`, async () => {
     let calls = 0;
     const app = storefront({
-      saved: { liora_cart: JSON.stringify([{ id: 'botanique', qty: 1, frag: 'Lavanda' }]) },
+      saved: { liora_cart: JSON.stringify([{ id: 'botanique', qty: 1, frag: 'Lavanda' }]), 'liora_checkout_proof:LIORA-TESTE-12345678': 'synthetic-proof' },
       search: '?checkout=return&payment_id=123&order_id=LIORA-TESTE-12345678',
-      fetch: async (url) => {
+      fetch: async (url, options) => {
+        assert.equal(options.headers['X-Checkout-Proof'], 'synthetic-proof');
         calls += 1;
         assert.match(url, /^\/api\/payment-status\?/);
         return { ok: true, json: async () => ({ status }) };
@@ -180,3 +181,52 @@ for (const status of ['approved', 'pending', 'rejected']) {
     assert.equal(JSON.parse(app.storage.get('liora_cart')).length, status === 'approved' ? 0 : 1);
   });
 }
+
+test('retorno sem comprovante assinado preserva carrinho e não consulta pagamento', async () => {
+  const app = storefront({
+    saved: { liora_cart: JSON.stringify([{ id: 'botanique', qty: 1 }]) },
+    search: '?checkout=return&payment_id=123&order_id=LIORA-TESTE-12345678'
+  });
+  await app.done;
+  assert.equal(app.run('cartQty()'), 1);
+  assert.match(app.nodes.get('toastMsg').textContent, /Confira a situação no provedor/);
+});
+
+test('checkout transmite origem e guarda comprovante sem persistir dados pessoais', async () => {
+  let sent;
+  const app = storefront({ fetch: async (url, options) => {
+    assert.equal(url, '/api/create-preference');
+    sent = JSON.parse(options.body);
+    return { ok: true, json: async () => ({ init_point: 'https://www.mercadopago.com.br/checkout/teste', order_id: 'LIORA-TESTE-12345678', checkout_proof: 'signed-fixture' }) };
+  } });
+  await app.done;
+  app.run("addToCart('botanique',1); shippingState={status:'ready',quotes:[{id:'curitiba-fixed',price:19.9,preview:false}]}; selectedShippingService='curitiba-fixed'; $('fN').value='Cliente Fictício'; $('fE').value='cliente@example.com'; $('fC').value='80000000'; $('fNum').value='100'; $('fA').value='Rua Fictícia';");
+  await app.run('confirmOrder()');
+  assert.equal(sent.returnOrigin, 'https://liora.example');
+  assert.equal(app.storage.get('liora_checkout_proof:LIORA-TESTE-12345678'), 'signed-fixture');
+  assert.doesNotMatch(JSON.stringify([...app.storage]), /cliente@example|Fictício|Fictícia|80000000/);
+});
+
+test('navegador sem armazenamento não cria pagamento sem conseguir guardar o comprovante', async () => {
+  const app = storefront({ blockedStorage: true });
+  await app.done;
+  app.run("addToCart('botanique',1); shippingState={status:'ready',quotes:[{id:'curitiba-fixed',price:19.9,preview:false}]}; selectedShippingService='curitiba-fixed'; $('fN').value='Teste'; $('fE').value='teste@example.com'; $('fC').value='80000000'; $('fA').value='Rua Fictícia';");
+  await app.run('confirmOrder()');
+  assert.match(app.nodes.get('toastMsg').textContent, /armazenamento desta sessão/);
+});
+
+test('aprovação de teste é identificada e pendência não promete e-mail inexistente', async () => {
+  for (const status of ['approved', 'pending']) {
+    const app = storefront({
+      saved: { 'liora_checkout_proof:LIORA-TESTE-12345678': 'synthetic-proof' },
+      search: '?checkout=return&payment_id=123&order_id=LIORA-TESTE-12345678',
+      fetch: async () => ({ ok: true, json: async () => ({ status, payment_mode: 'test' }) })
+    });
+    await app.done;
+    assert.doesNotMatch(app.nodes.get('toastMsg').textContent, /e-mail|avisaremos/);
+    if (status === 'approved') {
+      assert.match(app.nodes.get('toastMsg').textContent, /teste aprovado/);
+      assert.equal(app.storage.get('liora_checkout_proof:LIORA-TESTE-12345678'), undefined);
+    } else assert.equal(app.storage.get('liora_checkout_proof:LIORA-TESTE-12345678'), 'synthetic-proof');
+  }
+});

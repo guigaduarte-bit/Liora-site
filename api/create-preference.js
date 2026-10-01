@@ -3,6 +3,7 @@
 const { randomUUID } = require('node:crypto');
 const CATALOG = require('./catalog');
 const { SHIP_FREE, cleanZip, quoteShipping, roundCurrency } = require('./_shipping');
+const { configuration, siteOrigin, signProof, httpsUrl, providerRequest, fail, respondError, responseHeaders } = require('./_payment');
 
 const PAYMENT_TYPES = ['credit_card', 'debit_card', 'ticket', 'bank_transfer'];
 const PAYMENT_METHODS = new Set(['pix', 'card', 'boleto', 'infinitepay']);
@@ -16,26 +17,6 @@ function parseBody(req) {
   if (req.body && typeof req.body === 'object' && !Buffer.isBuffer(req.body)) return req.body;
   if (typeof req.body === 'string' || Buffer.isBuffer(req.body)) return JSON.parse(req.body.toString());
   return {};
-}
-
-function getHttpUrl(rawValue) {
-  if (!rawValue) return null;
-  try {
-    const raw = /^https?:\/\//i.test(rawValue) ? rawValue : `https://${rawValue}`;
-    const url = new URL(raw);
-    if (!['http:', 'https:'].includes(url.protocol)) return null;
-    return url;
-  } catch {
-    return null;
-  }
-}
-
-function getSiteUrl() {
-  const configured = process.env.SITE_URL
-    || process.env.VERCEL_PROJECT_PRODUCTION_URL
-    || process.env.VERCEL_URL;
-  const url = getHttpUrl(configured);
-  return url ? url.origin : null;
 }
 
 function validateCart(items) {
@@ -148,25 +129,15 @@ function buildInfinitePayItems(cart, shippingCost, selectedQuote) {
   return items;
 }
 
-function setResponseHeaders(res) {
-  res.setHeader('Cache-Control', 'no-store');
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-}
-
 module.exports = async function handler(req, res) {
-  setResponseHeaders(res);
+  responseHeaders(res);
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Método não permitido' });
   }
 
-  const siteUrl = getSiteUrl();
-  if (!siteUrl) {
-    return res.status(500).json({ error: 'Pagamento temporariamente indisponível' });
-  }
-
   try {
-    const { items, payMethod, shipping, payer } = parseBody(req);
+    const { items, payMethod, shipping, payer, returnOrigin } = parseBody(req);
     const selectedPayment = cleanText(payMethod, 20);
     const selectedShipping = cleanText(shipping && shipping.method, 20);
 
@@ -177,13 +148,11 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ error: 'Meio de envio inválido' });
     }
 
-    const accessToken = process.env.MP_ACCESS_TOKEN;
-    const infinitePayHandle = cleanText(process.env.INFINITEPAY_HANDLE, 100);
-    if (selectedPayment === 'infinitepay' && !infinitePayHandle) {
-      return res.status(503).json({ error: 'InfinitePay ainda precisa ser ativado para esta loja' });
-    }
-    if (selectedPayment !== 'infinitepay' && !accessToken) {
-      return res.status(500).json({ error: 'Pagamento temporariamente indisponível' });
+    const provider = selectedPayment === 'infinitepay' ? 'infinitepay' : 'mercadopago';
+    const config = configuration(provider);
+    const siteUrl = siteOrigin(config);
+    if (returnOrigin !== undefined && returnOrigin !== siteUrl) {
+      fail('CHECKOUT_ORIGIN_MISMATCH', 'Abra a loja pelo endereço configurado para este checkout antes de continuar.', 409);
     }
 
     const name = cleanText(payer && payer.name, 120);
@@ -226,12 +195,13 @@ module.exports = async function handler(req, res) {
       : subtotal;
     const total = roundCurrency(productTotal + shippingCost);
     const orderId = `LIORA-${Date.now().toString(36).toUpperCase()}-${randomUUID().slice(0, 8).toUpperCase()}`;
+    const checkoutProof = signProof({ orderId, provider, totalCents: Math.round(total * 100), method: selectedPayment }, config);
     const returnUrl = `${siteUrl}/?checkout=return&order_id=${encodeURIComponent(orderId)}`;
 
     if (selectedPayment === 'infinitepay') {
       const infinitePayReturnUrl = `${siteUrl}/?checkout=infinitepay-return&order_id=${encodeURIComponent(orderId)}`;
       const checkoutPayload = {
-        handle: infinitePayHandle,
+        handle: config.credential,
         redirect_url: infinitePayReturnUrl,
         order_nsu: orderId,
         customer: { name, email },
@@ -242,28 +212,26 @@ module.exports = async function handler(req, res) {
         },
         items: buildInfinitePayItems(cart, shippingCost, selectedQuote)
       };
-      const webhookUrl = getHttpUrl(process.env.INFINITEPAY_WEBHOOK_URL);
-      if (webhookUrl) checkoutPayload.webhook_url = webhookUrl.toString();
+      if (process.env.INFINITEPAY_WEBHOOK_URL) {
+        const webhookUrl = httpsUrl(process.env.INFINITEPAY_WEBHOOK_URL, [new URL(siteUrl).hostname]);
+        if (!webhookUrl) fail('PAYMENT_WEBHOOK_URL_INVALID');
+        checkoutPayload.webhook_url = webhookUrl.toString();
+      }
 
-      const infiniteResponse = await fetch('https://api.checkout.infinitepay.io/links', {
+      const data = await providerRequest('https://api.checkout.infinitepay.io/links', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify(checkoutPayload)
       });
-      const data = await infiniteResponse.json().catch(() => ({}));
-      const checkoutUrl = getHttpUrl(data.url);
-      if (!infiniteResponse.ok || !checkoutUrl || checkoutUrl.hostname !== 'checkout.infinitepay.com.br') {
-        console.error('InfinitePay recusou o checkout', {
-          status: infiniteResponse.status,
-          cause: data.message || data.error || 'resposta inválida'
-        });
-        return res.status(502).json({ error: 'Não foi possível iniciar o pagamento pela InfinitePay' });
-      }
+      const checkoutUrl = httpsUrl(data.url, ['checkout.infinitepay.com.br']);
+      if (!checkoutUrl) fail('PAYMENT_PROVIDER_INVALID_RESPONSE', 'Não foi possível iniciar o pagamento pela InfinitePay.', 502);
       return res.status(200).json({
         id: data.invoice_slug || orderId,
         init_point: checkoutUrl.toString(),
         order_id: orderId,
         provider: 'infinitepay',
+        checkout_proof: checkoutProof,
+        payment_mode: config.mode,
         total
       });
     }
@@ -299,39 +267,36 @@ module.exports = async function handler(req, res) {
         shipping_service: selectedQuote.name,
         shipping_carrier: selectedQuote.carrier,
         shipping_delivery_days: selectedQuote.deliveryDays || 0,
-        customer_address: address,
-        customer_number: streetNumber,
         subtotal,
         total
       }
     };
 
-    const webhookUrl = getHttpUrl(process.env.MP_WEBHOOK_URL);
-    if (webhookUrl) preference.notification_url = webhookUrl.toString();
+    if (process.env.MP_WEBHOOK_URL) {
+      const webhookUrl = httpsUrl(process.env.MP_WEBHOOK_URL, [new URL(siteUrl).hostname]);
+      if (!webhookUrl) fail('PAYMENT_WEBHOOK_URL_INVALID');
+      preference.notification_url = webhookUrl.toString();
+    }
 
-    const mpResponse = await fetch('https://api.mercadopago.com/checkout/preferences', {
+    const data = await providerRequest('https://api.mercadopago.com/checkout/preferences', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${accessToken}`
+        Authorization: `Bearer ${config.credential}`
       },
       body: JSON.stringify(preference)
     });
-    const data = await mpResponse.json().catch(() => ({}));
-
-    if (!mpResponse.ok || !data.init_point) {
-      console.error('Mercado Pago recusou a preferência', {
-        status: mpResponse.status,
-        cause: data.cause || data.message || 'resposta inválida'
-      });
-      return res.status(502).json({ error: 'Não foi possível iniciar o pagamento' });
-    }
+    const checkoutUrl = httpsUrl(data.init_point, ['www.mercadopago.com.br', 'mercadopago.com.br', ...(config.mode === 'test' ? ['sandbox.mercadopago.com.br'] : [])]);
+    if (!checkoutUrl || typeof data.id !== 'string' || !data.id || data.id.length > 200) fail('PAYMENT_PROVIDER_INVALID_RESPONSE', 'Não foi possível iniciar o pagamento.', 502);
+    if (typeof data.live_mode !== 'undefined' && data.live_mode !== (config.mode === 'live')) fail('PAYMENT_ENVIRONMENT_MISMATCH');
 
     return res.status(200).json({
       id: data.id,
-      init_point: data.init_point,
+      init_point: checkoutUrl.toString(),
       order_id: orderId,
       provider: 'mercadopago',
+      checkout_proof: checkoutProof,
+      payment_mode: config.mode,
       total
     });
   } catch (error) {
@@ -344,7 +309,6 @@ module.exports = async function handler(req, res) {
     if (error && /Carrinho|produto|Quantidade|Estoque/i.test(error.message)) {
       return res.status(400).json({ error: error.message });
     }
-    console.error('Erro ao criar preferência', error);
-    return res.status(500).json({ error: 'Erro interno ao criar pagamento' });
+    return respondError(res, error);
   }
 };

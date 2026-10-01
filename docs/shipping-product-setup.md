@@ -1,6 +1,6 @@
 # Frete por carrinho — Liora
 
-Atualização: 27/09/2026. Estimador implementado no preview. Embalagens e transportadora ainda não homologadas; publicação em produção depende de aprovação.
+Atualização: 01/10/2026. Estimador implementado no preview. Embalagens e transportadora ainda não homologadas; publicação em produção depende de aprovação.
 
 ## Dados separados
 
@@ -26,15 +26,15 @@ O modo de estimativa só é ativado por `VERCEL_ENV=preview` no servidor; campos
 
 - `/__preview-frete/`: ferramenta de conferência, gerada somente no build de preview (ou build local de QA). Permite testar os 27 modelos e carrinhos hipotéticos, inclusive quantidades maiores que o estoque, sem fazer compra nem alterar estoque.
 - `/api/preview-shipping-estimate`: GET de dados públicos do catálogo e POST de estimativa; retorna 404 fora do ambiente Preview. Sem chamadas a transportadoras ou pagamentos.
-- `/api/shipping-quote`: continua validando o estoque real do checkout. No Preview acrescenta o resumo da embalagem. Com um volume e credenciais disponíveis, envia à SuperFrete apenas `package`, com dimensões externas e peso total convertido de g para kg. Não envia `products` junto, pois `package` prevalece na API.
+- `/api/shipping-quote`: continua validando o estoque real do checkout. No Preview acrescenta o resumo da embalagem. Com credenciais disponíveis, envia uma consulta por volume à SuperFrete usando apenas `package`, com dimensões externas e peso total convertido de g para kg. Não envia `products` junto, pois `package` prevalece na API.
 - Cotações externas com embalagem estimada recebem `preview: true` e `estimated: true`. São bloqueadas no botão de pagamento e revalidadas/bloqueadas no servidor antes de qualquer criação de pagamento.
-- Sem credenciais ou com falha do provedor, a embalagem permanece visível com aviso; não são inventadas tarifas para esta estimativa. Múltiplos volumes são mostrados separadamente e ainda não geram cotação conjunta. Não tratá-los como um único pacote fictício.
+- Sem credenciais ou com falha do provedor, a embalagem permanece visível com aviso; não são inventadas tarifas para esta estimativa. Múltiplos volumes são cotados separadamente. Só são oferecidas modalidades presentes em todas as caixas, com soma em centavos e o maior prazo de transporte. Se faltar prazo em um volume, o prazo total fica desconhecido. Falha em qualquer volume impede oferta externa parcial; a entrega local permanece independente.
 - A entrega local de Curitiba mantém sua regra independente. Frete grátis a partir de R$ 150 em produtos, antes do Pix, continua com o mesmo alcance do código existente; não foi limitado a Curitiba. Pix mantém 5% de desconto. Produção: 10 dias úteis após pagamento e personalização confirmados, acrescidos do transporte.
 - Fora do Preview, permanece o caminho anterior `buildShippingProducts`, que exige dados logísticos confirmados por SKU. A promoção do código para produção não ativa a estimativa automaticamente. A migração definitiva para caixas por pedido é uma próxima etapa após validação.
 
 ## Evidências locais
 
-Suite atual: 142 testes aprovados, com build de 41 páginas. Inclui 27 modelos (23 estimáveis, três incompletos e um sem caixa), conservação de todos os 23 modelos completos no mesmo carrinho, colisões/limites, rotação, tara por volume, conversão para kg, estoque, falsificação de dados, bloqueio de cobrança estimada, preservação das regras existentes e isolamento de produção. Chamadas de provedores foram simuladas em memória; não homologam as contas externas.
+Evidência histórica anterior a 01/10/2026: 142 testes aprovados, com build de 41 páginas. Inclui 27 modelos (23 estimáveis, três incompletos e um sem caixa), conservação de todos os 23 modelos completos no mesmo carrinho, colisões/limites, rotação, tara por volume, conversão para kg, estoque, falsificação de dados, bloqueio de cobrança estimada, preservação das regras existentes e isolamento de produção. Chamadas de provedores foram simuladas em memória; não homologam as contas externas.
 
 | Exemplo | Resultado |
 |---|---|
@@ -49,10 +49,18 @@ Suite atual: 142 testes aprovados, com build de 41 páginas. Inclui 27 modelos (
 1. Confirmar os modelos de caixa realmente adotados, suas dimensões internas/externas e tara; calibrar proteção com uma peça, duas iguais e um pedido misto. Não exigir todas as combinações.
 2. Completar os dados faltantes de peças e revisar pesos totais de outros vidros/kits. Nunca presumir que o nome do produto é o peso completo.
 3. Configurar credenciais e origem no Preview sem gravar segredos no repositório. Comparar cotação da API com painel usando peso, caixa, CEPs, valor declarado e serviços iguais.
-4. Implementar/homologar cotações e etiquetas para múltiplos volumes antes de liberar esse caso para cobrança. A etiqueta deve reproduzir o pacote real.
+4. Homologar no ambiente real cotações e emissão de etiquetas para múltiplos volumes antes de liberar esse caso para cobrança. O cálculo separado já foi implementado no Preview em 01/10/2026; nenhuma etiqueta foi emitida. Cada etiqueta deve reproduzir seu pacote real.
 5. Revisar a regra operacional aprovada, ativar apenas dados conferidos e testar pagamento/retorno antes da aprovação de produção.
 
 ## Fontes
 
 - Correios: https://www.correios.com.br/Plone/enviar/encomendas/arquivo/nacional/guia-tecnico-embalagens-rpc_v1-1.pdf — dimensões dos modelos RPC. Resistência não é tara; o guia não confirma estoque de caixas em uma agência.
 - SuperFrete: https://superfrete.readme.io/reference/cotacao-de-frete — `products`, `package`, unidades e consistência com a etiqueta.
+
+## Múltiplos volumes — 01/10/2026
+
+O seguro usa o valor dos produtos de cada caixa no catálogo do servidor. Antes de consultar, o código confere se todos os itens e quantidades foram conservados e se os valores por caixa somam o subtotal. A recuperação de seguro mínimo é avaliada por volume; uma caixa de R$ 75 não perde o seguro porque outra contém R$ 24.
+
+A cotação traz `parcelCount` e `components` para conferência. A gratuidade é aplicada após totalizar, mantendo `originalPrice` como custo integral. Máximo de três consultas simultâneas, timeout de oito segundos por requisição e limite total de quinze segundos. Preço ausente, booleano ou vazio é inválido, nunca frete grátis. Prazo ausente permanece desconhecido.
+
+Teste local focado: 46/46 aprovados, incluindo dez casos novos de múltiplos volumes/normalização/timeout e o bloqueio de pagamento estimado. Isso não valida medidas físicas, conta real, etiquetas ou a divergência de centavos da Botanique. O plano principal registra o resultado da suíte completa e do Preview desta rodada.

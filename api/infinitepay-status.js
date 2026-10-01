@@ -1,61 +1,41 @@
 'use strict';
 
-function clean(value, maxLength) {
-  return String(value || '').replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, maxLength);
-}
-
-function setResponseHeaders(res) {
-  res.setHeader('Cache-Control', 'no-store');
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-}
+const { configuration, verifyProof, providerRequest, fail, respondError, responseHeaders } = require('./_payment');
 
 module.exports = async function handler(req, res) {
-  setResponseHeaders(res);
+  responseHeaders(res);
   if (req.method !== 'GET') {
     res.setHeader('Allow', 'GET');
     return res.status(405).json({ error: 'Método não permitido' });
   }
-
-  const handle = clean(process.env.INFINITEPAY_HANDLE, 100);
-  if (!handle) {
-    return res.status(500).json({ error: 'InfinitePay temporariamente indisponível' });
-  }
-
-  const orderId = clean(req.query && (req.query.order_id || req.query.order_nsu), 100);
-  const transactionNsu = clean(req.query && req.query.transaction_nsu, 120);
-  const slug = clean(req.query && (req.query.slug || req.query.invoice_slug), 160);
-  if (!/^LIORA-[A-Z0-9-]{10,80}$/.test(orderId) || !transactionNsu || !slug) {
-    return res.status(400).json({ error: 'Identificação do pagamento inválida' });
-  }
-
   try {
-    const response = await fetch('https://api.checkout.infinitepay.io/payment_check', {
+    const config = configuration('infinitepay');
+    const proof = verifyProof(req, 'infinitepay', config);
+    const query = req.query || {};
+    const orderId = query.order_id || query.order_nsu;
+    const transactionNsu = query.transaction_nsu;
+    const slug = query.slug || query.invoice_slug;
+    if (orderId !== proof.orderId || typeof transactionNsu !== 'string' || !/^[A-Za-z0-9_-]{1,120}$/.test(transactionNsu)
+      || typeof slug !== 'string' || !/^[A-Za-z0-9_-]{1,160}$/.test(slug)) {
+      fail('PAYMENT_IDENTIFICATION_INVALID', 'Identificação do pagamento inválida.', 400);
+    }
+    const payment = await providerRequest('https://api.checkout.infinitepay.io/payment_check', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({
-        handle,
-        order_nsu: orderId,
-        transaction_nsu: transactionNsu,
-        slug
-      })
+      body: JSON.stringify({ handle: config.credential, order_nsu: proof.orderId, transaction_nsu: transactionNsu, slug })
     });
-    const payment = await response.json().catch(() => ({}));
-    if (!response.ok || payment.success === false) {
-      console.error('InfinitePay não retornou o pagamento', { status: response.status });
-      return res.status(502).json({ error: 'Não foi possível confirmar o pagamento' });
+    if (payment.success !== true || typeof payment.paid !== 'boolean'
+      || !Number.isSafeInteger(payment.amount) || payment.amount <= 0) {
+      fail('PAYMENT_PROVIDER_INVALID_RESPONSE', 'Não foi possível validar a resposta do pagamento.', 502);
     }
-
-    return res.status(200).json({
-      order_id: orderId,
-      status: payment.paid ? 'approved' : 'pending',
-      amount: Number.isFinite(Number(payment.amount)) ? Number(payment.amount) : null,
-      paid_amount: Number.isFinite(Number(payment.paid_amount)) ? Number(payment.paid_amount) : null,
-      installments: Number.isFinite(Number(payment.installments)) ? Number(payment.installments) : null,
-      capture_method: clean(payment.capture_method, 40) || null
-    });
-  } catch (error) {
-    console.error('Erro ao consultar pagamento InfinitePay', error);
-    return res.status(500).json({ error: 'Erro interno ao confirmar pagamento' });
-  }
+    if (payment.amount !== proof.totalCents) fail('PAYMENT_ORDER_MISMATCH', 'O pagamento não corresponde ao valor deste pedido.', 409);
+    if (payment.paid && (!Number.isSafeInteger(payment.paid_amount) || payment.paid_amount < proof.totalCents
+      || !Number.isInteger(payment.installments) || payment.installments < 1 || payment.installments > 12
+      || !['credit_card', 'pix'].includes(payment.capture_method))) {
+      fail('PAYMENT_PROVIDER_INVALID_RESPONSE', 'Não foi possível validar a resposta do pagamento.', 502);
+    }
+    // InfinitePay reports BRL cents and has no documented test mode.
+    // It is therefore permitted only in Production with explicit live mode.
+    return res.status(200).json({ order_id: proof.orderId, status: payment.paid === true ? 'approved' : 'pending', payment_mode: proof.mode });
+  } catch (error) { return respondError(res, error); }
 };
-

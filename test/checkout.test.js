@@ -3,7 +3,7 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
-const { afterEach, test } = require('node:test');
+const { afterEach, beforeEach, test } = require('node:test');
 
 const { loadApi, confirmedShipping } = require('./helpers/isolated-api.cjs');
 const shippingProducts = {
@@ -17,7 +17,11 @@ const infinitePayStatus = require('../api/infinitepay-status');
 const catalog = require('../api/catalog');
 
 const originalFetch = global.fetch;
+const { signProof, configuration } = require('../api/_payment');
 const originalEnv = {
+  PAYMENT_MODE: process.env.PAYMENT_MODE,
+  CHECKOUT_SIGNING_SECRET: process.env.CHECKOUT_SIGNING_SECRET,
+  VERCEL_ENV: process.env.VERCEL_ENV,
   MP_ACCESS_TOKEN: process.env.MP_ACCESS_TOKEN,
   SITE_URL: process.env.SITE_URL,
   VERCEL_URL: process.env.VERCEL_URL,
@@ -30,6 +34,16 @@ const originalEnv = {
   INFINITEPAY_HANDLE: process.env.INFINITEPAY_HANDLE,
   INFINITEPAY_WEBHOOK_URL: process.env.INFINITEPAY_WEBHOOK_URL
 };
+
+beforeEach(() => {
+  process.env.PAYMENT_MODE = 'test';
+  process.env.CHECKOUT_SIGNING_SECRET = 'synthetic-checkout-signing-key-for-tests-only';
+  process.env.VERCEL_ENV = 'development';
+});
+
+function proofHeaders(orderId, provider = 'mercadopago', totalCents = 16990) {
+  return { 'x-checkout-proof': signProof({ orderId, provider, totalCents, method: provider === 'infinitepay' ? 'infinitepay' : 'pix' }, configuration(provider)) };
+}
 
 afterEach(() => {
   global.fetch = originalFetch;
@@ -114,7 +128,7 @@ test('preço, desconto Pix e frete são calculados no servidor uma única vez', 
     return {
       ok: true,
       status: 201,
-      json: async () => ({ id: 'pref-123', init_point: 'https://mercadopago.example/checkout' })
+      json: async () => ({ id: 'pref-123', init_point: 'https://www.mercadopago.com.br/checkout' })
     };
   };
 
@@ -214,7 +228,7 @@ test('boleto bancário é enviado ao Mercado Pago como pagamento por ticket', as
     return {
       ok: true,
       status: 201,
-      json: async () => ({ id: 'pref-boleto', init_point: 'https://mercadopago.example/boleto' })
+      json: async () => ({ id: 'pref-boleto', init_point: 'https://www.mercadopago.com.br/boleto' })
     };
   };
   const res = await invoke(createPreference, validRequest({
@@ -317,6 +331,8 @@ test('CEP válido sem modalidade é distinguido de CEP inválido', async () => {
 test('InfinitePay recebe itens, frete e dados do pedido em centavos', async () => {
   process.env.SITE_URL = 'https://liora.example';
   process.env.INFINITEPAY_HANDLE = 'liora-aromas';
+  process.env.PAYMENT_MODE = 'live';
+  process.env.VERCEL_ENV = 'production';
   let sentCheckout;
   global.fetch = async (url, options) => {
     assert.equal(url, 'https://api.checkout.infinitepay.io/links');
@@ -343,6 +359,8 @@ test('InfinitePay recebe itens, frete e dados do pedido em centavos', async () =
 
 test('retorno InfinitePay é confirmado na API antes de aprovar o pedido', async () => {
   process.env.INFINITEPAY_HANDLE = 'liora-aromas';
+  process.env.PAYMENT_MODE = 'live';
+  process.env.VERCEL_ENV = 'production';
   const orderId = 'LIORA-ABC12345-1234ABCD';
   global.fetch = async (url, options) => {
     assert.equal(url, 'https://api.checkout.infinitepay.io/payment_check');
@@ -360,11 +378,12 @@ test('retorno InfinitePay é confirmado na API antes de aprovar o pedido', async
   };
   const res = await invoke(infinitePayStatus, {
     method: 'GET',
+    headers: proofHeaders(orderId, 'infinitepay'),
     query: { order_id: orderId, transaction_nsu: 'transaction-uuid', slug: 'invoice-slug' }
   });
   assert.equal(res.statusCode, 200);
   assert.equal(res.body.status, 'approved');
-  assert.equal(res.body.capture_method, 'pix');
+  assert.equal(res.body.payment_mode, 'live');
 });
 
 test('retorno aprovado só é aceito quando pertence ao mesmo pedido', async () => {
@@ -380,13 +399,14 @@ test('retorno aprovado só é aceito quando pertence ao mesmo pedido', async () 
         id: 987654321,
         external_reference: orderId,
         status: 'approved',
-        status_detail: 'accredited'
+        status_detail: 'accredited', transaction_amount: 169.9, currency_id: 'BRL', live_mode: false, payment_method_id: 'pix'
       })
     };
   };
 
   const res = await invoke(paymentStatus, {
     method: 'GET',
+    headers: proofHeaders(orderId),
     query: { payment_id: '987654321', order_id: orderId }
   });
   assert.equal(res.statusCode, 200);
@@ -395,10 +415,11 @@ test('retorno aprovado só é aceito quando pertence ao mesmo pedido', async () 
   global.fetch = async () => ({
     ok: true,
     status: 200,
-    json: async () => ({ id: 987654321, external_reference: 'LIORA-OUTRO-12345678', status: 'approved' })
+    json: async () => ({ id: 987654321, external_reference: 'LIORA-OUTRO-12345678', status: 'approved', transaction_amount: 169.9, currency_id: 'BRL', live_mode: false, payment_method_id: 'pix' })
   });
   const mismatch = await invoke(paymentStatus, {
     method: 'GET',
+    headers: proofHeaders(orderId),
     query: { payment_id: '987654321', order_id: orderId }
   });
   assert.equal(mismatch.statusCode, 409);

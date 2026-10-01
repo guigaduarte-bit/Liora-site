@@ -130,13 +130,19 @@ test('missing and oversized pieces prevent partial carrier requests', async () =
   assert.equal(calls, 0);
 });
 
-test('multiple parcels are shown separately and never quoted as one package', async () => {
+test('multiple parcels are quoted separately and never submitted as one package', async () => {
   previewEnv(true);
-  global.fetch = async () => { throw new Error('Must not quote multiple parcels as one'); };
+  const calls = [];
+  providerStub(calls);
   const result = await quoteShipping({ zipCode: '95900180', subtotal: 300, cart: [{ id: 'botanique', quantity: 4 }] });
   assert.equal(result.packaging.parcels.length, 2);
-  assert.deepEqual(result.quotes, []);
-  assert.equal(result.code, 'SHIPPING_MULTIPLE_PACKAGES');
+  assert.equal(calls.length, 2);
+  assert.ok(calls.every(call => call.package.weight === 1.4));
+  assert.ok(calls.every(call => call.options.insurance_value === 150));
+  assert.equal(result.quotes[0].originalPrice, 40);
+  assert.equal(result.quotes[0].price, 0);
+  assert.equal(result.quotes[0].parcelCount, 2);
+  assert.equal(result.quotes[0].estimated, true);
 });
 
 test('provider failure preserves the calculated packaging without fictitious rates', async () => {
@@ -170,6 +176,9 @@ test('server rejects a payment using estimated shipping before any payment-provi
   previewEnv(true);
   process.env.SITE_URL = 'https://example.com';
   process.env.MP_ACCESS_TOKEN = 'test-only-payment-token';
+  process.env.PAYMENT_MODE = 'test';
+  process.env.VERCEL_URL = 'example.com';
+  process.env.CHECKOUT_SIGNING_SECRET = 'synthetic-checkout-signing-key-for-tests-only';
   const calls = [];
   providerStub(calls);
   const response = await invoke(createPreference, 'POST', {
