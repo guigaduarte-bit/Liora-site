@@ -1,0 +1,47 @@
+{
+  "date": "2026-09-14",
+  "repository": "guigaduarte-bit/Liora-site",
+  "production_base_commit": "1266f2189395fc2fa7955f4ff50e0c64f76e8e18",
+  "branch": "preview/seo-2026-09-14",
+  "draft_pull_request": "https://github.com/guigaduarte-bit/Liora-site/pull/7",
+  "preview_url": "https://liora-site-git-preview-seo-2026-09-14-circulo-de-cuidado.vercel.app",
+  "local_validation": {
+    "command": "npm test",
+    "tests": 43,
+    "passed": 43,
+    "failed": 0,
+    "pages": 41,
+    "products": 27,
+    "production_build_excludes_preview_qa": true,
+    "provider_calls": "mocked; no real orders or payments",
+    "scope": "Current branch snapshot, including follow-up CEP race-condition fix"
+  },
+  "deployment": {
+    "vercel_bot_status": "Ready",
+    "github_status": "success",
+    "dashboard_url": "https://vercel.com/circulo-de-cuidado/liora-site/8yHfar8YSwiMCXgRv13u41eyYX5b",
+    "scope": "Initial implementation commit; follow-up commit deployment must be checked separately"
+  },
+  "preview_access": {
+    "browser_result": "Redirect to Login – Vercel",
+    "head_status": 302,
+    "head_x_robots_tag": "noindex",
+    "head_scope": "Authentication response, not final application page",
+    "project_read": "404 with connected account and verified project ID",
+    "temporary_share_link": "Tool could not create link",
+    "application_browser_qa": "blocked; not passed",
+    "application_http_api_checks": "pending"
+  },
+  "privacy": "No credentials, authentication cookies, nonce values, personal contact data or buyer records included in this evidence.",
+  "production_approved": false,
+  "production_promoted": false,
+  "next_action": "Obtain authorized access to existing preview, run visual and purchase-flow checks, resolve commercial policy facts, then request production approval.",
+  "implementation_initial_commit": "bd7db434b9d8bd560638a7d0ea761dd67454a397",
+  "followup_fix": "Invalidate in-flight address/shipping responses after deleting a CEP digit; regression failed before fix and passed after fix.",
+  "browser_followup": {
+    "status": "Browser session can now open preview; representative UI/commerce checks completed",
+    "evidence_file": "docs/seo-browser-evidence.json",
+    "http_checks": "52 checks completed on 9fefa1e: 50 expected responses, two payment-status JSON 500 errors requiring preview configuration review; all 52 noindex",
+    "http_evidence_file": "docs/seo-http-evidence.json"
+  }
+}

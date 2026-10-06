@@ -1,0 +1,736 @@
+{
+  "sitemapExpectedRoutes": 41,
+  "sitemapRoutes": 41,
+  "sitemapRead": "41 rotas encontradas",
+  "results": [
+    {
+      "path": "/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/",
+      "passed": true
+    },
+    {
+      "path": "/velas-aromaticas/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/velas-aromaticas/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/velas-aromaticas/",
+      "passed": true
+    },
+    {
+      "path": "/essenciais/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/essenciais/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/essenciais/",
+      "passed": true
+    },
+    {
+      "path": "/velas-decorativas/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/velas-decorativas/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/velas-decorativas/",
+      "passed": true
+    },
+    {
+      "path": "/classico/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/classico/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/classico/",
+      "passed": true
+    },
+    {
+      "path": "/boho-glass/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/boho-glass/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/boho-glass/",
+      "passed": true
+    },
+    {
+      "path": "/flora-linea/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/flora-linea/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/flora-linea/",
+      "passed": true
+    },
+    {
+      "path": "/kits-e-presentes/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/kits-e-presentes/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/kits-e-presentes/",
+      "passed": true
+    },
+    {
+      "path": "/produtos/vela-escultural-lady-veil-phie3/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/produtos/vela-escultural-lady-veil-phie3/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/produtos/vela-escultural-lady-veil-phie3/",
+      "passed": true
+    },
+    {
+      "path": "/produtos/vela-decorativa-anjo-em-vitral-1sbe9/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/produtos/vela-decorativa-anjo-em-vitral-1sbe9/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/produtos/vela-decorativa-anjo-em-vitral-1sbe9/",
+      "passed": true
+    },
+    {
+      "path": "/produtos/botanique/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/produtos/botanique/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/produtos/botanique/",
+      "passed": true
+    },
+    {
+      "path": "/produtos/botanique-150-gr-1gyzj/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/produtos/botanique-150-gr-1gyzj/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/produtos/botanique-150-gr-1gyzj/",
+      "passed": true
+    },
+    {
+      "path": "/produtos/botanique-70-ml-1dqj4/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/produtos/botanique-70-ml-1dqj4/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/produtos/botanique-70-ml-1dqj4/",
+      "passed": true
+    },
+    {
+      "path": "/produtos/ursinho/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/produtos/ursinho/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/produtos/ursinho/",
+      "passed": true
+    },
+    {
+      "path": "/produtos/flordevenus/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/produtos/flordevenus/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/produtos/flordevenus/",
+      "passed": true
+    },
+    {
+      "path": "/produtos/abraco-em-luz/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/produtos/abraco-em-luz/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/produtos/abraco-em-luz/",
+      "passed": true
+    },
+    {
+      "path": "/produtos/mini-bubble/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/produtos/mini-bubble/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/produtos/mini-bubble/",
+      "passed": true
+    },
+    {
+      "path": "/produtos/bolhas/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/produtos/bolhas/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/produtos/bolhas/",
+      "passed": true
+    },
+    {
+      "path": "/produtos/no-deluz/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/produtos/no-deluz/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/produtos/no-deluz/",
+      "passed": true
+    },
+    {
+      "path": "/produtos/lioracoral/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/produtos/lioracoral/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/produtos/lioracoral/",
+      "passed": true
+    },
+    {
+      "path": "/produtos/essenza-cube/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/produtos/essenza-cube/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/produtos/essenza-cube/",
+      "passed": true
+    },
+    {
+      "path": "/produtos/kit-silhouette/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/produtos/kit-silhouette/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/produtos/kit-silhouette/",
+      "passed": true
+    },
+    {
+      "path": "/produtos/trevo/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/produtos/trevo/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/produtos/trevo/",
+      "passed": true
+    },
+    {
+      "path": "/produtos/perolas/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/produtos/perolas/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/produtos/perolas/",
+      "passed": true
+    },
+    {
+      "path": "/produtos/kit-boho-glass/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/produtos/kit-boho-glass/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/produtos/kit-boho-glass/",
+      "passed": true
+    },
+    {
+      "path": "/produtos/lumina/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/produtos/lumina/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/produtos/lumina/",
+      "passed": true
+    },
+    {
+      "path": "/produtos/gota-de-luz1/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/produtos/gota-de-luz1/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/produtos/gota-de-luz1/",
+      "passed": true
+    },
+    {
+      "path": "/produtos/geometricafacetada/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/produtos/geometricafacetada/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/produtos/geometricafacetada/",
+      "passed": true
+    },
+    {
+      "path": "/produtos/cilindro-mosaico/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/produtos/cilindro-mosaico/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/produtos/cilindro-mosaico/",
+      "passed": true
+    },
+    {
+      "path": "/produtos/chama-esculpida/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/produtos/chama-esculpida/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/produtos/chama-esculpida/",
+      "passed": true
+    },
+    {
+      "path": "/produtos/jardim-encantado/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/produtos/jardim-encantado/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/produtos/jardim-encantado/",
+      "passed": true
+    },
+    {
+      "path": "/produtos/camafeufada/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/produtos/camafeufada/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/produtos/camafeufada/",
+      "passed": true
+    },
+    {
+      "path": "/produtos/botanicavasogesso/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/produtos/botanicavasogesso/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/produtos/botanicavasogesso/",
+      "passed": true
+    },
+    {
+      "path": "/produtos/peonia/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/produtos/peonia/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/produtos/peonia/",
+      "passed": true
+    },
+    {
+      "path": "/produtos/sagrada-familia/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/produtos/sagrada-familia/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/produtos/sagrada-familia/",
+      "passed": true
+    },
+    {
+      "path": "/catalogo-de-aromas/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/catalogo-de-aromas/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/catalogo-de-aromas/",
+      "passed": true
+    },
+    {
+      "path": "/sobre/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/sobre/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/sobre/",
+      "passed": true
+    },
+    {
+      "path": "/velas-personalizadas/",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/velas-personalizadas/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/velas-personalizadas/",
+      "passed": true
+    },
+    {
+      "path": "/trocas-e-devolucoes.html",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/trocas-e-devolucoes.html",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/trocas-e-devolucoes.html",
+      "passed": true
+    },
+    {
+      "path": "/termos-de-uso.html",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/termos-de-uso.html",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/termos-de-uso.html",
+      "passed": true
+    },
+    {
+      "path": "/politica-de-privacidade.html",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/politica-de-privacidade.html",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/politica-de-privacidade.html",
+      "passed": true
+    },
+    {
+      "path": "/sitemap.xml",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "application/xml",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/sitemap.xml",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/sitemap.xml",
+      "passed": true
+    },
+    {
+      "path": "/robots.txt",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/plain; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/robots.txt",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/robots.txt",
+      "passed": true
+    },
+    {
+      "path": "/pagina-inexistente-validacao-seo/",
+      "method": "HEAD",
+      "status": 404,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/pagina-inexistente-validacao-seo/",
+      "expectedStatus": [
+        404
+      ],
+      "passed": true
+    },
+    {
+      "path": "/trocas-e-devolucoes",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": true,
+      "finalPathname": "/trocas-e-devolucoes.html",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/trocas-e-devolucoes.html",
+      "passed": true
+    },
+    {
+      "path": "/termos-de-uso",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": true,
+      "finalPathname": "/termos-de-uso.html",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/termos-de-uso.html",
+      "passed": true
+    },
+    {
+      "path": "/privacidade",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": true,
+      "finalPathname": "/politica-de-privacidade.html",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/politica-de-privacidade.html",
+      "passed": true
+    },
+    {
+      "path": "/esculturas",
+      "method": "HEAD",
+      "status": 200,
+      "contentType": "text/html; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": true,
+      "finalPathname": "/velas-decorativas/",
+      "expectedStatus": [
+        200
+      ],
+      "expectedPath": "/velas-decorativas/",
+      "passed": true
+    },
+    {
+      "path": "/api/shipping-quote",
+      "method": "GET",
+      "status": 405,
+      "contentType": "application/json; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/api/shipping-quote",
+      "expectedStatus": [
+        405
+      ],
+      "passed": true
+    },
+    {
+      "path": "/api/create-preference",
+      "method": "GET",
+      "status": 405,
+      "contentType": "application/json; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/api/create-preference",
+      "expectedStatus": [
+        405
+      ],
+      "passed": true
+    },
+    {
+      "path": "/api/payment-status",
+      "method": "GET",
+      "status": 500,
+      "contentType": "application/json; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/api/payment-status",
+      "expectedStatus": [
+        400
+      ],
+      "passed": false
+    },
+    {
+      "path": "/api/infinitepay-status",
+      "method": "GET",
+      "status": 500,
+      "contentType": "application/json; charset=utf-8",
+      "xRobotsTag": "noindex",
+      "redirected": false,
+      "finalPathname": "/api/infinitepay-status",
+      "expectedStatus": [
+        400
+      ],
+      "passed": false
+    }
+  ],
+  "passed": 50,
+  "requiresReview": 2,
+  "tested_commit": "9fefa1ec826835c6f8152e5f7310e060232a365f",
+  "tested_date": "2026-09-14",
+  "method_note": "Explicit click in preview QA page, same-origin requests using existing browser session; no secret/cookie access; no payment/order identifiers or payloads.",
+  "interpretation": "41 pages, sitemap, robots, missing-page 404 and four final redirect destinations behaved as expected. Shipping/create-preference rejected GET with 405. Payment-status and InfinitePay-status returned JSON 500 without parameters; source checks required environment settings before validating parameters, consistent with missing preview configuration. Environment values were not read. Do not mark provider integration approved."
+}
