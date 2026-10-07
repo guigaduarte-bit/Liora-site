@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta name="robots" content="noindex,nofollow"><title>Teste do retorno de pagamento · Liora</title>
+<style>body{margin:0;background:#f7f3eb;color:#2b2118;font:14px system-ui}header{padding:18px 24px;border-bottom:1px solid #d8c9ad}h1{font-size:20px;margin:0 0 8px}p{margin:6px 0}form{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:14px}button,select{font:inherit;padding:9px}output{display:block;padding:12px 24px}main{padding:0 16px 20px;overflow:auto}iframe{display:block;margin:auto;width:390px;height:780px;border:1px solid #b08a47;background:#fff}</style></head>
+<body><header><h1>Retorno de pagamento — teste do preview</h1><p>Simulação com respostas fictícias. Nenhuma cobrança é criada e nenhum dado de cliente é utilizado.</p>
+<form><label>Cenário <select id="scenario"><option value="retry">Falha → nova consulta → aprovado</option><option value="approved">Aprovado com item novo na sacola</option><option value="pending">Pagamento pendente</option><option value="rejected">Pagamento rejeitado</option></select></label>
+<label>Largura <select id="width"><option>360</option><option selected>390</option><option>1366</option></select> px</label><button id="start" type="button">Reiniciar teste</button><button id="inspect" type="button">Conferir resultado</button></form></header>
+<output id="result" aria-live="polite">Carregando simulação…</output><main><iframe id="site" title="Retorno de pagamento Liora em simulação"></iframe></main>
+<script>
+const frame=document.getElementById('site'),result=document.getElementById('result');
+function fixture(scenario){
+  const orderId='LIORA-SIMULACAO-12345678';
+  const original=[{id:'botanique',qty:1,frag:'Lavanda'}];
+  const cart=scenario==='approved'?[...original,{id:'mini-bubble',qty:1,frag:''}]:original;
+  const storage=new Map(Object.entries({liora_cart:JSON.stringify(cart),liora_checkout_order:orderId,[`liora_checkout_proof:${orderId}`]:'synthetic-preview-fixture',[`liora_checkout_cart:${orderId}`]:JSON.stringify(original)}));
+  Object.defineProperty(window,'sessionStorage',{value:{getItem:key=>storage.get(key)||null,setItem:(key,value)=>storage.set(key,String(value)),removeItem:key=>storage.delete(key)}});
+  window.__paymentQA={calls:0,unexpected:0};
+  window.fetch=async url=>{
+    if(!String(url).startsWith('/api/payment-status?')){window.__paymentQA.unexpected++;throw new Error('A simulação não faz outras chamadas');}
+    window.__paymentQA.calls++;
+    const failed=scenario==='retry'&&window.__paymentQA.calls===1;
+    return {ok:!failed,json:async()=>failed?{code:'PAYMENT_PROVIDER_UNAVAILABLE'}:{order_id:orderId,payment_id:'123',status:['pending','rejected'].includes(scenario)?scenario:'approved',payment_mode:'test'}};
+  };
+  document.addEventListener('click',event=>{if(event.target.closest('a'))event.preventDefault();});
+}
+let template;
+async function start(){
+  result.textContent='Carregando simulação…';
+  template=template||await(await fetch('/',{cache:'no-store'})).text();
+  const scenario=document.getElementById('scenario').value;
+  const code='('+fixture.toString()+')('+JSON.stringify(scenario)+')';
+  const injection='<base href="/">'+'<scr'+'ipt>'+code+'</scr'+'ipt>';
+  frame.srcdoc=template.replace('<head>','<head>'+injection);
+}
+function inspect(){
+  const d=frame.contentDocument,qa=frame.contentWindow?.__paymentQA;
+  if(!qa)return;
+  const width=frame.contentWindow.innerWidth,drawer=d.getElementById('drawer');
+  const drawerOverflow=drawer.scrollWidth>drawer.clientWidth;
+  result.textContent=JSON.stringify({cenario:document.getElementById('scenario').value,consultas:qa.calls,cobrancasCriadas:qa.unexpected,itensNaSacola:Number(d.getElementById('cartCount').textContent),tela:d.getElementById('drawerTitle').textContent,largura:width,conteudoCortado:drawerOverflow});
+}
+frame.addEventListener('load',inspect);document.getElementById('start').addEventListener('click',start);document.getElementById('inspect').addEventListener('click',inspect);
+document.getElementById('scenario').addEventListener('change',start);document.getElementById('width').addEventListener('change',e=>{frame.style.width=e.target.value+'px';inspect()});
+start();
+</script></body></html>

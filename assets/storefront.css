@@ -297,6 +297,8 @@ footer li a:hover{color:#E4C98F}
 .success h3{font-family:var(--display);font-size:30px;font-weight:500;margin-bottom:12px}
 .success p{color:var(--ink-soft);font-size:13.5px;max-width:34ch;margin:0 auto 8px}
 .success .order{font-size:11px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold-deep);margin:18px 0 30px}
+.success .payment-close{margin-top:14px}
+.success button:disabled{opacity:.6;cursor:wait}
 
 /* quick view modal */
 .modal{position:fixed;inset:0;z-index:95;display:grid;place-items:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .35s}

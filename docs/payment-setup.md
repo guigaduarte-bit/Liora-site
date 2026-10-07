@@ -1,5 +1,19 @@
 # Liora — configuração e homologação dos pagamentos
 
+## Correção do retorno — 07/10/2026
+
+- Produção registrou HTTP 409 `PAYMENT_ORDER_MISMATCH` no retorno após um pagamento relatado como confirmado pelo emissor. O log anterior não distinguia o campo divergente; não comprova sozinho o status `approved` do Mercado Pago.
+- A comparação agora considera `transaction_amount` + `shipping_amount` em centavos exatos. Valores líquidos após taxas e totais com juros não substituem o principal do pedido. Moeda, ambiente, referência, ID, método e assinatura continuam obrigatórios. Diagnóstico registra somente nomes de campos divergentes.
+- Consulta sem `payment_id` pode recuperar a transação pela referência externa, sempre mediante comprovante assinado válido. Busca incompleta ou com mais de um pagamento aprovado exige conferência; a transação selecionada é consultada novamente por ID. Este fluxo faz apenas GET e nunca cria cobrança.
+- O navegador guarda a referência de retorno antes de limpar a URL. Erros e pagamentos pendentes mostram uma tela persistente com nova consulta. Aprovação remove as quantidades do carrinho registrado no início do checkout, preservando acréscimos posteriores. Repetir a consulta aprovada não remove itens novamente.
+- Sessões anteriores sem snapshot usam o carrinho presente na primeira retomada; não existe histórico para distinguir alterações feitas antes dessa retomada. A recuperação exige a mesma sessão/origem e o comprovante ainda válido (sete dias); não substitui uma base de pedidos ou webhook.
+- `__preview-pagamento/` oferece cenários visuais fictícios somente no Preview. Não usa credenciais nem acessa o provedor; não é evidência de liquidação real. A suíte de regressão valida os handlers com respostas controladas.
+- Antes da liberação: testar Preview, obter aprovação da nova alteração e então consultar o pagamento existente em Production. Não pedir outra compra como forma de confirmar esta transação. Se a divergência continuar, usar o diagnóstico por campo sem expor dados do cliente.
+
+Referências: [frete separado no Checkout Pro](https://www.mercadopago.com.br/developers/pt/docs/checkout-pro-preferences/additional-settings/shipping-cost), [consulta de pagamento](https://www.mercadopago.com.br/developers/pt/reference/online-payments/checkout-pro-preferences/get-payment/get) e [busca por referência externa](https://www.mercadopago.com.br/developers/pt/reference/online-payments/checkout-pro-preferences/search-payments/get).
+
+## Histórico de configuração
+
 Atualização: 01/10/2026. Correções implementadas para Preview; pagamentos externos ainda não homologados. Não promover para produção com base apenas na suíte simulada.
 
 ## Configuração aplicada e pendente
