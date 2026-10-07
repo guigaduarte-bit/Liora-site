@@ -57,6 +57,7 @@ let payMethod='pix', shipMethod='delivery', selectedShippingService='';
 let checkoutForm={name:'',email:'',cep:'',num:'',addr:''};
 let shippingState={status:'idle',quotes:[],preview:false,packaging:null,notice:'',error:'',code:'',sandbox:false,cep:''};
 let shippingRequestId=0;
+let paymentReturn=null, paymentView={status:'idle',test:false}, paymentCheckRunning=false;
 
 const $=id=>document.getElementById(id);
 const money=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
@@ -171,7 +172,7 @@ function renderDrawer(){
     foot.innerHTML='';return;
   }
   if(drawerView==='checkout'){renderCheckout();return}
-  if(drawerView==='success'){renderSuccess();return}
+  if(drawerView==='payment'){renderPaymentStatus();return}
   title.textContent='Carrinho de compras';
   if(!cart.length){
     body.innerHTML=`<div class="cart-empty"><p class="display">O carrinho de compras está vazio</p><p>As velas mais desejadas esperam por você.</p><br><button class="btn btn-outline" onclick="closeAll()">Ver mais produtos</button></div>`;
@@ -197,6 +198,7 @@ function renderDrawer(){
       <button class="ci-remove" onclick="removeItem('${i.key}')">Remover</button></div>
     </div>`).join('')}`;
   foot.innerHTML=`
+    ${paymentReturn?'<button class="back-link" onclick="openDrawer(\'payment\')">Consultar pagamento anterior</button>':''}
     <div class="sum-row"><span>Subtotal (sem frete)</span><span>${money(st)}</span></div>
     <div class="sum-row total"><span>Total parcial</span><span>${money(st)}</span></div>
     <button class="btn btn-ink w-full" style="margin-top:14px" onclick="drawerView='checkout';renderDrawer()">Iniciar compra</button>
@@ -389,24 +391,34 @@ async function confirmOrder(){
       btn.disabled=false;btn.textContent=original;
       return;
     }
-    sessionStorage.setItem('liora_checkout_order',data.order_id);
     sessionStorage.setItem(`liora_checkout_proof:${data.order_id}`,data.checkout_proof);
+    sessionStorage.setItem(`liora_checkout_cart:${data.order_id}`,JSON.stringify(payload.items));
+    sessionStorage.setItem('liora_checkout_order',data.order_id);
+    paymentReturn={orderId:data.order_id,provider:data.provider||(payMethod==='infinitepay'?'infinitepay':'mercadopago')};
+    savePaymentReturn();
     window.location.href=data.init_point;
   }catch(err){
     toast('Erro de conexão. Tente novamente.');
     btn.disabled=false;btn.textContent=original;
   }
 }
-function renderSuccess(){
-  $('drawerTitle').textContent='Pedido confirmado';
-  $('drawerBody').innerHTML=`
-    <div class="success">
-      <div class="ok-ring"><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg></div>
-      <h3>Obrigada pelo seu pedido ✦</h3>
-      <p>Pagamento confirmado. O prazo de produção é de 10 dias úteis após a confirmação do pagamento e da personalização.</p>
-      <p class="order">Pedido ${window._order}</p>
-      <button class="btn btn-outline" onclick="cart=[];updateCounts();closeAll()">Ver mais produtos</button>
-    </div>`;
+function renderPaymentStatus(){
+  const status=paymentView.status,approved=status==='approved';
+  const terminal=['rejected','cancelled','refunded','charged_back'].includes(status);
+  const headings={checking:'Confirmando pagamento…',approved:paymentView.test?'Pagamento de teste aprovado':'Pagamento confirmado',pending:'Aguardando confirmação',in_process:'Pagamento em análise',authorized:'Aguardando conclusão',rejected:'Pagamento não aprovado',cancelled:'Pagamento cancelado',refunded:'Pagamento devolvido',charged_back:'Pagamento contestado',in_mediation:'Pagamento em análise',error:'Confirmação em aberto'};
+  const title=headings[status]||'Consultar pagamento';
+  let message='Confira a situação no provedor antes de tentar pagar novamente. Use o botão abaixo para consultar este mesmo pagamento.';
+  if(status==='checking')message='Consultando o pagamento já iniciado. Aguarde a resposta do provedor.';
+  else if(approved)message=paymentView.test?'Nenhum pedido será produzido. Este pagamento pertence ao ambiente de testes.':'Obrigada pelo seu pedido. O prazo de produção é de 10 dias úteis após a confirmação do pagamento e da personalização.';
+  else if(['pending','in_process','authorized','in_mediation'].includes(status))message='O provedor ainda não confirmou a conclusão. Você pode consultar novamente sem fazer outro pagamento.';
+  else if(terminal)message=['rejected','cancelled'].includes(status)?'O provedor informou que este pagamento não foi concluído. Os produtos continuam no carrinho.':'Consulte os detalhes no provedor e entre em contato com a Liora sobre este pedido.';
+  $('drawerTitle').textContent=title;
+  $('drawerBody').innerHTML=`<div class="success" role="status" aria-live="polite">
+    ${approved?'<div class="ok-ring"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg></div>':''}
+    <h3>${title}</h3><p>${message}</p>
+    ${paymentReturn?`<p class="order">Pedido ${escapeAttr(paymentReturn.orderId)}</p>`:''}
+    ${!approved&&!terminal?`<button class="btn btn-ink w-full" onclick="retryPaymentConfirmation()" ${paymentCheckRunning?'disabled':''}>${paymentCheckRunning?'Consultando…':'Verificar pagamento novamente'}</button>`:''}
+    <button class="btn btn-outline w-full payment-close" onclick="closeAll()">Continuar no site</button></div>`;
   $('drawerFoot').innerHTML='';
 }
 
@@ -516,49 +528,82 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 restoreCart();renderTabs();renderGrid();updateCounts();
 
 /* ============ RETORNO DOS CHECKOUTS ============ */
+function savePaymentReturn(){
+  sessionStorage.setItem('liora_checkout_return',JSON.stringify(paymentReturn));
+}
+function removePurchasedItems(orderId){
+  const snapshot=JSON.parse(sessionStorage.getItem(`liora_checkout_cart:${orderId}`)||'[]');
+  if(!Array.isArray(snapshot))throw new Error('Carrinho do pedido inválido');
+  for(const item of snapshot){
+    if(!item||!Number.isSafeInteger(item.qty)||item.qty<1)continue;
+    const line=cart.find(current=>current.id===item.id&&(current.frag||'')===(item.frag||''));
+    if(line)line.qty=Math.max(0,line.qty-item.qty);
+  }
+  cart=cart.filter(item=>item.qty>0);updateCounts();
+}
+async function retryPaymentConfirmation(){
+  if(!paymentReturn||paymentCheckRunning||paymentView.status==='approved')return;
+  paymentCheckRunning=true;paymentView={status:'checking',test:false};openDrawer('payment');
+  const context=paymentReturn,orderId=context.orderId;
+  try{
+    const checkoutProof=sessionStorage.getItem(`liora_checkout_proof:${orderId}`);
+    if(!checkoutProof)throw new Error('Comprovante da sessão não encontrado');
+    const query=new URLSearchParams({order_id:orderId});
+    let endpoint='/api/payment-status';
+    if(context.provider==='infinitepay'){
+      if(!context.transactionNsu||!context.slug)throw new Error('Retorno incompleto');
+      query.set('transaction_nsu',context.transactionNsu);query.set('slug',context.slug);endpoint='/api/infinitepay-status';
+    }else if(context.paymentId)query.set('payment_id',context.paymentId);
+    const resp=await fetch(`${endpoint}?${query}`,{headers:{'X-Checkout-Proof':checkoutProof},cache:'no-store'});
+    const data=await resp.json().catch(()=>({}));
+    if(!resp.ok||data.order_id!==orderId||!['approved','pending','in_process','authorized','rejected','cancelled','refunded','charged_back','in_mediation'].includes(data.status))throw new Error('Falha ao confirmar pagamento');
+    paymentView={status:data.status,test:data.payment_mode==='test'};
+    if(data.status==='approved'){
+      removePurchasedItems(orderId);
+      checkoutForm={name:'',email:'',cep:'',num:'',addr:''};
+      if(sessionStorage.getItem('liora_checkout_order')===orderId)sessionStorage.removeItem('liora_checkout_order');
+      sessionStorage.removeItem('liora_checkout_return');
+      sessionStorage.removeItem(`liora_checkout_proof:${orderId}`);
+      sessionStorage.removeItem(`liora_checkout_cart:${orderId}`);
+      toast(paymentView.test?'Pagamento de teste aprovado. Nenhum pedido será produzido.':'Pagamento aprovado ✦ Obrigada pelo seu pedido!');
+    }else{
+      if(data.payment_id&&/^\d{1,30}$/.test(String(data.payment_id)))context.paymentId=String(data.payment_id);
+      savePaymentReturn();
+      toast(['pending','in_process','authorized'].includes(data.status)?'Pagamento pendente ou em análise. Consulte novamente sem repetir o pagamento.':'Situação do pagamento atualizada. Confira os detalhes na tela.');
+    }
+  }catch{
+    paymentView={status:'error',test:false};
+    toast('Confirmação em aberto. Confira a situação no provedor antes de tentar pagar novamente.');
+  }finally{
+    paymentCheckRunning=false;
+    if(drawerView==='payment')renderPaymentStatus();
+  }
+}
 (async function checkPaymentReturn(){
   const params=new URLSearchParams(window.location.search);
   const isInfinitePay=params.get('checkout')==='infinitepay-return'||Boolean(params.get('transaction_nsu')&&params.get('slug'));
   const paymentId=params.get('payment_id')||params.get('collection_id');
-  const orderId=params.get('order_nsu')||params.get('order_id')||params.get('external_reference')||(()=>{try{return sessionStorage.getItem('liora_checkout_order')}catch{return null}})();
-  const isReturn=isInfinitePay||params.get('checkout')==='return'||Boolean(paymentId&&orderId);
-  if(!isReturn)return;
-
-  window.history.replaceState({},document.title,window.location.pathname);
-  if(!orderId||(!isInfinitePay&&!paymentId)){
-    toast('Não foi possível confirmar o pagamento. Confira a situação no provedor antes de tentar pagar novamente.');
-    return;
-  }
-
-  toast('Confirmando pagamento…');
+  const isReturn=isInfinitePay||params.get('checkout')==='return'||Boolean(paymentId);
   try{
-    const checkoutProof=sessionStorage.getItem(`liora_checkout_proof:${orderId}`);
-    if(!checkoutProof)throw new Error('Comprovante da sessão não encontrado');
-    let statusUrl;
-    if(isInfinitePay){
-      const transactionNsu=params.get('transaction_nsu');
-      const slug=params.get('slug')||params.get('invoice_slug');
-      if(!transactionNsu||!slug)throw new Error('Retorno InfinitePay incompleto');
-      statusUrl=`/api/infinitepay-status?transaction_nsu=${encodeURIComponent(transactionNsu)}&slug=${encodeURIComponent(slug)}&order_id=${encodeURIComponent(orderId)}`;
-    }else{
-      statusUrl=`/api/payment-status?payment_id=${encodeURIComponent(paymentId)}&order_id=${encodeURIComponent(orderId)}`;
-    }
-    const resp=await fetch(statusUrl,{headers:{'X-Checkout-Proof':checkoutProof}});
-    const data=await resp.json().catch(()=>({}));
-    if(!resp.ok)throw new Error(data.error||'Falha ao confirmar pagamento');
-
-    if(data.status==='approved'){
-      cart=[];updateCounts();checkoutForm={name:'',email:'',cep:'',num:'',addr:''};
-      try{sessionStorage.removeItem('liora_checkout_order');sessionStorage.removeItem(`liora_checkout_proof:${orderId}`)}catch{}
-      toast(data.payment_mode==='test'?'Pagamento de teste aprovado. Nenhum pedido será produzido.':'Pagamento aprovado ✦ Obrigada pelo seu pedido!');
-    }else if(['pending','in_process','authorized'].includes(data.status)){
-      toast('Pagamento pendente ou em análise. Acompanhe a confirmação no provedor de pagamento.');
-    }else{
-      try{sessionStorage.removeItem('liora_checkout_order');sessionStorage.removeItem(`liora_checkout_proof:${orderId}`)}catch{}
-      toast('Pagamento não concluído. Você pode tentar novamente.');
-    }
-  }catch(err){
-    toast('Não foi possível confirmar o pagamento agora. Confira a situação no provedor antes de tentar pagar novamente.');
+    const stored=JSON.parse(sessionStorage.getItem('liora_checkout_return')||'null');
+    const latest=sessionStorage.getItem('liora_checkout_order');
+    const orderId=isReturn?(params.get('order_nsu')||params.get('order_id')||params.get('external_reference')||latest):(stored?.orderId||latest);
+    if(!orderId){if(isReturn)throw new Error('Retorno incompleto');return}
+    if(!/^LIORA-[A-Z0-9-]{10,80}$/.test(orderId))throw new Error('Pedido inválido');
+    if(!isReturn&&!sessionStorage.getItem(`liora_checkout_proof:${orderId}`))return;
+    paymentReturn=isReturn?{orderId,provider:isInfinitePay?'infinitepay':'mercadopago',
+      ...(paymentId&&/^\d{1,30}$/.test(paymentId)?{paymentId}:{}),
+      ...(isInfinitePay?{transactionNsu:params.get('transaction_nsu'),slug:params.get('slug')||params.get('invoice_slug')}:{}),
+    }:stored?.orderId===orderId?stored:{orderId,provider:'mercadopago'};
+    // Migrate sessions created before cart snapshots existed. Preserve the
+    // snapshot before querying so additions during a retry are never removed.
+    if(!sessionStorage.getItem(`liora_checkout_cart:${orderId}`))sessionStorage.setItem(`liora_checkout_cart:${orderId}`,JSON.stringify(cart.map(({id,qty,frag})=>({id,qty,frag}))));
+    savePaymentReturn();
+    if(isReturn)window.history.replaceState({},document.title,window.location.pathname);
+    await retryPaymentConfirmation();
+  }catch{
+    paymentView={status:'error',test:false};openDrawer('payment');
+    toast('Confirmação em aberto. Confira a situação no provedor antes de tentar pagar novamente.');
   }
 })();
 

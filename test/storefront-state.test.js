@@ -193,7 +193,7 @@ for (const status of ['approved', 'pending', 'rejected']) {
         assert.equal(options.headers['X-Checkout-Proof'], 'synthetic-proof');
         calls += 1;
         assert.match(url, /^\/api\/payment-status\?/);
-        return { ok: true, json: async () => ({ status }) };
+        return { ok: true, json: async () => ({ status, order_id: 'LIORA-TESTE-12345678' }) };
       }
     });
     await app.done;
@@ -241,7 +241,7 @@ test('aprovação de teste é identificada e pendência não promete e-mail inex
     const app = storefront({
       saved: { 'liora_checkout_proof:LIORA-TESTE-12345678': 'synthetic-proof' },
       search: '?checkout=return&payment_id=123&order_id=LIORA-TESTE-12345678',
-      fetch: async () => ({ ok: true, json: async () => ({ status, payment_mode: 'test' }) })
+      fetch: async () => ({ ok: true, json: async () => ({ status, payment_mode: 'test', order_id: 'LIORA-TESTE-12345678' }) })
     });
     await app.done;
     assert.doesNotMatch(app.nodes.get('toastMsg').textContent, /e-mail|avisaremos/);
@@ -250,4 +250,65 @@ test('aprovação de teste é identificada e pendência não promete e-mail inex
       assert.equal(app.storage.get('liora_checkout_proof:LIORA-TESTE-12345678'), undefined);
     } else assert.equal(app.storage.get('liora_checkout_proof:LIORA-TESTE-12345678'), 'synthetic-proof');
   }
+});
+
+test('falha no retorno permite consultar o mesmo pagamento e limpar somente itens comprados', async () => {
+  let calls = 0;
+  const requests = [];
+  const app = storefront({
+    saved: { liora_cart: JSON.stringify([{ id: 'botanique', qty: 1, frag: 'Lavanda' }]), 'liora_checkout_proof:LIORA-TESTE-12345678': 'synthetic-proof' },
+    search: '?checkout=return&payment_id=123&order_id=LIORA-TESTE-12345678',
+    fetch: async (url, options) => {
+      requests.push(url); assert.equal(options.method, undefined); calls++;
+      return { ok: calls > 1, json: async () => ({ status: 'approved', order_id: 'LIORA-TESTE-12345678' }) };
+    }
+  });
+  await app.done;
+  assert.equal(app.run('cartQty()'), 1);
+  assert.match(app.nodes.get('drawerBody').innerHTML, /Verificar pagamento novamente/);
+  app.run("addToCart('mini-bubble',1,'');");
+  await app.run('retryPaymentConfirmation()');
+  assert.equal(requests[0], requests[1]);
+  assert.equal(app.run('cartQty()'), 1);
+  assert.equal(app.run('cart[0].id'), 'mini-bubble');
+  assert.match(app.nodes.get('drawerBody').innerHTML, /Pagamento confirmado/);
+  await app.run('retryPaymentConfirmation()');
+  assert.equal(calls, 2);
+  assert.equal(app.run('cartQty()'), 1);
+});
+
+test('recarregar após falha recupera a referência removida da URL sem nova cobrança', async () => {
+  const saved = { liora_cart: JSON.stringify([{ id: 'botanique', qty: 1 }]), 'liora_checkout_proof:LIORA-TESTE-12345678': 'synthetic-proof' };
+  const first = storefront({ saved, search: '?checkout=return&payment_id=123&order_id=LIORA-TESTE-12345678', fetch: async () => { throw new Error('offline'); } });
+  await first.done;
+  const next = storefront({ saved: Object.fromEntries(first.storage), fetch: async url => {
+    assert.match(url, /payment_id=123/);
+    return { ok: true, json: async () => ({ order_id: 'LIORA-TESTE-12345678', status: 'approved' }) };
+  } });
+  await next.done;
+  assert.equal(next.run('cartQty()'), 0);
+  assert.equal(next.storage.get('liora_checkout_return'), undefined);
+});
+
+test('sessão da versão anterior recupera pedido mesmo sem payment_id no navegador', async () => {
+  const app = storefront({
+    saved: { liora_checkout_order: 'LIORA-TESTE-12345678', 'liora_checkout_proof:LIORA-TESTE-12345678': 'synthetic-proof', liora_cart: JSON.stringify([{ id: 'botanique', qty: 1 }]) },
+    fetch: async url => {
+      assert.equal(url, '/api/payment-status?order_id=LIORA-TESTE-12345678');
+      return { ok: true, json: async () => ({ order_id: 'LIORA-TESTE-12345678', status: 'approved' }) };
+    }
+  });
+  await app.done;
+  assert.equal(app.run('cartQty()'), 0);
+});
+
+test('status aprovado adulterado na URL ou resposta de outro pedido não esvazia sacola', async () => {
+  const app = storefront({
+    saved: { liora_cart: JSON.stringify([{ id: 'botanique', qty: 1 }]), 'liora_checkout_proof:LIORA-TESTE-12345678': 'synthetic-proof' },
+    search: '?checkout=return&status=approved&payment_id=123&order_id=LIORA-TESTE-12345678',
+    fetch: async () => ({ ok: true, json: async () => ({ status: 'approved', order_id: 'LIORA-OTHER-12345678' }) })
+  });
+  await app.done;
+  assert.equal(app.run('cartQty()'), 1);
+  assert.match(app.nodes.get('drawerBody').innerHTML, /Confirmação em aberto/);
 });

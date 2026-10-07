@@ -140,7 +140,7 @@ test('Mercado Pago confirmation checks reference, payment ID, exact cents, BRL, 
 });
 
 test('Mercado Pago rejects malformed responses and returns legitimate pending/rejected/approved status only', async () => {
-  for (const invalid of [{ status: 'unknown' }, { live_mode: 'false' }, { transaction_amount: '94.90' }, { transaction_amount: NaN }, { transaction_amount: 94.901 }]) {
+  for (const invalid of [{ status: 'unknown' }, { live_mode: 'false' }, { transaction_amount: ' 94.90' }, { transaction_amount: '9.49e1' }, { transaction_amount: NaN }, { transaction_amount: 94.901 }]) {
     mockResponse(mpPayment(invalid));
     assert.equal((await invoke(paymentStatus, statusRequest())).statusCode, 502);
   }
@@ -152,6 +152,79 @@ test('Mercado Pago rejects malformed responses and returns legitimate pending/re
     assert.equal(res.body.payment_mode, 'test');
     assert.equal(res.headers['Cache-Control'], 'no-store');
   }
+});
+
+test('Checkout Pro reconciles products plus separate delivery, including decimal strings', async () => {
+  for (const amounts of [
+    { transaction_amount: 75, shipping_amount: 19.9 },
+    { transaction_amount: '75.00', shipping_amount: '19.90' },
+    { transaction_amount: 94.9, shipping_amount: 0 }
+  ]) {
+    mockResponse(mpPayment({ ...amounts, transaction_details: { total_paid_amount: 102, net_received_amount: 87 } }));
+    const response = await invoke(paymentStatus, statusRequest());
+    assert.equal(response.statusCode, 200);
+    assert.equal(response.body.status, 'approved');
+  }
+});
+
+test('freight is not counted twice and interest/net receipts cannot conceal underpayment', async () => {
+  for (const amounts of [
+    { transaction_amount: 75, shipping_amount: 19.89 },
+    { transaction_amount: 94.9, shipping_amount: 19.9 },
+    { transaction_amount: 75, shipping_amount: 0 }
+  ]) {
+    mockResponse(mpPayment({ ...amounts, transaction_details: { total_paid_amount: 94.9, net_received_amount: 94.9 } }));
+    assert.equal((await invoke(paymentStatus, statusRequest())).statusCode, 409);
+  }
+  for (const shipping_amount of [-1, false, '19.9x', 19.901, Infinity]) {
+    mockResponse(mpPayment({ transaction_amount: 75, shipping_amount }));
+    assert.equal((await invoke(paymentStatus, statusRequest())).statusCode, 502);
+  }
+});
+
+test('recovery uses a signed external reference and re-reads the chosen payment', async () => {
+  const urls = [];
+  global.fetch = async url => {
+    urls.push(String(url));
+    return { ok: true, status: 200, json: async () => urls.length === 1
+      ? { paging: { total: 2 }, results: [mpPayment({ id: 456, status: 'rejected' }), mpPayment()] }
+      : mpPayment({ transaction_amount: 75, shipping_amount: 19.9 }) };
+  };
+  const req = statusRequest(); delete req.query.payment_id;
+  const response = await invoke(paymentStatus, req);
+  assert.equal(response.statusCode, 200);
+  assert.equal(response.body.status, 'approved');
+  const query = new URL(urls[0]).searchParams;
+  assert.equal(query.get('external_reference'), orderId);
+  assert.equal(query.get('limit'), '20');
+  assert.equal(urls[1], 'https://api.mercadopago.com/v1/payments/123');
+  assert.doesNotMatch(JSON.stringify(response.body), /payer|card|amount|proof|credential/);
+});
+
+test('recovery fails closed for missing, incomplete, ambiguous or unrelated search results', async () => {
+  const req = statusRequest(); delete req.query.payment_id;
+  for (const [data, expected] of [
+    [{ paging: { total: 0 }, results: [] }, 404],
+    [{ paging: { total: 21 }, results: [mpPayment()] }, 409],
+    [{ paging: { total: 2 }, results: [mpPayment(), mpPayment({ id: 456 })] }, 409],
+    [{ paging: { total: 1 }, results: [mpPayment({ external_reference: 'OTHER' })] }, 404],
+    [{ results: [] }, 502]
+  ]) {
+    mockResponse(data);
+    assert.equal((await invoke(paymentStatus, req)).statusCode, expected);
+  }
+  req.headers = {};
+  calls = 0;
+  assert.equal((await invoke(paymentStatus, req)).statusCode, 400);
+  assert.equal(calls, 0);
+});
+
+test('mismatch diagnostics identify only field names, without payment/customer data', async () => {
+  const logs = []; console.warn = value => logs.push(value);
+  mockResponse(mpPayment({ transaction_amount: 73.21, shipping_amount: 19.9, payer: { email: 'private@example.com' } }));
+  await invoke(paymentStatus, statusRequest());
+  assert.deepEqual(JSON.parse(logs[0]), { event: 'payment_order_mismatch', fields: ['total'] });
+  assert.doesNotMatch(logs.join('\n'), /73.21|19.9|private|LIORA-SECURITY|Bearer|eyJ/);
 });
 
 test('InfinitePay requires strict booleans, integer cents and adequate paid amount before approval', async () => {
