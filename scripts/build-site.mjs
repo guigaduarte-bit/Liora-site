@@ -15,6 +15,12 @@ const out=path.join(root,'dist');
 fs.rmSync(out,{recursive:true,force:true});fs.mkdirSync(out,{recursive:true});
 fs.cpSync(path.join(root,'assets'),path.join(out,'assets'),{recursive:true});
 const imageManifest=json('content/image-manifest.json');
+for(const [src,meta] of Object.entries(imageManifest)){
+ for(const image of [{src,bytes:meta.bytes},...(meta.variants||[])]){
+  const file=path.join(root,image.src);
+  if(!fs.existsSync(file)||!image.bytes||fs.statSync(file).size!==image.bytes)throw Error(`Invalid or incomplete image ${image.src}`);
+ }
+}
 const editorial=json('content/product-editorial.json');
 const original=json('content/products.json');
 const productIds=original.map(p=>p.id);
