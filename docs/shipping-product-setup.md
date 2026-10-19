@@ -1,12 +1,26 @@
 # Frete por carrinho — Liora
 
-Atualização: 01/10/2026. Estimador implementado no preview. Embalagens e transportadora ainda não homologadas; publicação em produção depende de aprovação.
+Atualização: 19/10/2026. Pesos de sete modelos Flora Línea informados pelo usuário e cadastrados no preview. Estimador implementado; embalagens e transportadora ainda não homologadas. Disponibilidade a confirmar mantida; publicação em produção depende de aprovação.
 
 ## Dados separados
 
-- `content/shipping-products.json`: peso total e dimensões de cada peça. A Botanique 250 g foi confirmada com 475 g, altura 16 cm e diâmetro 9 cm. Os demais dados são referências do catálogo, sem confirmação automática para postagem. Lady Veil e Anjo em Vitral não têm três dimensões; Botanique 150 g também não tem peso completo. São 26 pesos e 24 conjuntos completos de dimensões em 27 SKUs.
+- `content/shipping-products.json`: peso total e dimensões de cada peça. A Botanique 250 g foi confirmada com 475 g, altura 16 cm e diâmetro 9 cm. Os sete pesos Flora Línea informados em 19/10 constam da tabela abaixo. Os demais dados são referências do catálogo, sem confirmação automática para postagem. Lady Veil e Anjo em Vitral não têm três dimensões. Botanique 150 g ainda não tem peso completo. São 31 pesos e 24 conjuntos completos de dimensões em 32 SKUs.
 - `content/shipping-packaging-estimate.json`: nove modelos RPC dos Correios, taras provisórias e parâmetros de proteção. Nenhuma estimativa deve ser gravada como peso medido.
 - `api/_shipping-estimate.js`: compõe caixas conforme os produtos e quantidades. A responsável não precisa medir todas as combinações de compra; validar caixas e regras com amostras representativas.
+
+## Pesos Flora Línea — 19/10/2026
+
+| Modelo | Peso total da peça informado | Dimensões da peça (C × L × A) |
+|---|---:|---|
+| Caixa quadrada média | 420 g | Pendente |
+| Caixa redonda floral | 460 g | Pendente |
+| Caixa floral grande (R$ 129,90) | 480 g | Pendente |
+| Vaso de gesso P | 200 g | 12 × 12 × 12 cm, referência anterior do catálogo |
+| Vaso de metal com alça | 265 g | Pendente |
+| Vaso floral de cerâmica | 520 g | 15 × 15 × 18 cm, referência anterior do catálogo |
+| Caixa flor solitária | 100 g | Pendente |
+
+O vaso cerâmico foi corrigido de 700 g para 520 g. A caixa de apresentação e o recipiente integram a peça; a caixa externa de transporte/proteção continua separada. Nenhum peso de embalagem foi deduzido desses valores. As dimensões anteriores não foram reconfirmadas nesta mensagem. `confirmedForShipping` continua falso e as taras/medidas protegidas continuam sem homologação física. Os sete modelos mantêm estoque 10, disponibilidade a confirmar e compra bloqueada conforme orientação expressa do usuário.
 
 ## Cálculo de estimativa
 

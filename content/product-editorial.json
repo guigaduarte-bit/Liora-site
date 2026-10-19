@@ -335,6 +335,10 @@
         "value": "Vaso de cerâmica"
       },
       {
+        "label": "Peso total da peça",
+        "value": "520 g"
+      },
+      {
         "label": "Valor",
         "value": "Por unidade"
       },
@@ -367,7 +371,11 @@
     "specs": [
       {
         "label": "Apresentação",
-        "value": "Vaso de gesso"
+        "value": "Vaso de gesso P"
+      },
+      {
+        "label": "Peso total da peça",
+        "value": "200 g"
       },
       {
         "label": "Valor",
@@ -421,6 +429,10 @@
         "value": "Caixa redonda com tampa"
       },
       {
+        "label": "Peso total da peça",
+        "value": "460 g"
+      },
+      {
         "label": "Valor",
         "value": "Por unidade"
       },
@@ -438,7 +450,11 @@
     "specs": [
       {
         "label": "Apresentação",
-        "value": "Vaso de metal"
+        "value": "Vaso de metal com alça"
+      },
+      {
+        "label": "Peso total da peça",
+        "value": "265 g"
       },
       {
         "label": "Valor",
@@ -461,6 +477,10 @@
         "value": "Caixa com uma flor"
       },
       {
+        "label": "Peso total da peça",
+        "value": "100 g"
+      },
+      {
         "label": "Valor",
         "value": "Por unidade"
       },
@@ -481,6 +501,10 @@
         "value": "Caixa média com tampa"
       },
       {
+        "label": "Peso total da peça",
+        "value": "420 g"
+      },
+      {
         "label": "Valor",
         "value": "Por unidade"
       },
@@ -499,6 +523,10 @@
       {
         "label": "Apresentação",
         "value": "Caixa grande em formato de flor"
+      },
+      {
+        "label": "Peso total da peça",
+        "value": "480 g"
       },
       {
         "label": "Valor",

@@ -340,7 +340,7 @@
     }
   },
   "jardim-encantado": {
-    "weightGrams": 700,
+    "weightGrams": 520,
     "dimensionsCm": {
       "length": 15,
       "width": 15,
@@ -352,7 +352,7 @@
     "source": {
       "file": "content/products.json",
       "field": "dims",
-      "text": "Peso: 700gr · Medidas: 15cmX15cmX18cm (CXLXA)"
+      "text": "Peso total da peça: 520 g · Medidas: 15cmX15cmX18cm (CXLXA)"
     }
   },
   "camafeufada": {
@@ -384,7 +384,7 @@
     "source": {
       "file": "content/products.json",
       "field": "dims",
-      "text": "Peso: 200gr · Medidas: 12cmX12cmX12cm (CXLXA)"
+      "text": "Peso total da peça: 200 g · Medidas: 12cmX12cmX12cm (CXLXA)"
     }
   },
   "peonia": {
@@ -420,7 +420,7 @@
     }
   },
   "caixa-redonda-floral": {
-    "weightGrams": null,
+    "weightGrams": 460,
     "dimensionsCm": null,
     "packingWeightGrams": null,
     "shippingDimensionsCm": null,
@@ -428,11 +428,11 @@
     "source": {
       "file": "content/products.json",
       "field": "dims",
-      "text": ""
+      "text": "Peso total da peça: 460 g"
     }
   },
   "vaso-floral-metal": {
-    "weightGrams": null,
+    "weightGrams": 265,
     "dimensionsCm": null,
     "packingWeightGrams": null,
     "shippingDimensionsCm": null,
@@ -440,11 +440,11 @@
     "source": {
       "file": "content/products.json",
       "field": "dims",
-      "text": ""
+      "text": "Peso total da peça: 265 g"
     }
   },
   "caixa-flor-solitaria": {
-    "weightGrams": null,
+    "weightGrams": 100,
     "dimensionsCm": null,
     "packingWeightGrams": null,
     "shippingDimensionsCm": null,
@@ -452,11 +452,11 @@
     "source": {
       "file": "content/products.json",
       "field": "dims",
-      "text": ""
+      "text": "Peso total da peça: 100 g"
     }
   },
   "caixa-quadrada-media": {
-    "weightGrams": null,
+    "weightGrams": 420,
     "dimensionsCm": null,
     "packingWeightGrams": null,
     "shippingDimensionsCm": null,
@@ -464,11 +464,11 @@
     "source": {
       "file": "content/products.json",
       "field": "dims",
-      "text": ""
+      "text": "Peso total da peça: 420 g"
     }
   },
   "caixa-floral-grande": {
-    "weightGrams": null,
+    "weightGrams": 480,
     "dimensionsCm": null,
     "packingWeightGrams": null,
     "shippingDimensionsCm": null,
@@ -476,7 +476,7 @@
     "source": {
       "file": "content/products.json",
       "field": "dims",
-      "text": ""
+      "text": "Peso total da peça: 480 g"
     }
   }
 }
