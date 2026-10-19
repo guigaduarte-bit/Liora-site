@@ -312,8 +312,9 @@
     "name": "Vaso floral de cerâmica",
     "price": 89.9,
     "old": null,
-    "stock": 3,
-    "soldout": false,
+    "stock": 10,
+    "soldout": true,
+    "availabilityPending": true,
     "cats": [
       "Flora Linea"
     ],
@@ -354,8 +355,9 @@
     "name": "Vaso de gesso floral",
     "price": 59.9,
     "old": null,
-    "stock": 0,
+    "stock": 10,
     "soldout": true,
+    "availabilityPending": true,
     "cats": [
       "Flora Linea"
     ],
@@ -402,7 +404,7 @@
     "name": "Caixa redonda floral",
     "price": 89.9,
     "old": null,
-    "stock": 0,
+    "stock": 10,
     "soldout": true,
     "availabilityPending": true,
     "cats": [
@@ -427,7 +429,7 @@
     "name": "Vaso floral de metal",
     "price": 89.9,
     "old": null,
-    "stock": 0,
+    "stock": 10,
     "soldout": true,
     "availabilityPending": true,
     "cats": [
@@ -448,7 +450,7 @@
     "name": "Caixa flor solitária",
     "price": 15.0,
     "old": null,
-    "stock": 0,
+    "stock": 10,
     "soldout": true,
     "availabilityPending": true,
     "cats": [
@@ -469,7 +471,7 @@
     "name": "Caixa quadrada média",
     "price": 69.9,
     "old": null,
-    "stock": 0,
+    "stock": 10,
     "soldout": true,
     "availabilityPending": true,
     "cats": [
@@ -490,7 +492,7 @@
     "name": "Caixa floral grande",
     "price": 129.9,
     "old": null,
-    "stock": 0,
+    "stock": 10,
     "soldout": true,
     "availabilityPending": true,
     "cats": [

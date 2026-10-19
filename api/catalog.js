@@ -25,14 +25,14 @@ module.exports = Object.freeze({
   geometricafacetada: { name: 'LIORA ELEGANCE', price: 32, stock: 5 },
   'cilindro-mosaico': { name: 'CILINDRO MOSAICO', price: 42, stock: 5 },
   'chama-esculpida': { name: 'CHAMA ESCULPIDA', price: 62, stock: 5 },
-  'jardim-encantado': { name: 'Vaso floral de cerâmica', price: 89.9, stock: 3 },
+  'jardim-encantado': { name: 'Vaso floral de cerâmica', price: 89.9, stock: 10, soldout: true },
   camafeufada: { name: 'CAMAFEU FADA', price: 8, stock: 30 },
-  botanicavasogesso: { name: 'Vaso de gesso floral', price: 59.9, stock: 0, soldout: true },
+  botanicavasogesso: { name: 'Vaso de gesso floral', price: 59.9, stock: 10, soldout: true },
   peonia: { name: 'FLOR DE VÊNUS', price: 12, stock: 8 },
   'sagrada-familia': { name: 'Sagrada Familia', price: 52, stock: 5 },
-  'caixa-redonda-floral': { name: 'Caixa redonda floral', price: 89.9, stock: 0, soldout: true },
-  'vaso-floral-metal': { name: 'Vaso floral de metal', price: 89.9, stock: 0, soldout: true },
-  'caixa-flor-solitaria': { name: 'Caixa flor solitária', price: 15.0, stock: 0, soldout: true },
-  'caixa-quadrada-media': { name: 'Caixa quadrada média', price: 69.9, stock: 0, soldout: true },
-  'caixa-floral-grande': { name: 'Caixa floral grande', price: 129.9, stock: 0, soldout: true }
+  'caixa-redonda-floral': { name: 'Caixa redonda floral', price: 89.9, stock: 10, soldout: true },
+  'vaso-floral-metal': { name: 'Vaso floral de metal', price: 89.9, stock: 10, soldout: true },
+  'caixa-flor-solitaria': { name: 'Caixa flor solitária', price: 15.0, stock: 10, soldout: true },
+  'caixa-quadrada-media': { name: 'Caixa quadrada média', price: 69.9, stock: 10, soldout: true },
+  'caixa-floral-grande': { name: 'Caixa floral grande', price: 129.9, stock: 10, soldout: true }
 });
