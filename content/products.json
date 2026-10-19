@@ -7,10 +7,7 @@
     "stock": 10,
     "soldout": false,
     "cats": [
-      "Essenciais",
-      "Esculturas",
-      "Clássico",
-      "Kits e Presentes"
+      "Esculturas"
     ],
     "desc": "Vela decorativa feminina em formato de busto com véu e flores, perfeita para dar sofisticação ao seu ambiente.",
     "dims": "Peso: 110gr",
@@ -24,9 +21,7 @@
     "stock": 20,
     "soldout": false,
     "cats": [
-      "Essenciais",
-      "Esculturas",
-      "Kits e Presentes"
+      "Esculturas"
     ],
     "desc": "Vela decorativa com anjo e criança, ornamentos florais e moldura detalhada. Perfeita para decorar ou presentear.",
     "dims": "Peso: 100 gr · Medidas: 11cm x 6,2 cm",
@@ -40,9 +35,7 @@
     "stock": 2,
     "soldout": false,
     "cats": [
-      "Essenciais",
-      "Flora Linea",
-      "Kits e Presentes"
+      "Boho Glass"
     ],
     "desc": "Vela em vidro, luminária,com tampa metálica, decorada com pássaros e flores, perfeita para decorar e ambientar. Aproveite e compre já!",
     "dims": "Peso total: 475 g · Altura: 16 cm · Diâmetro: 9 cm",
@@ -56,8 +49,7 @@
     "stock": 12,
     "soldout": false,
     "cats": [
-      "Essenciais",
-      "Flora Linea"
+      "Boho Glass"
     ],
     "desc": "Conjunto de velas decorativas em copo de vidro com tampa de madeira, estampas florais e de pássaro. Decore e aromatize seu ambiente. Compre já!",
     "dims": "",
@@ -71,9 +63,7 @@
     "stock": 5,
     "soldout": false,
     "cats": [
-      "Essenciais",
-      "Flora Linea",
-      "Kits e Presentes"
+      "Boho Glass"
     ],
     "desc": "Vela perfumada em copo de vidro com tampa de madeira e estampa floral delicada. Decore e aromatize seu ambiente com charme. Compre já!",
     "dims": "Peso 70gr | Medidas: 9cm x 9cm x 7cm (C x L x A) · Medidas: 9cm x 9cm x 7cm (C x L x A)",
@@ -87,7 +77,7 @@
     "stock": 30,
     "soldout": false,
     "cats": [
-      "Essenciais"
+      "Esculturas"
     ],
     "desc": "Pedidos acima de 20 unidades: 10% de desconto\nPedidos acima de 30 unidades: 15% de desconto\nPedidos acima de 50 unidades: 20% de desconto\nPeças feitas a mão, com intenção.\nPrazo confecção - 5 a 7 dias.",
     "dims": "Peso: 40gr · Medidas: 4cmX4cmX5cm (CXLXA)",
@@ -129,7 +119,7 @@
     "stock": 30,
     "soldout": false,
     "cats": [
-      "Essenciais"
+      "Esculturas"
     ],
     "desc": "Vela decorativa bolinhas pequena com textura em relevo e acabamento liso para um toque acolhedor. Ideal para decorar ambientes.",
     "dims": "Peso: 40gr · Medidas: 4cmX4cmX4cm (CXLXA)",
@@ -157,7 +147,7 @@
     "stock": 5,
     "soldout": false,
     "cats": [
-      "Essenciais"
+      "Esculturas"
     ],
     "desc": "Decore seu ambiente com a vela nó entrelaçada. Textura artesanal única e exclusiva.",
     "dims": "Peso: 55gr · Medidas: 8cmX8cmX8cm (CXLXA)",
@@ -241,8 +231,7 @@
     "stock": 2,
     "soldout": false,
     "cats": [
-      "Boho Glass",
-      "Kits e Presentes"
+      "Boho Glass"
     ],
     "desc": "Vela perfumada em vidro listrado com tampa bolinhas para ambientes aromatizados com estilo. Compre já!",
     "dims": "Peso: 350gr · Medidas: 8cmX8cmX10cm (CXLXA)",
@@ -326,8 +315,7 @@
     "stock": 3,
     "soldout": false,
     "cats": [
-      "Flora Linea",
-      "Kits e Presentes"
+      "Flora Linea"
     ],
     "desc": "Decore ambientes com arranjo de velas florais em vaso decorativo. Ideal para trazer charme e aroma suave.",
     "dims": "Peso: 700gr · Medidas: 15cmX15cmX18cm (CXLXA)",
@@ -341,10 +329,7 @@
     "stock": 30,
     "soldout": false,
     "cats": [
-      "Essenciais",
-      "Esculturas",
-      "Clássico",
-      "Kits e Presentes"
+      "Esculturas"
     ],
     "desc": "Presente decorativo com fita e relevo de fada com flores para um ambiente delicado e clássico. Decore com charme, compre agora!",
     "dims": "Peso: 50gr · Medidas: 10cmX8cmX11cm (CXLXA).",
@@ -386,7 +371,6 @@
     "stock": 5,
     "soldout": false,
     "cats": [
-      "Essenciais",
       "Esculturas"
     ],
     "desc": "Escultura Família Sagrada em material liso, ideal para decoração religiosa. Adquira já e valorize seu ambiente com arte e fé.",

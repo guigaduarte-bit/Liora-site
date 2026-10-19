@@ -13,7 +13,7 @@ if(!document.getElementById('fav').getAttribute('href'))document.getElementById(
 
 /* ============ STORE DATA (lioraaromasdeluxo.lojavirtualnuvem.com.br) ============ */
 const AROMA_TAB='Catálogo de Aromas';
-const CATS=['Todas','Essenciais','Esculturas','Clássico','Boho Glass','Flora Linea','Kits e Presentes',AROMA_TAB];
+const CATS=['Todas','Esculturas','Clássico','Boho Glass','Flora Linea','Kits e Presentes',AROMA_TAB];
 const AROMA_FAMILIES=[
   {name:'Floral Frutal',className:'floral-frutal',profile:'Romântico · Fresco · Feminino',items:[
     {name:'Sim Arman',notes:'Figo · Damasco · Cedro · Musk'},
