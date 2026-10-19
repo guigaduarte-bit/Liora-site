@@ -47,7 +47,7 @@ const AROMA_FAMILIES=[
   ]}
 ];
 const PRODUCTS=window.LIORA_PRODUCTS;
-PRODUCTS.forEach(p=>p.img=PIMG[p.id]);
+PRODUCTS.forEach(p=>p.img=p.img||PIMG[p.id]||`/assets/images/${p.id}.webp`);
 const SHIP_FREE=150;
 
 /* ============ STATE ============ */
@@ -423,6 +423,13 @@ function renderPaymentStatus(){
 }
 
 /* ============ QUICK VIEW ============ */
+function selectProductImage(button,index){
+  const gallery=button.closest('.product-gallery');
+  const p=gallery&&prod(gallery.dataset.productId),photo=p?.gallery?.[index];
+  if(!photo)return;
+  gallery.querySelector('[data-gallery-main]').innerHTML=lioraImage({...p,...photo,displayName:photo.alt},true);
+  gallery.querySelectorAll('.gallery-thumb').forEach((thumb,i)=>thumb.setAttribute('aria-pressed',String(i===index)));
+}
 function openQuick(id){
   quick={id,qty:1};
   renderQuick();
@@ -430,6 +437,7 @@ function openQuick(id){
   document.body.style.overflow='hidden';
 }
 function stockNote(p){
+  if(p.availabilityPending)return '<p class="stock-note">Disponibilidade a confirmar</p>';
   if(p.soldout)return '<p class="stock-note">Esgotado — avise-me quando voltar</p>';
   if(p.stock===1)return '<p class="stock-note">Atenção, última peça!</p>';
   if(p.stock&&p.stock<=5)return `<p class="stock-note">Só ${p.stock} em estoque</p>`;
@@ -449,6 +457,7 @@ function renderQuick(){
       <p class="m-inst">${instTxt(p)} · Pix com 5% de desconto extra</p>
       ${stockNote(p)}
       <p class="m-desc">${p.desc}</p>
+      ${p.gallery?.length>1?`<p class="product-help"><a href="/produtos/${p.id}/">Ver todas as fotos deste modelo</a></p>`:''}
       <div class="pyramid">
         ${p.dims?`<div class="pyr-row"><span>Dimensões</span><div>${p.dims}</div></div>`:''}
         ${p.frag?`<div class="pyr-row"><span>Fragrância</span><div>Personalizada pelo cliente — sem custo adicional</div></div>`:''}

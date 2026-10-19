@@ -5,7 +5,7 @@ import {createRequire} from 'node:module';
 import {normalizeBusinessIdentity,applyBusinessIdentity} from './business-identity.mjs';
 const require=createRequire(import.meta.url);
 const catalog=require('../api/catalog.js');
-const {lioraEscape:e,lioraMoney:money,lioraImage,lioraCardHTML,lioraTabsHTML,lioraAromasHTML}=require('../assets/components.js');
+const {lioraEscape:e,lioraMoney:money,lioraImage,lioraGallery,lioraCardHTML,lioraTabsHTML,lioraAromasHTML}=require('../assets/components.js');
 const root=path.resolve(import.meta.dirname||path.dirname(new URL(import.meta.url).pathname),'..');
 const read=f=>fs.readFileSync(path.join(root,f),'utf8');
 const json=f=>JSON.parse(read(f));
@@ -17,20 +17,23 @@ fs.cpSync(path.join(root,'assets'),path.join(out,'assets'),{recursive:true});
 const imageManifest=json('content/image-manifest.json');
 const editorial=json('content/product-editorial.json');
 const original=json('content/products.json');
-if(new Set(original.map(p=>p.id)).size!==27||editorial.length!==27)throw Error('Expected 27 unique products');
+const productIds=original.map(p=>p.id);
+if(new Set(productIds).size!==original.length||editorial.length!==original.length||Object.keys(catalog).length!==original.length||new Set(editorial.map(p=>p.id)).size!==original.length)throw Error('Product catalogue IDs must be unique and synchronized');
 const products=original.map(p=>{
  const commercial=catalog[p.id],copy=editorial.find(x=>x.id===p.id);
  if(!commercial||!copy)throw Error(`Missing data ${p.id}`);
  if(commercial.price!==p.price||commercial.stock!==p.stock||commercial.name!==p.name)throw Error(`Commercial drift ${p.id}`);
- const img=`/assets/images/${p.id}.webp`;
- return {...p,...commercial,soldout:!!commercial.soldout||commercial.stock===0,displayName:copy.displayName,desc:copy.description,detail:copy.detail||'',specs:copy.specs,dims:'',img,imageMeta:imageManifest[img]};
+ const gallery=(p.images||[{src:`/assets/images/${p.id}.webp`,alt:copy.displayName}]).map(photo=>({img:photo.src,alt:photo.alt,imageMeta:imageManifest[photo.src]}));
+ if(gallery.some(photo=>!photo.imageMeta))throw Error(`Missing image metadata ${p.id}`);
+ const img=gallery[0].img;
+ return {...p,...commercial,soldout:!!commercial.soldout||commercial.stock===0,displayName:copy.displayName,desc:copy.description,detail:copy.detail||'',specs:copy.specs,dims:'',img,imageMeta:imageManifest[img],gallery};
 });
 const categories=[
  {name:'Todas',path:'/velas-aromaticas/',title:'Velas artesanais aromáticas e decorativas',description:'Conheça as velas Liora: peças esculturais, formas geométricas e modelos botânicos feitos à mão em Curitiba. Encontre o desenho que combina com o seu espaço.',ids:products.map(p=>p.id)},
  {name:'Esculturas',path:'/velas-decorativas/',title:'Velas decorativas da coleção Esculturas',description:'Bustos, relevos e formas delicadas em velas feitas à mão. Lady Veil, Anjo em Vitral, Pequeno Amor e Mini Bubble se encontram na coleção Esculturas.',ids:products.filter(p=>p.cats.includes('Esculturas')).map(p=>p.id)},
  {name:'Clássico',path:'/classico/',title:'Coleção Clássico',description:'Formas geométricas, curvas e texturas para compor ambientes: descubra Pérolas, Bolhas, Lumina e Chama Esculpida.',ids:products.filter(p=>p.cats.includes('Clássico')).map(p=>p.id)},
  {name:'Boho Glass',path:'/boho-glass/',title:'Coleção Boho Glass',description:'Velas em vidro com detalhes que encantam. Explore as versões Botanique de 70 g, 150 g e 250 g junto ao Kit Boho Glass.',ids:products.filter(p=>p.cats.includes('Boho Glass')).map(p=>p.id)},
- {name:'Flora Linea',path:'/flora-linea/',title:'Flora Linea: flores e formas delicadas',description:'Flores e formas delicadas atravessam a coleção Flora Linea. Conheça os desenhos de Flor de Vênus, Abraço em Luz e Jardim Encantado.',ids:products.filter(p=>p.cats.includes('Flora Linea')).map(p=>p.id)},
+ {name:'Flora Linea',path:'/flora-linea/',title:'Flora Línea: flores para encantar',description:'Arranjos de velas florais em vasos de gesso, cerâmica e metal, caixas para presentear e formas delicadas. Conheça as composições da coleção Flora Línea.',ids:products.filter(p=>p.cats.includes('Flora Linea')).map(p=>p.id)},
  {name:'Kits e Presentes',path:'/kits-e-presentes/',title:'Kits Liora para decorar e presentear',description:'Conheça Kit Silhouette e Kit Boho Glass. Consulte a apresentação de cada modelo; composição e embalagem devem ser confirmadas com a Liora antes da compra.',ids:['kit-silhouette','kit-boho-glass']}
 ];
 const script=read('assets/storefront.js');
@@ -66,15 +69,16 @@ fs.writeFileSync(path.join(out,'index.html'),home);
 function readDist(f){return fs.readFileSync(path.join(out,f),'utf8');}
 for(const c of categories){
  const items=products.filter(p=>c.ids.includes(p.id));
- page({url:c.path,title:`${c.title} | Liora`,description:c.description,schemas:[crumbSchema([{name:c.name,path:c.path}])]},`<section class="wrap category-page">${crumbs([{name:c.name}])}<div class="page-intro"><p class="eyebrow">Coleções Liora</p><h1 class="display">${c.title}</h1><p>${c.description}</p></div><nav class="tabs" id="tabsBar" aria-label="Coleções">${lioraTabsHTML(categories,c.name)}</nav><div class="grid" id="grid">${items.map(p=>lioraCardHTML(p)).join('')}</div><p class="product-help">Frete grátis a partir de R$ 150 em produtos, antes do desconto Pix. Confira as <a href="/termos-de-uso.html">condições de compra</a>.</p></section>`,c.name);
+ const feature=c.name==='Flora Linea'?`<figure class="collection-feature">${lioraImage({img:'/assets/images/flora-linea-arranjos.webp',imageMeta:imageManifest['/assets/images/flora-linea-arranjos.webp'],displayName:'Arranjos florais Liora em vasos de cerâmica e metal'})}<figcaption>Composições florais da coleção Flora Línea. Cada modelo é vendido por unidade.</figcaption></figure>`:'';
+ page({url:c.path,title:`${c.title} | Liora`,description:c.description,schemas:[crumbSchema([{name:c.name,path:c.path}])]},`<section class="wrap category-page">${crumbs([{name:c.name}])}<div class="page-intro"><p class="eyebrow">Coleções Liora</p><h1 class="display">${c.title}</h1><p>${c.description}</p></div><nav class="tabs" id="tabsBar" aria-label="Coleções">${lioraTabsHTML(categories,c.name)}</nav><div class="grid" id="grid">${items.map(p=>lioraCardHTML(p)).join('')}</div>${feature}<p class="product-help">Frete grátis a partir de R$ 150 em produtos, antes do desconto Pix. Confira as <a href="/termos-de-uso.html">condições de compra</a>.</p></section>`,c.name);
 }
 for(const p of products){
  const url=`/produtos/${p.id}/`,cat=categories.find(c=>c.name===p.cats[0])||categories[0];
  const trail=[{name:cat.name,path:cat.path},{name:p.displayName,path:url}];
- const productSchema={'@context':'https://schema.org','@type':'Product',name:p.displayName,description:p.desc,image:[base+p.img],sku:p.id,brand:{'@type':'Brand',name:'Liora'},offers:{'@type':'Offer',url:base+url,priceCurrency:'BRL',price:p.price,availability:`https://schema.org/${p.soldout?'OutOfStock':'InStock'}`}};
+ const productSchema={'@context':'https://schema.org','@type':'Product',name:p.displayName,description:p.desc,image:p.gallery.map(photo=>base+photo.img),sku:p.id,brand:{'@type':'Brand',name:'Liora'},offers:{'@type':'Offer',url:base+url,priceCurrency:'BRL',price:p.price,availability:`https://schema.org/${p.soldout?'OutOfStock':'InStock'}`}};
  const related=products.filter(r=>r.id!==p.id&&r.cats.some(c=>p.cats.includes(c))).slice(0,4);
- page({url,title:`${p.displayName} | Liora`,description:p.desc,img:p.img,schemas:[productSchema,crumbSchema(trail)]},`<section class="wrap product-page">${crumbs([{name:cat.name,path:cat.path},{name:p.displayName}])}<div class="product-layout"><div class="product-photo">${lioraImage(p,true)}</div><div class="product-copy"><p class="eyebrow">${e(cat.name)} · Liora</p><h1 class="display">${e(p.displayName)}</h1><p class="description">${e(p.desc)}</p><p class="product-price">${p.old?`<del>${money(p.old)}</del>`:''}${money(p.price)}</p><p class="product-pix">${money(Math.round(p.price*95)/100)} no Pix · 5% de desconto</p><p class="product-status">${p.soldout?'Esgotado no momento':'Disponível no catálogo'}</p>
- <form class="product-form" onsubmit="return productAdd(event,'${p.id}')">${p.frag&&!p.soldout?'<label for="fragrance">Qual fragrância você deseja? (opcional)</label><input id="fragrance" name="fragrance" maxlength="60" placeholder="Ex.: Lavanda Sofisticada"><p class="product-help">Fragrância personalizada sem custo adicional. <a href="/catalogo-de-aromas/">Conheça o catálogo de aromas</a>.</p>':''}<div class="purchase-row"><div><label for="quantity">Quantidade</label><input id="quantity" name="quantity" type="number" value="1" min="1" max="${p.stock||1}" step="1" ${p.soldout?'disabled':''}></div><button class="btn btn-ink" type="submit" ${p.soldout?'disabled':''}>${p.soldout?'Produto esgotado':'Adicionar ao carrinho'}</button></div><noscript><p class="product-help">Ative o JavaScript para usar o carrinho e finalizar a compra.</p></noscript></form>
+ page({url,title:`${p.displayName} | Liora`,description:p.desc,img:p.img,schemas:[productSchema,crumbSchema(trail)]},`<section class="wrap product-page">${crumbs([{name:cat.name,path:cat.path},{name:p.displayName}])}<div class="product-layout">${lioraGallery(p)}<div class="product-copy"><p class="eyebrow">${e(cat.name)} · Liora</p><h1 class="display">${e(p.displayName)}</h1><p class="description">${e(p.desc)}</p><p class="product-price">${p.old?`<del>${money(p.old)}</del>`:''}${money(p.price)}</p><p class="product-pix">${money(Math.round(p.price*95)/100)} no Pix · 5% de desconto</p><p class="product-status">${p.availabilityPending?'Disponibilidade a confirmar':p.soldout?'Esgotado no momento':'Disponível no catálogo'}</p>
+ <form class="product-form" onsubmit="return productAdd(event,'${p.id}')">${p.frag&&!p.soldout?'<label for="fragrance">Qual fragrância você deseja? (opcional)</label><input id="fragrance" name="fragrance" maxlength="60" placeholder="Ex.: Lavanda Sofisticada"><p class="product-help">Fragrância personalizada sem custo adicional. <a href="/catalogo-de-aromas/">Conheça o catálogo de aromas</a>.</p>':''}<div class="purchase-row"><div><label for="quantity">Quantidade</label><input id="quantity" name="quantity" type="number" value="1" min="1" max="${p.stock||1}" step="1" ${p.soldout?'disabled':''}></div><button class="btn btn-ink" type="submit" ${p.soldout?'disabled':''}>${p.availabilityPending?'Disponibilidade a confirmar':p.soldout?'Produto esgotado':'Adicionar ao carrinho'}</button></div><noscript><p class="product-help">Ative o JavaScript para usar o carrinho e finalizar a compra.</p></noscript></form>
  <p class="product-help"><strong>Produção: 10 dias úteis.</strong> A contagem começa quando pagamento e personalização estiverem confirmados. O prazo de transporte, calculado pelo CEP, é acrescido à produção.</p>
  <h2 class="display" style="font-size:30px">Sobre a peça</h2><dl class="product-specs">${p.specs.map(s=>`<dt>${e(s.label)}</dt><dd>${e(s.value)}</dd>`).join('')}</dl>${p.detail?`<p class="product-help">${e(p.detail)}</p>`:''}<div class="product-links"><a href="/velas-personalizadas/">Personalização</a><a href="/trocas-e-devolucoes.html">Trocas e devoluções</a></div>
  <details><summary>Entrega e pagamento</summary><p>Envio para todo o Brasil, com opções calculadas pelo CEP no carrinho. Curitiba: R$ 19,90 em compras abaixo de R$ 150. Frete grátis a partir de R$ 150 em produtos, antes do desconto Pix. Pix com 5% de desconto; cartão e boleto pelo Mercado Pago, além de InfinitePay. A produção leva 10 dias úteis, contados a partir do momento em que pagamento e personalização estiverem confirmados. O prazo total soma a produção ao transporte informado na cotação pelo CEP.</p></details><details><summary>Cuidados com a peça</summary><p>Consulte as orientações que acompanham a peça. Os cuidados variam conforme o formato e o recipiente.</p></details></div></div><div class="related"><p class="eyebrow">Continue explorando</p><h2 class="display">Outras formas de encantar</h2><div class="grid">${related.map(r=>lioraCardHTML(r)).join('')}</div></div></section>`);
@@ -95,7 +99,7 @@ fs.writeFileSync(path.join(out,'sitemap.xml'),`<?xml version="1.0" encoding="UTF
 fs.writeFileSync(path.join(out,'robots.txt'),`User-agent: *\nAllow: /\n\nSitemap: ${base}/sitemap.xml\n`);
 fs.writeFileSync(path.join(out,'404.html'),template.replace(/<title>.*?<\/title>/,`<title>Página não encontrada | Liora</title><meta name="robots" content="noindex">`).replace(/<main id="conteudo">[\s\S]*?<\/main>/,'<main id="conteudo"><section class="wrap section"><div class="page-intro"><p class="eyebrow">404</p><h1 class="display">Esta página não foi encontrada</h1><p>Explore as coleções para encontrar sua Liora.</p><a class="btn btn-ink" href="/velas-aromaticas/">Ver as velas</a></div></section></main>'));
 fs.writeFileSync(path.join(root,'docs/seo-routes.json'),JSON.stringify(pages,null,2)+'\n');
-console.log(`Generated ${pages.length} pages, 27 products, sitemap and robots in dist/`);
+console.log(`Generated ${pages.length} pages, ${products.length} products, sitemap and robots in dist/`);
 
 if(process.env.VERCEL_ENV==='preview'||process.env.LIORA_PREVIEW_QA==='1'){
  fs.mkdirSync(path.join(out,'__preview-qa'),{recursive:true});

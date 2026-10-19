@@ -47,7 +47,9 @@ const singleUnits = [
 const incompleteIds = [
   'vela-escultural-lady-veil-phie3',
   'vela-decorativa-anjo-em-vitral-1sbe9',
-  'botanique-150-gr-1gyzj'
+  'botanique-150-gr-1gyzj',
+  'caixa-redonda-floral', 'vaso-floral-metal', 'caixa-flor-solitaria',
+  'caixa-quadrada-media', 'caixa-floral-grande'
 ];
 
 function checkParcelGeometryAndWeight(result) {
@@ -112,10 +114,10 @@ function checkParcelGeometryAndWeight(result) {
   assert.equal(result.totalWeightGrams, totalWeight);
 }
 
-test('tabela cobre os 27 SKUs: 23 estimáveis, 3 incompletos e 1 sem caixa', () => {
+test('tabela cobre os 32 SKUs: 23 estimáveis, 8 incompletos e 1 sem caixa', () => {
   const coveredIds = [...singleUnits.map(([id]) => id), ...incompleteIds, 'jardim-encantado'];
   assert.equal(singleUnits.length, 23);
-  assert.equal(new Set(coveredIds).size, 27);
+  assert.equal(new Set(coveredIds).size, 32);
   assert.deepEqual(coveredIds.sort(), Object.keys(catalog).sort());
 });
 

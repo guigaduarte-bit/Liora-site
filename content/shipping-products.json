@@ -418,5 +418,65 @@
       "field": "dims",
       "text": "Peso: 200g · Medidas: 12cm x 8cm x 15cm (C x L x A)"
     }
+  },
+  "caixa-redonda-floral": {
+    "weightGrams": null,
+    "dimensionsCm": null,
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": ""
+    }
+  },
+  "vaso-floral-metal": {
+    "weightGrams": null,
+    "dimensionsCm": null,
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": ""
+    }
+  },
+  "caixa-flor-solitaria": {
+    "weightGrams": null,
+    "dimensionsCm": null,
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": ""
+    }
+  },
+  "caixa-quadrada-media": {
+    "weightGrams": null,
+    "dimensionsCm": null,
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": ""
+    }
+  },
+  "caixa-floral-grande": {
+    "weightGrams": null,
+    "dimensionsCm": null,
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": ""
+    }
   }
 }

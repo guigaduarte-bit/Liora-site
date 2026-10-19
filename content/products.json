@@ -309,17 +309,31 @@
   },
   {
     "id": "jardim-encantado",
-    "name": "JARDIM ENCANTADO",
-    "price": 85.0,
-    "old": 89.9,
+    "name": "Vaso floral de cerâmica",
+    "price": 89.9,
+    "old": null,
     "stock": 3,
     "soldout": false,
     "cats": [
       "Flora Linea"
     ],
-    "desc": "Decore ambientes com arranjo de velas florais em vaso decorativo. Ideal para trazer charme e aroma suave.",
+    "desc": "Flores em forma de velas reunidas em vaso de cerâmica. Explore as apresentações da coleção Flora Línea nas fotos do mesmo modelo.",
     "dims": "Peso: 700gr · Medidas: 15cmX15cmX18cm (CXLXA)",
-    "frag": true
+    "frag": true,
+    "images": [
+      {
+        "src": "/assets/images/jardim-encantado.webp",
+        "alt": "Vaso floral de cerâmica branco com flores amarelas"
+      },
+      {
+        "src": "/assets/images/jardim-encantado-verde.webp",
+        "alt": "Vaso floral de cerâmica verde com flores rosa e lilás"
+      },
+      {
+        "src": "/assets/images/jardim-encantado-lilas.webp",
+        "alt": "Vaso floral de cerâmica verde com flores em tons de lilás"
+      }
+    ]
   },
   {
     "id": "camafeufada",
@@ -337,17 +351,23 @@
   },
   {
     "id": "botanicavasogesso",
-    "name": "JARDIM ENCANTADO",
-    "price": 75.0,
-    "old": 79.9,
+    "name": "Vaso de gesso floral",
+    "price": 59.9,
+    "old": null,
     "stock": 0,
     "soldout": true,
     "cats": [
       "Flora Linea"
     ],
-    "desc": "Vela artesanal em vaso com flores detalhadas, perfeita para decorar com charme e delicadeza. Adquira já a sua!",
+    "desc": "Arranjo de velas em formato de flores em vaso de gesso com detalhes geométricos. Uma composição da coleção Flora Línea para decorar e presentear.",
     "dims": "Peso: 200gr · Medidas: 12cmX12cmX12cm (CXLXA)",
-    "frag": true
+    "frag": true,
+    "images": [
+      {
+        "src": "/assets/images/botanicavasogesso.webp",
+        "alt": "Arranjos florais em vasos de gesso; preço por unidade"
+      }
+    ]
   },
   {
     "id": "peonia",
@@ -376,5 +396,114 @@
     "desc": "Escultura Família Sagrada em material liso, ideal para decoração religiosa. Adquira já e valorize seu ambiente com arte e fé.",
     "dims": "Peso: 200g · Medidas: 12cm x 8cm x 15cm (C x L x A)",
     "frag": true
+  },
+  {
+    "id": "caixa-redonda-floral",
+    "name": "Caixa redonda floral",
+    "price": 89.9,
+    "old": null,
+    "stock": 0,
+    "soldout": true,
+    "availabilityPending": true,
+    "cats": [
+      "Flora Linea"
+    ],
+    "desc": "Arranjo de velas florais em caixa redonda com detalhes vazados. As duas composições fotografadas estão reunidas neste modelo da coleção Flora Línea.",
+    "dims": "",
+    "frag": true,
+    "images": [
+      {
+        "src": "/assets/images/caixa-redonda-floral.webp",
+        "alt": "Caixa redonda com arranjo de velas florais e tampa Liora"
+      },
+      {
+        "src": "/assets/images/caixa-redonda-floral-rosa.webp",
+        "alt": "Caixa redonda com velas florais em tons de rosa e creme"
+      }
+    ]
+  },
+  {
+    "id": "vaso-floral-metal",
+    "name": "Vaso floral de metal",
+    "price": 89.9,
+    "old": null,
+    "stock": 0,
+    "soldout": true,
+    "availabilityPending": true,
+    "cats": [
+      "Flora Linea"
+    ],
+    "desc": "Arranjo de velas florais em vaso de metal. A apresentação fotografada reúne flores claras e um pássaro em uma composição da coleção Flora Línea.",
+    "dims": "",
+    "frag": true,
+    "images": [
+      {
+        "src": "/assets/images/vaso-floral-metal.webp",
+        "alt": "Vaso de metal vermelho com velas florais brancas e pássaro"
+      }
+    ]
+  },
+  {
+    "id": "caixa-flor-solitaria",
+    "name": "Caixa flor solitária",
+    "price": 15.0,
+    "old": null,
+    "stock": 0,
+    "soldout": true,
+    "availabilityPending": true,
+    "cats": [
+      "Flora Linea"
+    ],
+    "desc": "Uma vela em formato de flor apresentada em caixa individual. Um detalhe da coleção Flora Línea para presentear.",
+    "dims": "",
+    "frag": true,
+    "images": [
+      {
+        "src": "/assets/images/caixa-flor-solitaria.webp",
+        "alt": "Caixas com uma vela em formato de flor; preço por unidade"
+      }
+    ]
+  },
+  {
+    "id": "caixa-quadrada-media",
+    "name": "Caixa quadrada média",
+    "price": 69.9,
+    "old": null,
+    "stock": 0,
+    "soldout": true,
+    "availabilityPending": true,
+    "cats": [
+      "Flora Linea"
+    ],
+    "desc": "Composição de velas florais em caixa média com tampa decorada. Flores em diferentes tons se encontram nesta apresentação da coleção Flora Línea.",
+    "dims": "",
+    "frag": true,
+    "images": [
+      {
+        "src": "/assets/images/caixa-quadrada-media.webp",
+        "alt": "Caixa média com velas florais em tons de rosa e lilás"
+      }
+    ]
+  },
+  {
+    "id": "caixa-floral-grande",
+    "name": "Caixa floral grande",
+    "price": 129.9,
+    "old": null,
+    "stock": 0,
+    "soldout": true,
+    "availabilityPending": true,
+    "cats": [
+      "Flora Linea"
+    ],
+    "desc": "Arranjo de velas florais em caixa grande com contorno de flor e tampa decorada. Uma composição da coleção Flora Línea para ocasiões especiais.",
+    "dims": "",
+    "frag": true,
+    "images": [
+      {
+        "src": "/assets/images/caixa-floral-grande.webp",
+        "alt": "Caixa floral grande em formato de flor com velas coloridas"
+      }
+    ]
   }
 ]
