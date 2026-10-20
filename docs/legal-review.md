@@ -84,3 +84,13 @@ A autorização não inclui CPF, endereço residencial, telefone nem e-mail pess
 O [Decreto 7.962/2013](https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2013/decreto/d7962.htm), consultado em 01/10/2026, exige identificação e endereço físico/eletrônico, atendimento eletrônico eficaz, confirmação do recebimento das demandas e manifestação em até cinco dias. Essas exigências não são supridas apenas por CNPJ e perfil social. A restrição de dados pessoais precisa ser conciliada com uma solução comercial real pela responsável, sem publicação automática do endereço residencial.
 
 Evidência desta rodada: leitura do cadastro empresarial, transformações do build, três páginas legais e plano de continuidade; consulta pública de DNS e documentação oficial. Não houve nova validação jurídica integral, teste de atendimento, mudança de política pública ou aprovação de produção.
+
+## Atendimento de disponibilidade pelo WhatsApp — 20/10/2026
+
+O usuário solicitou que o botão de consulta de disponibilidade direcione ao seu WhatsApp. Esta instrução autoriza o link de atendimento da Liora neste fluxo e atualiza a restrição histórica relativa a esse contato específico. O destino é o mesmo WhatsApp comercial já publicado no site antes do commit `22596bd` e associado aos cartões da Liora, configurado em `content/contact.json`. Nenhum outro telefone, endereço ou e-mail pessoal foi acrescentado.
+
+Nos produtos com `availabilityPending`, “Consultar disponibilidade” abre o WhatsApp com o nome da peça e o endereço público da página. A mensagem fica preenchida para o cliente revisar e enviar; o site não a envia automaticamente. Cards, páginas dos produtos, visualização rápida e favoritos compartilham o mesmo destino. O estoque, a indicação “Disponibilidade a confirmar” e o bloqueio de compra desses produtos permanecem.
+
+O link foi preparado em preview, sujeito à validação já solicitada antes da publicação em produção. A existência do link não comprova recebimento/resposta, cumprimento de prazos, procedimentos de privacidade ou a operação de outros canais comerciais.
+
+Verificação desta alteração: 192 testes aprovados; os sete links gerados apontam ao contato configurado, com nome e URL da peça. A execução isolada da visualização rápida e dos favoritos confirmou o link e a preservação do carrinho. Foco por teclado e links nativos foram revisados no código. A conferência visual, de toque e de navegação real ficou não verificada: o executável Chromium não estava disponível e o download retornou arquivo inválido. Nenhuma mensagem foi enviada e nenhuma conversa foi acessada.

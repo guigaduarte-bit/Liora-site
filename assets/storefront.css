@@ -144,7 +144,12 @@ nav.main a:hover::after{width:100%}
 .wish-btn svg{width:17px;height:17px;fill:none;stroke:var(--ink);stroke-width:1.4;transition:all .25s}
 .wish-btn.on svg{fill:var(--gold);stroke:var(--gold)}
 .quick-add{position:absolute;left:0;right:0;bottom:0;background:rgba(36,27,18,.92);color:var(--cream);font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;padding:15px;transform:translateY(100%);transition:transform .4s ease,background .3s;z-index:2}
-.card:hover .quick-add{transform:none}
+.card:hover .quick-add,.card:focus-within .quick-add{transform:none}
+.quick-add.availability-link{text-align:center}
+.quick-add.availability-link:hover{background:var(--umber)}
+.quick-add.availability-link:focus-visible{outline:2px solid var(--cream);outline-offset:-4px}
+.m-actions .availability-link{flex:1;text-align:center}
+.ci-right .availability-link{display:inline-block;max-width:160px;margin-top:8px;font-size:11px;text-decoration:underline}
 .quick-add:hover{background:var(--gold)}
 .quick-add[disabled]{background:#857664;cursor:not-allowed}
 .card-info{padding:18px 4px 6px;text-align:center}

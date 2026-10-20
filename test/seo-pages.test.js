@@ -6,6 +6,7 @@ const path=require('node:path');
 const vm=require('node:vm');
 const catalog=require('../api/catalog');
 const business=require('../content/business.json');
+const contact=require('../content/contact.json');
 const routes=require('../docs/seo-routes.json');
 const root=path.join(__dirname,'../dist');
 const read=url=>fs.readFileSync(path.join(root,url.endsWith('/')?url.slice(1)+'index.html':url.slice(1)),'utf8');
@@ -21,9 +22,10 @@ test('todas as páginas têm conteúdo inicial, metadados únicos e destinos rea
   assert.ok(!titles.has(title),`duplicate title ${url}`);titles.add(title);
   assert.ok(!descriptions.has(desc),`duplicate description ${url}`);descriptions.add(desc);
   assert.doesNotMatch(html,/<meta name="robots"[^>]+noindex/,url);
-  // CNPJ and registered business name were explicitly supplied for display on
-  // 27/09/2026. Personal contact channels and CPF remain outside this preview.
-  assert.doesNotMatch(html,/mailto:|wa\.me\/|jullianas@gmail|id="newsForm"|\b\d{3}\.\d{3}\.\d{3}-\d{2}\b/,url);
+  // The user authorized product availability links to the existing Liora
+  // WhatsApp on 20/10/2026. Other personal contact data remains excluded.
+  assert.doesNotMatch(html,/mailto:|jullianas@gmail|id="newsForm"|\b\d{3}\.\d{3}\.\d{3}-\d{2}\b/,url);
+  for(const [,number] of html.matchAll(/https:\/\/wa\.me\/(\d+)/g))assert.equal(number,contact.whatsapp,url);
   if(business.cnpj){
    const footer=html.match(/<footer\b[\s\S]*?<\/footer>/)[0];
    assert.ok(footer.includes(`CNPJ ${business.cnpj}`),`missing business CNPJ ${url}`);
@@ -45,10 +47,19 @@ test('produtos têm preço, disponibilidade e identificador coerentes no HTML e 
   assert.equal(schema.sku,id);assert.equal(schema.offers.price,p.price);assert.equal(schema.offers.priceCurrency,'BRL');
   assert.equal(schema.offers.availability,`https://schema.org/${p.soldout?'OutOfStock':'InStock'}`);
   const data=client.window.LIORA_PRODUCTS.find(x=>x.id===id);assert.equal(data.price,p.price);assert.equal(data.stock,p.stock);assert.equal(data.name,p.name);
-  assert.ok(html.includes(`productAdd(event,'${id}')`));
+  if(data.availabilityPending){
+   const contactUrl=new URL(data.availabilityUrl);
+   assert.equal(contactUrl.origin,'https://wa.me');
+   assert.equal(contactUrl.pathname,`/${contact.whatsapp}`);
+   assert.ok(contactUrl.searchParams.get('text').includes(data.displayName));
+   assert.ok(contactUrl.searchParams.get('text').includes(`${base}/produtos/${id}/`));
+   assert.ok(html.includes(`href="${data.availabilityUrl}" target="_blank" rel="noopener noreferrer"`));
+   assert.ok(html.includes('>Consultar disponibilidade</a>'));
+   assert.ok(!html.includes(`productAdd(event,'${id}')`));
+  }else assert.ok(html.includes(`productAdd(event,'${id}')`));
   assert.ok(html.includes(p.price.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})));
   assert.ok(schemas.some(s=>s['@type']==='BreadcrumbList'));
-  if(p.soldout)assert.ok(html.includes(`<button class="btn btn-ink" type="submit" disabled>${data.availabilityPending?'Disponibilidade a confirmar':'Produto esgotado'}`));
+  if(p.soldout&&!data.availabilityPending)assert.ok(html.includes('<button class="btn btn-ink" type="submit" disabled>Produto esgotado'));
  }
 });
 test('sitemap cobre os destinos canônicos e home expõe links de todos os produtos sem JavaScript',()=>{

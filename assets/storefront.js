@@ -167,7 +167,7 @@ function renderDrawer(){
         <div><p class="ci-name">${escapeAttr(p.displayName||p.name)}</p><p class="ci-meta">${p.cats[0]||''}</p>
         <button class="ci-remove" onclick="toggleWish('${p.id}')">Remover</button></div>
         <div class="ci-right"><span class="ci-price">${money(p.price)}</span>
-        ${p.soldout?`<span class="ci-meta">${p.availabilityPending?'Disponibilidade a confirmar':'Esgotado'}</span>`:`<button class="btn btn-ink" style="padding:10px 14px;font-size:9px" onclick="quickAdd('${p.id}')">Mover ao carrinho</button>`}</div>
+        ${p.availabilityPending?lioraAvailabilityLink(p,'ci-availability'):p.soldout?'<span class="ci-meta">Esgotado</span>':`<button class="btn btn-ink" style="padding:10px 14px;font-size:9px" onclick="quickAdd('${p.id}')">Mover ao carrinho</button>`}</div>
       </div>`}).join('');
     foot.innerHTML='';return;
   }
@@ -467,10 +467,10 @@ function renderQuick(){
       <label class="opt-label" for="fragIn">Qual fragrância você deseja? (opcional)</label>
       <input class="frag-input" id="fragIn" maxlength="60" placeholder="Ex.: Lavanda Sofisticada, Dolci Notte…" value="">`:''}
       <div class="m-actions">
-        <div class="qty" style="height:48px">
+        ${p.availabilityPending?lioraAvailabilityLink(p):`<div class="qty" style="height:48px">
           <button style="width:42px;height:46px" onclick="quick.qty=Math.max(1,quick.qty-1);syncQty()" aria-label="Diminuir">−</button><span id="qQty">${quick.qty}</span><button style="width:42px;height:46px" onclick="quick.qty++;syncQty()" aria-label="Aumentar">+</button>
         </div>
-        <button class="btn btn-ink" style="flex:1" id="qAdd" ${p.soldout?'disabled':''} onclick="modalAdd('${p.id}')">${p.availabilityPending?'Disponibilidade a confirmar':p.soldout?'Esgotado':`Comprar · ${money(p.price*quick.qty)}`}</button>
+        <button class="btn btn-ink" style="flex:1" id="qAdd" ${p.soldout?'disabled':''} onclick="modalAdd('${p.id}')">${p.soldout?'Esgotado':`Comprar · ${money(p.price*quick.qty)}`}</button>`}
       </div>
       <div class="m-specs">
         <div><svg viewBox="0 0 24 24"><path d="M12 3c3.5 4.2 5.5 7.2 5.5 10a5.5 5.5 0 0 1-11 0c0-2.8 2-5.8 5.5-10z"/></svg>Feito à mão</div>
