@@ -7,10 +7,7 @@
     "stock": 10,
     "soldout": false,
     "cats": [
-      "Essenciais",
-      "Esculturas",
-      "Clássico",
-      "Kits e Presentes"
+      "Esculturas"
     ],
     "desc": "Vela decorativa feminina em formato de busto com véu e flores, perfeita para dar sofisticação ao seu ambiente.",
     "dims": "Peso: 110gr",
@@ -24,9 +21,7 @@
     "stock": 20,
     "soldout": false,
     "cats": [
-      "Essenciais",
-      "Esculturas",
-      "Kits e Presentes"
+      "Esculturas"
     ],
     "desc": "Vela decorativa com anjo e criança, ornamentos florais e moldura detalhada. Perfeita para decorar ou presentear.",
     "dims": "Peso: 100 gr · Medidas: 11cm x 6,2 cm",
@@ -40,9 +35,7 @@
     "stock": 2,
     "soldout": false,
     "cats": [
-      "Essenciais",
-      "Flora Linea",
-      "Kits e Presentes"
+      "Boho Glass"
     ],
     "desc": "Vela em vidro, luminária,com tampa metálica, decorada com pássaros e flores, perfeita para decorar e ambientar. Aproveite e compre já!",
     "dims": "Peso total: 475 g · Altura: 16 cm · Diâmetro: 9 cm",
@@ -56,8 +49,7 @@
     "stock": 12,
     "soldout": false,
     "cats": [
-      "Essenciais",
-      "Flora Linea"
+      "Boho Glass"
     ],
     "desc": "Conjunto de velas decorativas em copo de vidro com tampa de madeira, estampas florais e de pássaro. Decore e aromatize seu ambiente. Compre já!",
     "dims": "",
@@ -71,9 +63,7 @@
     "stock": 5,
     "soldout": false,
     "cats": [
-      "Essenciais",
-      "Flora Linea",
-      "Kits e Presentes"
+      "Boho Glass"
     ],
     "desc": "Vela perfumada em copo de vidro com tampa de madeira e estampa floral delicada. Decore e aromatize seu ambiente com charme. Compre já!",
     "dims": "Peso 70gr | Medidas: 9cm x 9cm x 7cm (C x L x A) · Medidas: 9cm x 9cm x 7cm (C x L x A)",
@@ -87,7 +77,7 @@
     "stock": 30,
     "soldout": false,
     "cats": [
-      "Essenciais"
+      "Esculturas"
     ],
     "desc": "Pedidos acima de 20 unidades: 10% de desconto\nPedidos acima de 30 unidades: 15% de desconto\nPedidos acima de 50 unidades: 20% de desconto\nPeças feitas a mão, com intenção.\nPrazo confecção - 5 a 7 dias.",
     "dims": "Peso: 40gr · Medidas: 4cmX4cmX5cm (CXLXA)",
@@ -129,7 +119,7 @@
     "stock": 30,
     "soldout": false,
     "cats": [
-      "Essenciais"
+      "Esculturas"
     ],
     "desc": "Vela decorativa bolinhas pequena com textura em relevo e acabamento liso para um toque acolhedor. Ideal para decorar ambientes.",
     "dims": "Peso: 40gr · Medidas: 4cmX4cmX4cm (CXLXA)",
@@ -157,7 +147,7 @@
     "stock": 5,
     "soldout": false,
     "cats": [
-      "Essenciais"
+      "Esculturas"
     ],
     "desc": "Decore seu ambiente com a vela nó entrelaçada. Textura artesanal única e exclusiva.",
     "dims": "Peso: 55gr · Medidas: 8cmX8cmX8cm (CXLXA)",
@@ -241,8 +231,7 @@
     "stock": 2,
     "soldout": false,
     "cats": [
-      "Boho Glass",
-      "Kits e Presentes"
+      "Boho Glass"
     ],
     "desc": "Vela perfumada em vidro listrado com tampa bolinhas para ambientes aromatizados com estilo. Compre já!",
     "dims": "Peso: 350gr · Medidas: 8cmX8cmX10cm (CXLXA)",
@@ -320,18 +309,32 @@
   },
   {
     "id": "jardim-encantado",
-    "name": "JARDIM ENCANTADO",
-    "price": 85.0,
-    "old": 89.9,
-    "stock": 3,
-    "soldout": false,
+    "name": "Vaso floral de cerâmica",
+    "price": 89.9,
+    "old": null,
+    "stock": 10,
+    "soldout": true,
+    "availabilityPending": true,
     "cats": [
-      "Flora Linea",
-      "Kits e Presentes"
+      "Flora Linea"
     ],
-    "desc": "Decore ambientes com arranjo de velas florais em vaso decorativo. Ideal para trazer charme e aroma suave.",
-    "dims": "Peso: 700gr · Medidas: 15cmX15cmX18cm (CXLXA)",
-    "frag": true
+    "desc": "Flores em forma de velas reunidas em vaso de cerâmica. Explore as apresentações da coleção Flora Línea nas fotos do mesmo modelo.",
+    "dims": "Peso total da peça: 520 g · Medidas: 15cmX15cmX18cm (CXLXA)",
+    "frag": true,
+    "images": [
+      {
+        "src": "/assets/images/jardim-encantado.webp",
+        "alt": "Vaso floral de cerâmica branco com flores amarelas"
+      },
+      {
+        "src": "/assets/images/jardim-encantado-verde.webp",
+        "alt": "Vaso floral de cerâmica verde com flores rosa e lilás"
+      },
+      {
+        "src": "/assets/images/jardim-encantado-lilas.webp",
+        "alt": "Vaso floral de cerâmica verde com flores em tons de lilás"
+      }
+    ]
   },
   {
     "id": "camafeufada",
@@ -341,10 +344,7 @@
     "stock": 30,
     "soldout": false,
     "cats": [
-      "Essenciais",
-      "Esculturas",
-      "Clássico",
-      "Kits e Presentes"
+      "Esculturas"
     ],
     "desc": "Presente decorativo com fita e relevo de fada com flores para um ambiente delicado e clássico. Decore com charme, compre agora!",
     "dims": "Peso: 50gr · Medidas: 10cmX8cmX11cm (CXLXA).",
@@ -352,17 +352,24 @@
   },
   {
     "id": "botanicavasogesso",
-    "name": "JARDIM ENCANTADO",
-    "price": 75.0,
-    "old": 79.9,
-    "stock": 0,
+    "name": "Vaso de gesso floral",
+    "price": 59.9,
+    "old": null,
+    "stock": 10,
     "soldout": true,
+    "availabilityPending": true,
     "cats": [
       "Flora Linea"
     ],
-    "desc": "Vela artesanal em vaso com flores detalhadas, perfeita para decorar com charme e delicadeza. Adquira já a sua!",
-    "dims": "Peso: 200gr · Medidas: 12cmX12cmX12cm (CXLXA)",
-    "frag": true
+    "desc": "Arranjo de velas em formato de flores em vaso de gesso com detalhes geométricos. Uma composição da coleção Flora Línea para decorar e presentear.",
+    "dims": "Peso total da peça: 200 g · Medidas: 12cmX12cmX12cm (CXLXA)",
+    "frag": true,
+    "images": [
+      {
+        "src": "/assets/images/botanicavasogesso.webp",
+        "alt": "Arranjos florais em vasos de gesso; preço por unidade"
+      }
+    ]
   },
   {
     "id": "peonia",
@@ -386,11 +393,119 @@
     "stock": 5,
     "soldout": false,
     "cats": [
-      "Essenciais",
       "Esculturas"
     ],
     "desc": "Escultura Família Sagrada em material liso, ideal para decoração religiosa. Adquira já e valorize seu ambiente com arte e fé.",
     "dims": "Peso: 200g · Medidas: 12cm x 8cm x 15cm (C x L x A)",
     "frag": true
+  },
+  {
+    "id": "caixa-redonda-floral",
+    "name": "Caixa redonda floral",
+    "price": 89.9,
+    "old": null,
+    "stock": 10,
+    "soldout": true,
+    "availabilityPending": true,
+    "cats": [
+      "Flora Linea"
+    ],
+    "desc": "Arranjo de velas florais em caixa redonda com detalhes vazados. As duas composições fotografadas estão reunidas neste modelo da coleção Flora Línea.",
+    "dims": "Peso total da peça: 460 g · Medidas estimadas (C × L × A): 20 × 20 × 12 cm",
+    "frag": true,
+    "images": [
+      {
+        "src": "/assets/images/caixa-redonda-floral.webp",
+        "alt": "Caixa redonda com arranjo de velas florais e tampa Liora"
+      },
+      {
+        "src": "/assets/images/caixa-redonda-floral-rosa.webp",
+        "alt": "Caixa redonda com velas florais em tons de rosa e creme"
+      }
+    ]
+  },
+  {
+    "id": "vaso-floral-metal",
+    "name": "Vaso floral de metal",
+    "price": 89.9,
+    "old": null,
+    "stock": 10,
+    "soldout": true,
+    "availabilityPending": true,
+    "cats": [
+      "Flora Linea"
+    ],
+    "desc": "Arranjo de velas florais em vaso de metal. A apresentação fotografada reúne flores claras e um pássaro em uma composição da coleção Flora Línea.",
+    "dims": "Peso total da peça: 265 g · Medidas estimadas (C × L × A): 16 × 16 × 22 cm",
+    "frag": true,
+    "images": [
+      {
+        "src": "/assets/images/vaso-floral-metal.webp",
+        "alt": "Vaso de metal vermelho com velas florais brancas e pássaro"
+      }
+    ]
+  },
+  {
+    "id": "caixa-flor-solitaria",
+    "name": "Caixa flor solitária",
+    "price": 15.0,
+    "old": null,
+    "stock": 10,
+    "soldout": true,
+    "availabilityPending": true,
+    "cats": [
+      "Flora Linea"
+    ],
+    "desc": "Uma vela em formato de flor apresentada em caixa individual. Um detalhe da coleção Flora Línea para presentear.",
+    "dims": "Peso total da peça: 100 g · Medidas estimadas (C × L × A): 10 × 10 × 6 cm",
+    "frag": true,
+    "images": [
+      {
+        "src": "/assets/images/caixa-flor-solitaria.webp",
+        "alt": "Caixas com uma vela em formato de flor; preço por unidade"
+      }
+    ]
+  },
+  {
+    "id": "caixa-quadrada-media",
+    "name": "Caixa quadrada média",
+    "price": 69.9,
+    "old": null,
+    "stock": 10,
+    "soldout": true,
+    "availabilityPending": true,
+    "cats": [
+      "Flora Linea"
+    ],
+    "desc": "Composição de velas florais em caixa média com tampa decorada. Flores em diferentes tons se encontram nesta apresentação da coleção Flora Línea.",
+    "dims": "Peso total da peça: 420 g · Medidas estimadas (C × L × A): 20 × 20 × 10 cm",
+    "frag": true,
+    "images": [
+      {
+        "src": "/assets/images/caixa-quadrada-media.webp",
+        "alt": "Caixa média com velas florais em tons de rosa e lilás"
+      }
+    ]
+  },
+  {
+    "id": "caixa-floral-grande",
+    "name": "Caixa floral grande",
+    "price": 129.9,
+    "old": null,
+    "stock": 10,
+    "soldout": true,
+    "availabilityPending": true,
+    "cats": [
+      "Flora Linea"
+    ],
+    "desc": "Arranjo de velas florais em caixa grande com contorno de flor e tampa decorada. Uma composição da coleção Flora Línea para ocasiões especiais.",
+    "dims": "Peso total da peça: 480 g · Medidas estimadas (C × L × A): 24 × 24 × 10 cm",
+    "frag": true,
+    "images": [
+      {
+        "src": "/assets/images/caixa-floral-grande.webp",
+        "alt": "Caixa floral grande em formato de flor com velas coloridas"
+      }
+    ]
   }
 ]

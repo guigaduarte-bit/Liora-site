@@ -26,10 +26,23 @@
     "bytes": 4004
   },
   "/assets/images/botanicavasogesso.webp": {
-    "width": 342,
-    "height": 180,
-    "variants": [],
-    "bytes": 5568
+    "width": 1440,
+    "height": 1080,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/botanicavasogesso-360.webp",
+        "width": 360,
+        "height": 270,
+        "bytes": 21956
+      },
+      {
+        "src": "/assets/images/responsive/botanicavasogesso-720.webp",
+        "width": 720,
+        "height": 540,
+        "bytes": 58370
+      }
+    ],
+    "bytes": 168438
   },
   "/assets/images/botanique-150-gr-1gyzj.webp": {
     "width": 560,
@@ -159,17 +172,23 @@
     "bytes": 5474
   },
   "/assets/images/jardim-encantado.webp": {
-    "width": 560,
-    "height": 746,
+    "width": 960,
+    "height": 1415,
     "variants": [
       {
         "src": "/assets/images/responsive/jardim-encantado-360.webp",
         "width": 360,
-        "height": 480,
-        "bytes": 56736
+        "height": 531,
+        "bytes": 33118
+      },
+      {
+        "src": "/assets/images/responsive/jardim-encantado-720.webp",
+        "width": 720,
+        "height": 1061,
+        "bytes": 85472
       }
     ],
-    "bytes": 80738
+    "bytes": 150320
   },
   "/assets/images/kit-boho-glass.webp": {
     "width": 560,
@@ -369,5 +388,176 @@
       }
     ],
     "bytes": 47404
+  },
+  "/assets/images/jardim-encantado-verde.webp": {
+    "width": 960,
+    "height": 1265,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/jardim-encantado-verde-360.webp",
+        "width": 360,
+        "height": 474,
+        "bytes": 33296
+      },
+      {
+        "src": "/assets/images/responsive/jardim-encantado-verde-720.webp",
+        "width": 720,
+        "height": 949,
+        "bytes": 88224
+      }
+    ],
+    "bytes": 154834
+  },
+  "/assets/images/jardim-encantado-lilas.webp": {
+    "width": 1080,
+    "height": 1440,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/jardim-encantado-lilas-360.webp",
+        "width": 360,
+        "height": 480,
+        "bytes": 62092
+      },
+      {
+        "src": "/assets/images/responsive/jardim-encantado-lilas-720.webp",
+        "width": 720,
+        "height": 960,
+        "bytes": 202302
+      }
+    ],
+    "bytes": 458010
+  },
+  "/assets/images/caixa-redonda-floral.webp": {
+    "width": 960,
+    "height": 1275,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/caixa-redonda-floral-360.webp",
+        "width": 360,
+        "height": 478,
+        "bytes": 37716
+      },
+      {
+        "src": "/assets/images/responsive/caixa-redonda-floral-720.webp",
+        "width": 720,
+        "height": 956,
+        "bytes": 112026
+      }
+    ],
+    "bytes": 205184
+  },
+  "/assets/images/caixa-redonda-floral-rosa.webp": {
+    "width": 1080,
+    "height": 1440,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/caixa-redonda-floral-rosa-360.webp",
+        "width": 360,
+        "height": 480,
+        "bytes": 39970
+      },
+      {
+        "src": "/assets/images/responsive/caixa-redonda-floral-rosa-720.webp",
+        "width": 720,
+        "height": 960,
+        "bytes": 102992
+      }
+    ],
+    "bytes": 213696
+  },
+  "/assets/images/vaso-floral-metal.webp": {
+    "width": 960,
+    "height": 1274,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/vaso-floral-metal-360.webp",
+        "width": 360,
+        "height": 478,
+        "bytes": 28748
+      },
+      {
+        "src": "/assets/images/responsive/vaso-floral-metal-720.webp",
+        "width": 720,
+        "height": 956,
+        "bytes": 71862
+      }
+    ],
+    "bytes": 121984
+  },
+  "/assets/images/caixa-flor-solitaria.webp": {
+    "width": 960,
+    "height": 1277,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/caixa-flor-solitaria-360.webp",
+        "width": 360,
+        "height": 479,
+        "bytes": 33664
+      },
+      {
+        "src": "/assets/images/responsive/caixa-flor-solitaria-720.webp",
+        "width": 720,
+        "height": 958,
+        "bytes": 88786
+      }
+    ],
+    "bytes": 162812
+  },
+  "/assets/images/caixa-quadrada-media.webp": {
+    "width": 788,
+    "height": 1173,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/caixa-quadrada-media-360.webp",
+        "width": 360,
+        "height": 536,
+        "bytes": 29168
+      },
+      {
+        "src": "/assets/images/responsive/caixa-quadrada-media-720.webp",
+        "width": 720,
+        "height": 1072,
+        "bytes": 75926
+      }
+    ],
+    "bytes": 104638
+  },
+  "/assets/images/caixa-floral-grande.webp": {
+    "width": 786,
+    "height": 1114,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/caixa-floral-grande-360.webp",
+        "width": 360,
+        "height": 510,
+        "bytes": 28928
+      },
+      {
+        "src": "/assets/images/responsive/caixa-floral-grande-720.webp",
+        "width": 720,
+        "height": 1020,
+        "bytes": 75042
+      }
+    ],
+    "bytes": 101644
+  },
+  "/assets/images/flora-linea-arranjos.webp": {
+    "width": 960,
+    "height": 945,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/flora-linea-arranjos-360.webp",
+        "width": 360,
+        "height": 354,
+        "bytes": 33802
+      },
+      {
+        "src": "/assets/images/responsive/flora-linea-arranjos-720.webp",
+        "width": 720,
+        "height": 709,
+        "bytes": 92428
+      }
+    ],
+    "bytes": 162772
   }
 }

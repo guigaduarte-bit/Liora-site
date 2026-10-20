@@ -35,9 +35,9 @@ test('todas as páginas têm conteúdo inicial, metadados únicos e destinos rea
   }
  }
 });
-test('27 produtos têm preço, disponibilidade e identificador coerentes no HTML e schema',()=>{
+test('produtos têm preço, disponibilidade e identificador coerentes no HTML e schema',()=>{
  const client={window:{}};vm.runInNewContext(fs.readFileSync(path.join(root,'assets/catalog.js'),'utf8'),client);
- assert.equal(client.window.LIORA_PRODUCTS.length,27);
+ assert.equal(client.window.LIORA_PRODUCTS.length,Object.keys(catalog).length);
  for(const [id,p] of Object.entries(catalog)){
   const html=read(`/produtos/${id}/`);
   const schemas=[...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/g)].map(m=>JSON.parse(m[1]));
@@ -48,10 +48,10 @@ test('27 produtos têm preço, disponibilidade e identificador coerentes no HTML
   assert.ok(html.includes(`productAdd(event,'${id}')`));
   assert.ok(html.includes(p.price.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})));
   assert.ok(schemas.some(s=>s['@type']==='BreadcrumbList'));
-  if(p.soldout)assert.match(html,/<button class="btn btn-ink" type="submit" disabled>Produto esgotado/);
+  if(p.soldout)assert.ok(html.includes(`<button class="btn btn-ink" type="submit" disabled>${data.availabilityPending?'Disponibilidade a confirmar':'Produto esgotado'}`));
  }
 });
-test('sitemap cobre os destinos canônicos e home expõe links dos 27 produtos sem JavaScript',()=>{
+test('sitemap cobre os destinos canônicos e home expõe links de todos os produtos sem JavaScript',()=>{
  const sitemap=fs.readFileSync(path.join(root,'sitemap.xml'),'utf8');
  assert.equal([...sitemap.matchAll(/<loc>/g)].length,routes.length);
  for(const url of routes)assert.ok(sitemap.includes(`<loc>${base+url}</loc>`));

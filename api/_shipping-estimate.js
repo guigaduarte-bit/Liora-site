@@ -138,6 +138,7 @@ function estimateCartPackaging(cart, options = {}) {
   const wallMm = cmToMm(PACKAGING.wallPerFaceCm);
   const assumptions = {
     estimated: true,
+    estimatedDimensionsProductIds: [],
     protectionPerFaceCm: paddingMm === null ? PACKAGING.protectionPerFaceCm : protectionPerFaceCm,
     wallPerFaceCm: PACKAGING.wallPerFaceCm,
     protectionWeightPerPieceGrams: PACKAGING.protectionWeightPerPieceGrams,
@@ -191,6 +192,7 @@ function estimateCartPackaging(cart, options = {}) {
   const oversized = [];
   for (const [id, quantity] of [...quantities].sort(([a], [b]) => compareText(a, b))) {
     const data = Object.hasOwn(SHIPPING_PRODUCTS, id) ? SHIPPING_PRODUCTS[id] : null;
+    if (data?.dimensionsEstimated === true) assumptions.estimatedDimensionsProductIds.push(id);
     const dimensions = data && dimensionsToMm(data.dimensionsCm);
     if (!data || !Number.isSafeInteger(data.weightGrams) || data.weightGrams <= 0 || !dimensions) {
       missing.push(issue(id, 'PIECE_DATA_INCOMPLETE', 'Faltam peso ou dimensões da peça para estimar a embalagem.'));

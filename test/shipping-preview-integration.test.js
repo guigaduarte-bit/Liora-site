@@ -61,13 +61,16 @@ test('preview catalogue exposes only public product fields and no contact data',
   assert.equal(response.statusCode, 200);
   assert.equal(response.headers['cache-control'], 'no-store');
   assert.equal(response.headers['x-robots-tag'], 'noindex, nofollow');
-  assert.equal(response.body.products.length, 27);
+  assert.equal(response.body.products.length, 32);
   for (const product of response.body.products) {
-    assert.deepEqual(Object.keys(product).sort(), ['dimensionsCm', 'id', 'name', 'stock', 'weightGrams']);
+    assert.deepEqual(Object.keys(product).sort(), ['dimensionsCm', 'dimensionsEstimated', 'id', 'name', 'stock', 'weightGrams']);
   }
+  assert.deepEqual(response.body.products.filter(product => product.dimensionsEstimated).map(product => product.id).sort(), [
+    'caixa-flor-solitaria', 'caixa-floral-grande', 'caixa-quadrada-media', 'caixa-redonda-floral', 'vaso-floral-metal'
+  ]);
 });
 
-test('all 27 models are evaluated by the deployed API handler without external calls', async () => {
+test('all 32 models are evaluated by the deployed API handler without external calls', async () => {
   previewEnv();
   global.fetch = async () => { throw new Error('No external request expected'); };
   const products = (await invoke(previewEstimate, 'GET')).body.products;
@@ -77,7 +80,7 @@ test('all 27 models are evaluated by the deployed API handler without external c
     assert.equal(result.statusCode, 200, product.id);
     counts[result.body.packaging.status] = (counts[result.body.packaging.status] || 0) + 1;
   }
-  assert.deepEqual(counts, { incomplete: 3, estimated: 23, unavailable: 1 });
+  assert.deepEqual(counts, { incomplete: 3, estimated: 26, unavailable: 3 });
 });
 
 test('simulation allows hypothetical quantities while checkout enforces inventory', async () => {

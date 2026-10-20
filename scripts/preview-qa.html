@@ -1,4 +1,4 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta name="robots" content="noindex,nofollow"><title>Verificação do preview Liora</title><style>body{margin:0;background:#e9dfc9;color:#2b2118;font:14px system-ui}form{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:16px;position:sticky;top:0;background:#fbf6ec;z-index:2}select,button{font:inherit;padding:8px}main{padding:20px;overflow:auto}iframe{border:1px solid #b08a47;background:#fbf6ec;width:390px;height:844px;display:block;margin:auto}output{padding:10px 16px;display:block}details{margin:0 16px 12px;background:#fbf6ec;padding:12px}summary{cursor:pointer}pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:440px;overflow:auto}</style></head><body><form><label>Página <select id="route"><option value="/">Home</option><option value="/velas-aromaticas/">Catálogo</option><option value="/produtos/vela-escultural-lady-veil-phie3/">Lady Veil</option><option value="/catalogo-de-aromas/">Aromas</option><option value="/trocas-e-devolucoes.html">Trocas e devoluções</option></select></label><label>Largura <select id="width"><option>360</option><option selected>390</option><option>768</option><option>1366</option></select> px</label><button type="button" id="inspect">Medir página</button><button type="button" id="http-check">Verificar HTTP</button></form><output id="result" aria-live="polite">Aguardando a página</output><output id="http-summary" aria-live="polite">HTTP ainda não verificado.</output><details id="http-details"><summary>Resultados HTTP do preview</summary><pre id="http-result">Aguardando verificação manual.</pre></details><main><iframe id="site" title="Preview responsivo Liora" src="/"></iframe></main><script>
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><meta name="robots" content="noindex,nofollow"><title>Verificação do preview Liora</title><style>body{margin:0;background:#e9dfc9;color:#2b2118;font:14px system-ui}form{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:16px;position:sticky;top:0;background:#fbf6ec;z-index:2}select,button{font:inherit;padding:8px}main{padding:20px;overflow:auto}iframe{border:1px solid #b08a47;background:#fbf6ec;width:390px;height:844px;display:block;margin:auto}output{padding:10px 16px;display:block}details{margin:0 16px 12px;background:#fbf6ec;padding:12px}summary{cursor:pointer}pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:440px;overflow:auto}</style></head><body><form><label>Página <select id="route"><option value="/">Home</option><option value="/velas-aromaticas/">Catálogo</option><option value="/velas-decorativas/">Esculturas</option><option value="/boho-glass/">Boho Glass</option><option value="/flora-linea/">Flora Línea</option><option value="/produtos/caixa-redonda-floral/">Caixa redonda floral</option><option value="/produtos/jardim-encantado/">Vaso de cerâmica</option><option value="/produtos/vela-escultural-lady-veil-phie3/">Lady Veil</option><option value="/catalogo-de-aromas/">Aromas</option><option value="/trocas-e-devolucoes.html">Trocas e devoluções</option></select></label><label>Largura <select id="width"><option>360</option><option selected>390</option><option>768</option><option>1366</option></select> px</label><button type="button" id="inspect">Medir página</button><button type="button" id="http-check">Verificar HTTP</button></form><output id="result" aria-live="polite">Aguardando a página</output><output id="http-summary" aria-live="polite">HTTP ainda não verificado.</output><details id="http-details"><summary>Resultados HTTP do preview</summary><pre id="http-result">Aguardando verificação manual.</pre></details><main><iframe id="site" title="Preview responsivo Liora" src="/"></iframe></main><script>
 const frame=document.getElementById('site');
 document.getElementById('route').addEventListener('change',e=>frame.src=e.target.value);
 document.getElementById('width').addEventListener('change',e=>frame.style.width=e.target.value+'px');
@@ -62,13 +62,13 @@ httpButton.addEventListener('click',async()=>{
   httpButton.disabled=true;
   httpSummary.textContent='Lendo sitemap e verificando apenas esta origem…';
   httpResult.textContent='Verificação em andamento.';
-  const report={sitemapExpectedRoutes:41,sitemapRoutes:0,sitemapRead:null,results:[]};
+  const report={sitemapExpectedRoutes:45,sitemapRoutes:0,sitemapRead:null,results:[]};
   try{
     let paths=[];
     try{
       paths=await sitemapPaths();
       report.sitemapRoutes=paths.length;
-      report.sitemapRead=paths.length===41?'41 rotas encontradas':'Quantidade de rotas diferente das 41 esperadas';
+      report.sitemapRead=paths.length===45?'45 rotas encontradas':'Quantidade de rotas diferente das 45 esperadas';
     }catch(error){
       report.sitemapRead=error.name==='AbortError'?'Sitemap: tempo limite de 15 segundos':'Não foi possível obter um sitemap XML válido da mesma origem';
     }
@@ -80,6 +80,8 @@ httpButton.addEventListener('click',async()=>{
       {path:'/trocas-e-devolucoes',method:'HEAD',expectedStatus:[200],expectedPath:'/trocas-e-devolucoes.html'},
       {path:'/termos-de-uso',method:'HEAD',expectedStatus:[200],expectedPath:'/termos-de-uso.html'},
       {path:'/privacidade',method:'HEAD',expectedStatus:[200],expectedPath:'/politica-de-privacidade.html'},
+      {path:'/essenciais',method:'HEAD',expectedStatus:[200],expectedPath:'/velas-decorativas/'},
+      {path:'/essenciais/',method:'HEAD',expectedStatus:[200],expectedPath:'/velas-decorativas/'},
       {path:'/esculturas',method:'HEAD',expectedStatus:[200],expectedPath:'/velas-decorativas/'},
       {path:'/api/shipping-quote',method:'GET',expectedStatus:[405]},
       {path:'/api/create-preference',method:'GET',expectedStatus:[405]},
@@ -99,9 +101,9 @@ httpButton.addEventListener('click',async()=>{
     await Promise.all(Array.from({length:Math.min(4,tasks.length)},worker));
     report.results=results;
     report.passed=results.filter(result=>result.passed).length;
-    report.requiresReview=results.length-report.passed+(report.sitemapRoutes===41?0:1);
+    report.requiresReview=results.length-report.passed+(report.sitemapRoutes===45?0:1);
     httpResult.textContent=JSON.stringify(report,null,2);
-    httpSummary.textContent=`HTTP: ${report.passed} de ${results.length} verificações com resultado esperado. ${report.requiresReview} item(ns) para revisão. Sitemap: ${report.sitemapRoutes} de 41 rotas.`;
+    httpSummary.textContent=`HTTP: ${report.passed} de ${results.length} verificações com resultado esperado. ${report.requiresReview} item(ns) para revisão. Sitemap: ${report.sitemapRoutes} de 45 rotas.`;
   }catch(error){
     httpResult.textContent=JSON.stringify({error:'Não foi possível concluir a verificação HTTP.'},null,2);
     httpSummary.textContent='Verificação HTTP incompleta. Tente novamente.';

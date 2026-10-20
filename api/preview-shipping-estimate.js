@@ -18,7 +18,8 @@ module.exports = async function handler(req, res) {
       products: Object.entries(CATALOG).map(([id, product]) => ({
         id, name: DISPLAY_NAMES.get(id) || product.name, stock: product.stock,
         weightGrams: SHIPPING_PRODUCTS[id]?.weightGrams ?? null,
-        dimensionsCm: SHIPPING_PRODUCTS[id]?.dimensionsCm ?? null
+        dimensionsCm: SHIPPING_PRODUCTS[id]?.dimensionsCm ?? null,
+        dimensionsEstimated: SHIPPING_PRODUCTS[id]?.dimensionsEstimated === true
       }))
     });
   }

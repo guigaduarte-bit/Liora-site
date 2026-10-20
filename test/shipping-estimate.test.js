@@ -42,13 +42,17 @@ const singleUnits = [
   ['camafeufada', 'G16', 420],
   ['botanicavasogesso', 'G16', 570],
   ['peonia', 'M12', 350],
-  ['sagrada-familia', 'G20', 600]
+  ['sagrada-familia', 'G20', 600],
+  ['caixa-redonda-floral', 'G16', 830],
+  ['caixa-quadrada-media', 'G16', 790],
+  ['caixa-flor-solitaria', 'M12', 350]
 ];
 const incompleteIds = [
   'vela-escultural-lady-veil-phie3',
   'vela-decorativa-anjo-em-vitral-1sbe9',
   'botanique-150-gr-1gyzj'
 ];
+const oversizedIds = ['jardim-encantado', 'vaso-floral-metal', 'caixa-floral-grande'];
 
 function checkParcelGeometryAndWeight(result) {
   assert.equal(result.status, 'estimated');
@@ -112,10 +116,10 @@ function checkParcelGeometryAndWeight(result) {
   assert.equal(result.totalWeightGrams, totalWeight);
 }
 
-test('tabela cobre os 27 SKUs: 23 estimáveis, 3 incompletos e 1 sem caixa', () => {
-  const coveredIds = [...singleUnits.map(([id]) => id), ...incompleteIds, 'jardim-encantado'];
-  assert.equal(singleUnits.length, 23);
-  assert.equal(new Set(coveredIds).size, 27);
+test('tabela cobre os 32 SKUs: 26 estimáveis, 3 incompletos e 3 sem caixa', () => {
+  const coveredIds = [...singleUnits.map(([id]) => id), ...incompleteIds, ...oversizedIds];
+  assert.equal(singleUnits.length, 26);
+  assert.equal(new Set(coveredIds).size, 32);
   assert.deepEqual(coveredIds.sort(), Object.keys(catalog).sort());
 });
 
@@ -142,15 +146,16 @@ for (const id of incompleteIds) {
   });
 }
 
-test('Jardim Encantado grande não cabe e não pode ser deitado nem parcialmente cotado', () => {
+for (const id of oversizedIds) test(`${id} não cabe e não pode ser deitado nem parcialmente cotado`, () => {
   for (const cart of [
-    [{ id: 'jardim-encantado', quantity: 1 }],
-    [{ id: 'botanique', quantity: 1 }, { id: 'jardim-encantado', quantity: 1 }]
+    [{ id, quantity: 1 }],
+    [{ id: 'botanique', quantity: 1 }, { id, quantity: 1 }]
   ]) {
     const result = estimateCartPackaging(cart);
     assert.equal(result.status, 'unavailable');
     assert.deepEqual(result.parcels, []);
-    assert.ok(result.issues.length > 0);
+    assert.ok(result.issues.some(issue => issue.id === id && issue.code === 'NO_BOX_FITS'));
+    assert.equal(result.totalWeightGrams, 0, 'não cotar somente a parte do pedido que cabe');
   }
 });
 
@@ -181,13 +186,16 @@ test('duas fragrâncias do mesmo SKU compartilham as peças, sem duplicar caixa 
   assert.doesNotMatch(JSON.stringify(variants), /Lavanda|Baunilha/);
 });
 
-test('carrinho com todos os 23 modelos completos conserva cada peça e independe da ordem', () => {
+test('carrinho com todos os 26 modelos estimáveis conserva cada peça e independe da ordem', () => {
   const cart = singleUnits.map(([id]) => ({ id, quantity: 1 }));
   const result = estimateCartPackaging(cart);
   checkParcelGeometryAndWeight(result);
   const placedIds = result.parcels.flatMap((parcel) => parcel.placements.map((placed) => placed.id)).sort();
   assert.deepEqual(placedIds, cart.map((item) => item.id).sort());
   assert.deepEqual(estimateCartPackaging([...cart].reverse()), result);
+  assert.deepEqual(result.assumptions.estimatedDimensionsProductIds, [
+    'caixa-flor-solitaria', 'caixa-quadrada-media', 'caixa-redonda-floral'
+  ]);
 });
 
 test('massa e dimensões forjadas no cliente são ignoradas; catálogo do servidor prevalece', () => {

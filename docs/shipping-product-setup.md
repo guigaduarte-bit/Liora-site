@@ -1,12 +1,26 @@
 # Frete por carrinho — Liora
 
-Atualização: 01/10/2026. Estimador implementado no preview. Embalagens e transportadora ainda não homologadas; publicação em produção depende de aprovação.
+Atualização: 20/10/2026. Sete pesos Flora Línea informados pelo usuário e cinco conjuntos de medidas estimadas cadastrados no preview. Estimador implementado; embalagens e transportadora ainda não homologadas. Disponibilidade a confirmar mantida; publicação em produção depende de aprovação.
 
 ## Dados separados
 
-- `content/shipping-products.json`: peso total e dimensões de cada peça. A Botanique 250 g foi confirmada com 475 g, altura 16 cm e diâmetro 9 cm. Os demais dados são referências do catálogo, sem confirmação automática para postagem. Lady Veil e Anjo em Vitral não têm três dimensões; Botanique 150 g também não tem peso completo. São 26 pesos e 24 conjuntos completos de dimensões em 27 SKUs.
+- `content/shipping-products.json`: peso total e dimensões de cada peça. A Botanique 250 g foi confirmada com 475 g, altura 16 cm e diâmetro 9 cm. Os sete pesos Flora Línea informados em 19/10 constam da tabela abaixo. Os demais dados são referências do catálogo, sem confirmação automática para postagem. Lady Veil e Anjo em Vitral não têm três dimensões. Botanique 150 g ainda não tem peso completo. São 31 pesos e 29 conjuntos completos de dimensões (cinco estimados) em 32 SKUs.
 - `content/shipping-packaging-estimate.json`: nove modelos RPC dos Correios, taras provisórias e parâmetros de proteção. Nenhuma estimativa deve ser gravada como peso medido.
 - `api/_shipping-estimate.js`: compõe caixas conforme os produtos e quantidades. A responsável não precisa medir todas as combinações de compra; validar caixas e regras com amostras representativas.
+
+## Pesos informados em 19/10 e medidas estimadas em 20/10/2026
+
+| Modelo | Peso total da peça informado | Dimensões da peça (C × L × A) |
+|---|---:|---|
+| Caixa quadrada média | 420 g | 20 × 20 × 10 cm, estimativa |
+| Caixa redonda floral | 460 g | 20 × 20 × 12 cm, estimativa |
+| Caixa floral grande (R$ 129,90) | 480 g | 24 × 24 × 10 cm, estimativa |
+| Vaso de gesso P | 200 g | 12 × 12 × 12 cm, referência anterior do catálogo |
+| Vaso de metal com alça | 265 g | 16 × 16 × 22 cm, estimativa |
+| Vaso floral de cerâmica | 520 g | 15 × 15 × 18 cm, referência anterior do catálogo |
+| Caixa flor solitária | 100 g | 10 × 10 × 6 cm, estimativa |
+
+O vaso cerâmico foi corrigido de 700 g para 520 g. A caixa de apresentação e o recipiente integram a peça; a caixa externa de transporte/proteção continua separada. Nenhum peso de embalagem foi deduzido desses valores. As dimensões anteriores não foram reconfirmadas nesta mensagem. `confirmedForShipping` continua falso e as taras/medidas protegidas continuam sem homologação física. Os sete modelos mantêm estoque 10, disponibilidade a confirmar e compra bloqueada conforme orientação expressa do usuário.
 
 ## Cálculo de estimativa
 
@@ -18,13 +32,13 @@ Hipóteses editáveis, sem certificação: proteção de 1,5 cm por face; parede
 
 A acomodação usa milímetros inteiros, peças em pé, rotação somente da base, sem empilhamento. Retângulos livres não se sobrepõem. Tenta a menor caixa por volume que comporta o conjunto; quando nenhuma comporta tudo, divide em volumes usando a caixa que recebe mais peças. É uma heurística conservadora, não uma solução ótima de empacotamento. Pode utilizar mais caixas que uma montagem manual. Limites: 100 peças e 20 volumes.
 
-Qualquer produto incompleto ou que não cabe impede um resultado parcial silencioso. Jardim Encantado precisa de caixa maior neste modelo. Não deduzir dimensões ausentes a partir de fotografias.
+Qualquer produto incompleto ou que não cabe impede um resultado parcial silencioso. Jardim Encantado precisa de caixa maior neste modelo. Medidas estimadas não equivalem a medições extraídas de fotografias; manter a indicação de estimativa até a conferência física.
 
 ## Isolamento do preview e integração
 
 O modo de estimativa só é ativado por `VERCEL_ENV=preview` no servidor; campos do cliente não podem ativá-lo.
 
-- `/__preview-frete/`: ferramenta de conferência, gerada somente no build de preview (ou build local de QA). Permite testar os 27 modelos e carrinhos hipotéticos, inclusive quantidades maiores que o estoque, sem fazer compra nem alterar estoque.
+- `/__preview-frete/`: ferramenta de conferência, gerada somente no build de preview (ou build local de QA). Permite testar os 32 modelos e carrinhos hipotéticos, inclusive quantidades maiores que o estoque, sem fazer compra nem alterar estoque.
 - `/api/preview-shipping-estimate`: GET de dados públicos do catálogo e POST de estimativa; retorna 404 fora do ambiente Preview. Sem chamadas a transportadoras ou pagamentos.
 - `/api/shipping-quote`: continua validando o estoque real do checkout. No Preview acrescenta o resumo da embalagem. Com credenciais disponíveis, envia uma consulta por volume à SuperFrete usando apenas `package`, com dimensões externas e peso total convertido de g para kg. Não envia `products` junto, pois `package` prevalece na API.
 - Cotações externas com embalagem estimada recebem `preview: true` e `estimated: true`. São bloqueadas no botão de pagamento e revalidadas/bloqueadas no servidor antes de qualquer criação de pagamento.
@@ -64,3 +78,22 @@ O seguro usa o valor dos produtos de cada caixa no catálogo do servidor. Antes 
 A cotação traz `parcelCount` e `components` para conferência. A gratuidade é aplicada após totalizar, mantendo `originalPrice` como custo integral. Máximo de três consultas simultâneas, timeout de oito segundos por requisição e limite total de quinze segundos. Preço ausente, booleano ou vazio é inválido, nunca frete grátis. Prazo ausente permanece desconhecido.
 
 Teste local focado: 46/46 aprovados, incluindo dez casos novos de múltiplos volumes/normalização/timeout e o bloqueio de pagamento estimado. Isso não valida medidas físicas, conta real, etiquetas ou a divergência de centavos da Botanique. O plano principal registra o resultado da suíte completa e do Preview desta rodada.
+
+
+## Estimativas de dimensões — 20/10/2026
+
+A pedido do usuário, os cinco cadastros que estavam sem dimensões receberam hipóteses de planejamento. Os valores não foram medidos nem calculados pelo peso ou por escala fotográfica. Consideram a peça completa com recipiente/tampa e saliências do arranjo; no vaso metálico, a altura inclui a composição. A alça deve ficar na posição real de transporte. Nas caixas redonda e floral, comprimento e largura delimitam o contorno externo. A caixa individual corresponde a uma unidade, ainda que a foto mostre duas.
+
+As fichas apresentam “Medidas estimadas (C × L × A)” e aviso de conferência. O dado `dimensionsEstimated: true` identifica esses cinco registros; o simulador mostra a indicação na tabela, no pedido e no resultado. O preenchimento não altera `confirmedForShipping: false`, não preenche dimensões de postagem homologadas e não libera a compra.
+
+| Modelo | Peça com proteção de 1,5 cm por face | Resultado individual da hipótese |
+|---|---|---|
+| Caixa quadrada média | 23 × 23 × 13 cm | G16, peso total estimado 790 g |
+| Caixa redonda floral | 23 × 23 × 15 cm | G16, peso total estimado 830 g |
+| Caixa flor solitária | 13 × 13 × 9 cm | M12, peso total estimado 350 g |
+| Vaso de metal com alça | 19 × 19 × 25 cm | Nenhuma das nove caixas acomoda a altura em pé |
+| Caixa floral grande | 27 × 27 × 13 cm | Nenhuma das nove caixas acomoda a largura |
+
+A G16 tem interior estimado de 31 × 23 × 15 cm: redonda e quadrada usam o limite de largura, e a redonda também o de altura. Não há folga adicional além da proteção considerada. Conferir fisicamente antes de adotar. A caixa floral grande requer interior de pelo menos 27 × 27 × 13 cm; o vaso metálico, 19 × 19 × 25 cm nesta hipótese. Essas são necessidades geométricas, não novos modelos de caixa cadastrados ou recomendação de compra. O vaso cerâmico de referência continua precisando de outra caixa para seus 18 × 18 × 21 cm protegidos.
+
+Os 32 modelos resultam em 26 estimativas, três cadastros incompletos e três casos sem caixa. Pedidos que incluem um produto sem caixa seguem bloqueados integralmente, sem apresentar peso/cotação parcial. Próxima ação: conferir uma amostra de cada formato, medir a embalagem fechada, validar proteção e tara, e cadastrar caixas maiores se as medidas reais confirmarem a necessidade. A aprovação para produção permanece separada da liberação comercial desses sete modelos.

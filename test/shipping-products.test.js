@@ -51,8 +51,9 @@ async function invoke(handler, body) {
 
 test('dados extraídos cobrem todos os SKUs e não aprovam pesos comerciais para expedição', () => {
   assert.deepEqual(Object.keys(shippingData).sort(), Object.keys(catalog).sort());
-  assert.equal(Object.values(shippingData).filter((item) => item.weightGrams !== null).length, 26);
-  assert.equal(Object.values(shippingData).filter((item) => item.dimensionsCm !== null).length, 24);
+  assert.equal(Object.values(shippingData).filter((item) => item.weightGrams !== null).length, 31);
+  assert.equal(Object.values(shippingData).filter((item) => item.dimensionsCm !== null).length, 29);
+  assert.equal(Object.values(shippingData).filter((item) => item.dimensionsEstimated === true).length, 5);
   for (const product of products) {
     const data = shippingData[product.id];
     assert.equal(data.confirmedForShipping, false);
