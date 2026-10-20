@@ -421,62 +421,87 @@
   },
   "caixa-redonda-floral": {
     "weightGrams": 460,
-    "dimensionsCm": null,
+    "dimensionsCm": {
+      "length": 20,
+      "width": 20,
+      "height": 12
+    },
     "packingWeightGrams": null,
     "shippingDimensionsCm": null,
     "confirmedForShipping": false,
     "source": {
       "file": "content/products.json",
       "field": "dims",
-      "text": "Peso total da peça: 460 g"
-    }
+      "text": "Peso total da peça: 460 g · Medidas estimadas (C × L × A): 20 × 20 × 12 cm"
+    },
+    "dimensionsEstimated": true
   },
   "vaso-floral-metal": {
     "weightGrams": 265,
-    "dimensionsCm": null,
+    "dimensionsCm": {
+      "length": 16,
+      "width": 16,
+      "height": 22
+    },
     "packingWeightGrams": null,
     "shippingDimensionsCm": null,
     "confirmedForShipping": false,
     "source": {
       "file": "content/products.json",
       "field": "dims",
-      "text": "Peso total da peça: 265 g"
-    }
+      "text": "Peso total da peça: 265 g · Medidas estimadas (C × L × A): 16 × 16 × 22 cm"
+    },
+    "dimensionsEstimated": true
   },
   "caixa-flor-solitaria": {
     "weightGrams": 100,
-    "dimensionsCm": null,
+    "dimensionsCm": {
+      "length": 10,
+      "width": 10,
+      "height": 6
+    },
     "packingWeightGrams": null,
     "shippingDimensionsCm": null,
     "confirmedForShipping": false,
     "source": {
       "file": "content/products.json",
       "field": "dims",
-      "text": "Peso total da peça: 100 g"
-    }
+      "text": "Peso total da peça: 100 g · Medidas estimadas (C × L × A): 10 × 10 × 6 cm"
+    },
+    "dimensionsEstimated": true
   },
   "caixa-quadrada-media": {
     "weightGrams": 420,
-    "dimensionsCm": null,
+    "dimensionsCm": {
+      "length": 20,
+      "width": 20,
+      "height": 10
+    },
     "packingWeightGrams": null,
     "shippingDimensionsCm": null,
     "confirmedForShipping": false,
     "source": {
       "file": "content/products.json",
       "field": "dims",
-      "text": "Peso total da peça: 420 g"
-    }
+      "text": "Peso total da peça: 420 g · Medidas estimadas (C × L × A): 20 × 20 × 10 cm"
+    },
+    "dimensionsEstimated": true
   },
   "caixa-floral-grande": {
     "weightGrams": 480,
-    "dimensionsCm": null,
+    "dimensionsCm": {
+      "length": 24,
+      "width": 24,
+      "height": 10
+    },
     "packingWeightGrams": null,
     "shippingDimensionsCm": null,
     "confirmedForShipping": false,
     "source": {
       "file": "content/products.json",
       "field": "dims",
-      "text": "Peso total da peça: 480 g"
-    }
+      "text": "Peso total da peça: 480 g · Medidas estimadas (C × L × A): 24 × 24 × 10 cm"
+    },
+    "dimensionsEstimated": true
   }
 }
