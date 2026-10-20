@@ -58,6 +58,8 @@ let checkoutForm={name:'',email:'',cep:'',num:'',addr:''};
 let shippingState={status:'idle',quotes:[],preview:false,packaging:null,notice:'',error:'',code:'',sandbox:false,cep:''};
 let shippingRequestId=0;
 let paymentReturn=null, paymentView={status:'idle',test:false}, paymentCheckRunning=false;
+let checkoutSubmitting=false;
+const infinitePayAvailable=window.LIORA_PAYMENT_ENVIRONMENT==='production';
 
 const $=id=>document.getElementById(id);
 const money=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
@@ -228,9 +230,9 @@ function renderCheckout(){
   const st=subtotal();
   const selectedQuote=shippingState.quotes.find(q=>q.id===selectedShippingService);
   const previewOnly=shipMethod==='delivery'&&Boolean(selectedQuote?.preview);
-  const checkoutReady=shipMethod!=='delivery'||Boolean(selectedQuote&&!previewOnly);
+  const checkoutReady=(shipMethod!=='delivery'||Boolean(selectedQuote&&!previewOnly))&&(payMethod!=='infinitepay'||infinitePayAvailable);
   const ship=shipMethod==='delivery'&&selectedQuote?selectedQuote.price:0;
-  const disc=payMethod==='pix'?roundCurrency(st*0.05):0;
+  const disc=payMethod==='pix'?Math.round(Math.round(st*100)*5/100)/100:0;
   const total=roundCurrency(st+ship-disc);
   $('drawerBody').innerHTML=`
     <button class="back-link" onclick="drawerView='cart';renderDrawer()">← Voltar ao carrinho</button>
@@ -246,18 +248,35 @@ function renderCheckout(){
     <p class="production-note"><strong>Produção: 10 dias úteis.</strong> A contagem começa quando pagamento e personalização estiverem confirmados. Some o prazo de transporte calculado pelo CEP.</p>
     ${shippingOptionsHTML(st)}
     ${packagingEstimateHTML()}
-    <p class="chk-step mt">3 · Pagamento</p>
-    <div class="pay-opt ${payMethod==='pix'?'sel':''}" onclick="payMethod='pix';renderCheckout()"><span>Pix</span><span class="disc">5% de desconto extra</span></div>
-    <div class="pay-opt ${payMethod==='card'?'sel':''}" onclick="payMethod='card';renderCheckout()"><span>Cartão de crédito</span><span class="disc">até 3x sem juros</span></div>
-    <div class="pay-opt ${payMethod==='boleto'?'sel':''}" onclick="payMethod='boleto';renderCheckout()"><span>Boleto bancário</span><span class="disc">aprovação após compensação</span></div>
-    <div class="pay-opt ${payMethod==='infinitepay'?'sel':''}" onclick="payMethod='infinitepay';renderCheckout()"><span class="ship-opt-main"><b>InfinitePay</b><small>Pix, cartão em até 12x e carteiras digitais</small></span><span class="disc">Opção adicional</span></div>`;
+    ${paymentOptionsHTML()}`;
   $('drawerFoot').innerHTML=`
     <div class="sum-row"><span>Subtotal</span><span>${money(st)}</span></div>
     <div class="sum-row"><span>Frete</span><span>${shipMethod==='delivery'&&!selectedQuote?'A calcular':ship?money(ship):'<span class="free">Grátis</span>'}</span></div>
     ${disc?`<div class="sum-row"><span>Desconto Pix (5%)</span><span style="color:var(--gold-deep)">− ${money(disc)}</span></div>`:''}
     <div class="sum-row total"><span>${previewOnly?'Total estimado':checkoutReady?'Total':'Total parcial'}</span><span>${money(total)}</span></div>
-    <button class="btn btn-solid w-full" style="margin-top:14px" onclick="confirmOrder()" ${checkoutReady?'':'disabled'}>${checkoutReady?`${payMethod==='pix'?'Pagar com Pix':payMethod==='boleto'?'Gerar boleto':payMethod==='infinitepay'?'Pagar com InfinitePay':'Confirmar pedido'} · ${money(total)}`:previewOnly?'Simulação · pagamento indisponível':'Calcule o frete para continuar'}</button>
+    <button class="btn btn-solid w-full" style="margin-top:14px" onclick="confirmOrder()" ${checkoutReady&&!checkoutSubmitting?'':'disabled'}>${checkoutSubmitting?'Gerando pagamento…':checkoutReady?`${payMethod==='pix'?'Pagar com Pix':payMethod==='boleto'?'Gerar boleto':payMethod==='infinitepay'?'Pagar com InfinitePay':'Confirmar pedido'} · ${money(total)}`:previewOnly?'Simulação · pagamento indisponível':payMethod==='infinitepay'&&!infinitePayAvailable?'InfinitePay indisponível neste preview':'Calcule o frete para continuar'}</button>
     <p style="text-align:center;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin-top:12px">Você será redirecionado ao ambiente seguro ${payMethod==='infinitepay'?'da InfinitePay':'do Mercado Pago'}</p>`;
+}
+function paymentOptionsHTML(){
+  const options=[
+    {id:'pix',name:'Pix',detail:'5% de desconto extra'},
+    {id:'card',name:'Cartão de crédito',detail:'até 3x sem juros'},
+    {id:'boleto',name:'Boleto bancário',detail:'aprovação após compensação'},
+    {id:'infinitepay',name:'InfinitePay',description:'Pix, cartão em até 12x e carteiras digitais',detail:infinitePayAvailable?'Opção adicional':'Indisponível neste preview',disabled:!infinitePayAvailable}
+  ];
+  return `<fieldset class="payment-options"><legend class="chk-step mt">3 · Pagamento</legend>${options.map(option=>{
+    const disabled=checkoutSubmitting||option.disabled;
+    return `<label class="pay-opt ${payMethod===option.id?'sel':''}" ${disabled?'aria-disabled="true"':''}>
+      <input type="radio" name="payment-method" id="payment-${option.id}" value="${option.id}" ${payMethod===option.id?'checked':''} ${disabled?'disabled':''} onchange="selectPayment('${option.id}')">
+      <span class="ship-opt-main payment-name">${option.name}${option.description?`<small>${option.description}</small>`:''}</span><span class="disc">${option.detail}</span>
+    </label>`;
+  }).join('')}</fieldset>`;
+}
+function selectPayment(method){
+  if(checkoutSubmitting||!['pix','card','boleto','infinitepay'].includes(method)||(method==='infinitepay'&&!infinitePayAvailable))return;
+  payMethod=method;
+  renderCheckout();
+  $(`payment-${method}`)?.focus();
 }
 function shippingOptionsHTML(st){
   if(shippingState.status==='loading') return `<div class="pay-opt" aria-disabled="true"><span class="ship-loading">Calculando as melhores opções…</span></div>`;
@@ -359,6 +378,8 @@ async function buscarCEP(cep){
 }
 
 async function confirmOrder(){
+  if(checkoutSubmitting)return;
+  if(payMethod==='infinitepay'&&!infinitePayAvailable){toast('InfinitePay indisponível neste preview. Escolha uma opção do Mercado Pago.');return}
   const selectedQuote=shippingState.quotes.find(q=>q.id===selectedShippingService);
   if(shipMethod==='delivery'&&selectedQuote?.preview){toast('Esta opção é uma simulação. O pagamento ficará disponível após a conferência do frete.');return}
   const name=$('fN').value.trim(),email=$('fE').value.trim(),cep=$('fC').value.trim(),num=$('fNum').value.trim(),addr=$('fA').value.trim();
@@ -369,9 +390,9 @@ async function confirmOrder(){
   try{sessionStorage.setItem('liora_checkout_storage_check','1');sessionStorage.removeItem('liora_checkout_storage_check')}catch{
     toast('Permita o armazenamento desta sessão no navegador para confirmar o pagamento com segurança.');return;
   }
-  const btn=document.querySelector('#drawerFoot .btn-solid');
-  const original=btn.textContent;
-  btn.disabled=true;btn.textContent='Gerando pagamento…';
+  checkoutSubmitting=true;
+  let redirecting=false;
+  renderCheckout();
   try{
     const payload={
       items:cart.map(i=>({id:i.id,qty:i.qty,frag:i.frag})),
@@ -388,7 +409,6 @@ async function confirmOrder(){
     const data=await resp.json().catch(()=>({}));
     if(!resp.ok||!data.init_point||!data.order_id||!data.checkout_proof){
       toast(data.error||'Não foi possível iniciar o pagamento. Tente novamente.');
-      btn.disabled=false;btn.textContent=original;
       return;
     }
     sessionStorage.setItem(`liora_checkout_proof:${data.order_id}`,data.checkout_proof);
@@ -397,11 +417,16 @@ async function confirmOrder(){
     paymentReturn={orderId:data.order_id,provider:data.provider||(payMethod==='infinitepay'?'infinitepay':'mercadopago')};
     savePaymentReturn();
     window.location.href=data.init_point;
+    redirecting=true;
   }catch(err){
     toast('Erro de conexão. Tente novamente.');
-    btn.disabled=false;btn.textContent=original;
+  }finally{
+    if(!redirecting){checkoutSubmitting=false;renderCheckout()}
   }
 }
+window.addEventListener('pageshow',event=>{
+  if(event.persisted){checkoutSubmitting=false;if(drawerView==='checkout')renderCheckout()}
+});
 function renderPaymentStatus(){
   const status=paymentView.status,approved=status==='approved';
   const terminal=['rejected','cancelled','refunded','charged_back'].includes(status);

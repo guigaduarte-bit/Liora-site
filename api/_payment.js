@@ -16,6 +16,11 @@ function fail(code, message = 'Pagamento temporariamente indisponível', status 
   throw new PaymentError(code, message, status);
 }
 
+function pixSubtotal(subtotal) {
+  const cents = Math.round(subtotal * 100);
+  return (cents - Math.round(cents * 5 / 100)) / 100;
+}
+
 function httpsUrl(value, allowedHosts) {
   if (typeof value !== 'string') return null;
   try {
@@ -137,4 +142,4 @@ function responseHeaders(res) {
   res.setHeader('X-Content-Type-Options', 'nosniff');
 }
 
-module.exports = { PaymentError, fail, httpsUrl, configuration, siteOrigin, signProof, verifyProof, providerRequest, respondError, responseHeaders, PAYMENT_TIMEOUT_MS };
+module.exports = { PaymentError, fail, pixSubtotal, httpsUrl, configuration, siteOrigin, signProof, verifyProof, providerRequest, respondError, responseHeaders, PAYMENT_TIMEOUT_MS };

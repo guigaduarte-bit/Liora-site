@@ -276,6 +276,11 @@ footer li a:hover{color:#E4C98F}
 .pay-opt.sel{border-color:var(--ink);background:rgba(176,138,71,.07)}
 .pay-opt .disc{font-size:10px;letter-spacing:.12em;color:var(--gold-deep);text-transform:uppercase;text-align:right}
 .pay-opt[aria-disabled="true"]{cursor:default;color:var(--ink-soft);background:rgba(255,255,255,.22)}
+.payment-options{border:0;padding:0;margin:0;min-width:0}
+.payment-options legend{width:100%}
+.payment-options input[type="radio"]{flex:none;accent-color:var(--ink);width:16px;height:16px}
+.payment-name{flex:1;min-width:0}
+.payment-options .pay-opt:focus-within{outline:2px solid var(--ink);outline-offset:3px}
 .ship-opt{align-items:flex-start}
 .ship-opt-main{display:flex;flex-direction:column;gap:4px}
 .ship-opt-main small{font-size:10.5px;color:var(--ink-soft);letter-spacing:.03em}

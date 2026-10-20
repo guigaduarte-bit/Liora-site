@@ -47,7 +47,7 @@ const categories=[
 ];
 const script=read('assets/storefront.js');
 const families=vm.runInNewContext(script.match(/const AROMA_FAMILIES=(\[.*?\]);/s)[1]);
-fs.writeFileSync(path.join(out,'assets/catalog.js'),`window.LIORA_PRODUCTS=${JSON.stringify(products).replace(/</g,'\\u003c')};\nwindow.LIORA_CATEGORIES=${JSON.stringify(categories)};\n`);
+fs.writeFileSync(path.join(out,'assets/catalog.js'),`window.LIORA_PRODUCTS=${JSON.stringify(products).replace(/</g,'\\u003c')};\nwindow.LIORA_CATEGORIES=${JSON.stringify(categories)};\nwindow.LIORA_PAYMENT_ENVIRONMENT=${JSON.stringify(process.env.VERCEL_ENV||'development')};\n`);
 const crumbs=(items)=>`<nav class="breadcrumbs" aria-label="Caminho da página"><a href="/">Início</a>${items.map((i,n)=>`<span aria-hidden="true">/</span>${i.path?`<a href="${i.path}">${e(i.name)}</a>`:`<span aria-current="page">${e(i.name)}</span>`}`).join('')}</nav>`;
 const crumbSchema=(items)=>({'@context':'https://schema.org','@type':'BreadcrumbList',itemListElement:[{name:'Início',path:'/'},...items].map((x,i)=>({'@type':'ListItem',position:i+1,name:x.name,item:base+x.path}))});
 function metadata({url,title,description,img='/assets/images/eiffel.jpg',schemas=[]}){

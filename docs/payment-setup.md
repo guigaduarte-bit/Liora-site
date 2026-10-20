@@ -1,5 +1,45 @@
 # Liora — configuração e homologação dos pagamentos
 
+## Revisão de 20/10/2026
+
+Alterações preparadas somente na branch de Preview `preview/restore-shipping-2026-10-20`. A revisão não criou preferência externa, link de cobrança, pagamento, estorno ou mensagem. Nenhuma credencial foi lida ou alterada. Os dados usados nos testes são fictícios.
+
+### Correções e evidências
+
+- **Pix em centavos:** o desconto de 5% é arredondado em centavos e subtraído do subtotal, sem desconto no frete. Tela, itens enviados ao provedor e comprovante assinado agora concordam. Antes da correção, um carrinho sintético de R$ 34,50 + frete de R$ 19,90 mostrava R$ 52,67, mas a API calculava R$ 52,68. Casos de R$ 19,90, R$ 34,50, R$ 149,90 e R$ 150,00 passaram; a gratuidade continua baseada no subtotal anterior ao Pix. Os preços reais do catálogo não foram alterados.
+- **Envio simultâneo:** a regressão reproduziu duas solicitações quando a função de checkout era acionada enquanto a primeira ainda aguardava resposta. Agora há uma trava durante a solicitação, inclusive para a troca de método; falha libera nova tentativa e preserva o carrinho. Isso não substitui idempotência persistida no servidor.
+- **Escolha por teclado:** os métodos usam radios nativos agrupados por legenda. O foco acompanha a opção após atualizar o resumo. InfinitePay permanece bloqueada pelo servidor fora de Production e agora também aparece desabilitada no Preview, com explicação antes do clique.
+- **Retorno:** mantidas as verificações de assinatura, origem exata, pedido, total, moeda, ambiente e método. Status pendente/recusado não esvazia o carrinho; consultar novamente não cria outra cobrança.
+
+### Resultado dos testes
+
+`npm test`: **201 testes passaram, zero falhas**. A base anterior tinha 192 testes. As regressões de arredondamento, envio simultâneo e opção InfinitePay no Preview falharam antes das correções e passaram depois.
+
+| Forma | Verificação local com respostas simuladas | Validação externa |
+|---|---|---|
+| Pix / Mercado Pago | Desconto, frete, preferência, comprovante e retornos aprovado/pendente/recusado | Pendente |
+| Cartão / Mercado Pago | Limite de 3 parcelas, total, comprovante e retornos aprovado/pendente/recusado | Pendente; sem juros depende da conta |
+| Boleto / Mercado Pago | Tipo ticket, valor e retornos pendente/recusado/aprovado após confirmação | Pendente |
+| InfinitePay | Itens e frete em centavos; consulta pendente, Pix aprovado e cartão em 12x com juros separados do principal | Pendente; bloqueada no Preview |
+
+As simulações de aprovação de Pix e boleto verificam a reação do código a uma resposta controlada. Não demonstram liquidação bancária. No teste offline do Checkout Pro, a documentação orienta considerar a pendência como resultado esperado.
+
+### Estado observado e limitações
+
+- Consultas GET sem comprovante em `/api/payment-status` e `/api/infinitepay-status` na produção retornaram HTTP 400 `CHECKOUT_PROOF_REQUIRED`. Isso mostra que os requisitos iniciais de configuração foram satisfeitos antes da recusa esperada; não comprova validade da credencial, condições comerciais ou transação aprovada. Nenhuma consulta de transação foi enviada ao processador.
+- O Preview existente redirecionou para a proteção de acesso da Vercel. A consulta de metadados das variáveis, sem descriptografia, retornou 404 para o ID conhecido do projeto no time correspondente. Portanto, não foi possível confirmar a configuração atual do Preview. A tabela histórica de 01/10 abaixo não deve ser interpretada como inventário atual.
+- Os testes de interface usam execução JavaScript com DOM simulado. A abertura em navegador real, a navegação por teclado e o retorno pelo celular ainda precisam de validação visual; o Chromium não está disponível neste ambiente e sua instalação anterior falhou.
+
+### Pendências antes de promover esta revisão
+
+1. Acessar o projeto Vercel correto, conferir o ambiente de teste e executar a compra de teste oficial do Mercado Pago, com credenciais e comprador de teste. O retorno deve usar exatamente a mesma origem configurada para o início do checkout.
+2. **Resolver o desconto exclusivo do Pix:** a documentação confirma que dinheiro em conta não pode ser excluído do Checkout Pro. O provedor pode receber uma forma diferente, e a confirmação atual recusará a divergência depois do pagamento. Não considerar esse fluxo homologado nem pedir ao cliente que pague novamente. A solução exige um fluxo que garanta Pix ou uma regra comercial de conciliação aprovada pela loja.
+3. **Conferir “até 3x sem juros” na conta Mercado Pago:** `installments: 3` define o máximo de parcelas, não comprova a configuração de juros. A condição anunciada foi preservada e permanece pendente de conferência no painel e no checkout de teste.
+4. Implementar o registro durável dos pedidos e a confirmação assíncrona descritos abaixo. Hoje o retorno depende da sessão do navegador; não há banco de pedidos nem webhook operacional neste repositório.
+5. Validar o Preview e obter aprovação antes de promover para Production. A suíte simulada não autoriza marcar pagamentos externos como homologados.
+
+Fontes oficiais consultadas em 20/10/2026: [restrições dos métodos e máximo de parcelas no Mercado Pago](https://www.mercadopago.com.br/developers/pt/docs/checkout-pro-preferences/additional-settings/payment-methods), [compras de teste e pendência offline](https://www.mercadopago.com.br/developers/pt/docs/checkout-pro-preferences/integration-test/test-purchases), [contrato de criação e consulta da InfinitePay](https://www.infinitepay.io/checkout-documentacao).
+
 ## Correção do retorno — 07/10/2026
 
 - Produção registrou HTTP 409 `PAYMENT_ORDER_MISMATCH` no retorno após um pagamento relatado como confirmado pelo emissor. O log anterior não distinguia o campo divergente; não comprova sozinho o status `approved` do Mercado Pago.

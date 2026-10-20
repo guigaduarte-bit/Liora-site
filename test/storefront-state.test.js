@@ -7,7 +7,7 @@ const vm = require('node:vm');
 const { test } = require('node:test');
 const products = require('../content/products.json');
 
-function storefront({ saved = {}, blockedStorage = false, search = '', fetch } = {}) {
+function storefront({ saved = {}, blockedStorage = false, search = '', fetch, environment = 'production' } = {}) {
   const storage = new Map(Object.entries(saved));
   const nodes = new Map();
   const element = (id) => {
@@ -22,6 +22,7 @@ function storefront({ saved = {}, blockedStorage = false, search = '', fetch } =
   const window = {
     LIORA_PRODUCTS: structuredClone(products),
     LIORA_CATEGORIES: [],
+    LIORA_PAYMENT_ENVIRONMENT: environment,
     location: { search, pathname: '/', href: 'https://liora.example/', origin: 'https://liora.example' },
     history: { replaceState() {} },
     addEventListener() {}
@@ -234,6 +235,56 @@ test('navegador sem armazenamento não cria pagamento sem conseguir guardar o co
   app.run("addToCart('botanique',1); shippingState={status:'ready',quotes:[{id:'curitiba-fixed',price:19.9,preview:false}]}; selectedShippingService='curitiba-fixed'; $('fN').value='Teste'; $('fE').value='teste@example.com'; $('fC').value='80000000'; $('fA').value='Rua Fictícia';");
   await app.run('confirmOrder()');
   assert.match(app.nodes.get('toastMsg').textContent, /armazenamento desta sessão/);
+});
+
+test('checkout Pix exibe desconto e total consistentes em limites de centavos', async () => {
+  const app = storefront();
+  await app.done;
+  for (const [price, expectedDiscount, expectedTotal] of [[19.9, 1, 38.8], [34.5, 1.73, 52.67], [149.9, 7.5, 162.3], [150, 7.5, 142.5]]) {
+    app.run(`cart=[{id:'botanique',qty:1,price:${price}}]; payMethod='pix'; shippingState={status:'ready',quotes:[{id:'curitiba-fixed',price:${price >= 150 ? 0 : 19.9}}]}; selectedShippingService='curitiba-fixed'; renderCheckout();`);
+    const footer = app.nodes.get('drawerFoot').innerHTML;
+    assert.ok(footer.includes(`− ${app.run(`money(${expectedDiscount})`)}`));
+    assert.ok(footer.includes(`Pagar com Pix · ${app.run(`money(${expectedTotal})`)}`));
+  }
+});
+
+test('envios simultâneos do checkout geram uma única solicitação e preservam o método', async () => {
+  let calls = 0, sent, resolve;
+  const response = new Promise(done => { resolve = done; });
+  const app = storefront({ fetch: async (url, options) => { calls++; sent=JSON.parse(options.body); return response; } });
+  await app.done;
+  app.run("addToCart('botanique',1); shippingState={status:'ready',quotes:[{id:'curitiba-fixed',price:19.9}]}; selectedShippingService='curitiba-fixed'; $('fN').value='Cliente Fictício'; $('fE').value='cliente@example.com'; $('fC').value='80000000'; $('fNum').value='100'; $('fA').value='Rua Fictícia';");
+  const first = app.run('confirmOrder()');
+  app.run("selectPayment('card')");
+  assert.equal(app.run('payMethod'),'pix');
+  const second = app.run('confirmOrder()');
+  resolve({ok:true,json:async()=>({init_point:'https://www.mercadopago.com.br/checkout/teste',order_id:'LIORA-TESTE-12345678',checkout_proof:'signed-fixture'})});
+  await Promise.all([first,second]);
+  assert.equal(calls,1);
+  assert.equal(sent.payMethod,'pix');
+});
+
+test('falha na criação permite uma nova tentativa sem apagar o carrinho', async () => {
+  let calls = 0;
+  const app = storefront({ fetch:async()=>{ calls++; return {ok:false,json:async()=>({error:'Tente novamente.'})}; } });
+  await app.done;
+  app.run("addToCart('botanique',1); shippingState={status:'ready',quotes:[{id:'curitiba-fixed',price:19.9}]}; selectedShippingService='curitiba-fixed'; $('fN').value='Teste'; $('fE').value='teste@example.com'; $('fC').value='80000000'; $('fA').value='Rua Fictícia';");
+  await app.run('confirmOrder()');
+  await app.run('confirmOrder()');
+  assert.equal(calls,2);
+  assert.equal(app.run('cartQty()'),1);
+});
+
+test('InfinitePay indisponível no preview não cria checkout nem permite seleção', async () => {
+  const app = storefront({environment:'preview'});
+  await app.done;
+  app.run("addToCart('botanique',1); shippingState={status:'ready',quotes:[]}; renderCheckout();");
+  assert.match(app.nodes.get('drawerBody').innerHTML, /<input[^>]+id="payment-infinitepay"[^>]+disabled/);
+  app.run("selectPayment('infinitepay')");
+  assert.equal(app.run('payMethod'),'pix');
+  app.run("payMethod='infinitepay'");
+  await app.run('confirmOrder()');
+  assert.match(app.nodes.get('toastMsg').textContent,/InfinitePay.*preview/);
 });
 
 test('aprovação de teste é identificada e pendência não promete e-mail inexistente', async () => {

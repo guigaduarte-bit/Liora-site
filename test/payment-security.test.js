@@ -107,6 +107,67 @@ test('issued proof contains only signed purchase facts, and return URL contains 
   assert.equal(sent.metadata.customer_address, undefined);
 });
 
+for (const method of ['pix','card','boleto']) {
+  test(`${method}: criação e retorno usam o mesmo total e distinguem aprovação, pendência e recusa`, async () => {
+    let preference;
+    global.fetch=async(url,options)=>{
+      assert.equal(url,'https://api.mercadopago.com/checkout/preferences');
+      preference=JSON.parse(options.body);
+      return {ok:true,status:201,json:async()=>({id:'pref-fixture',init_point:'https://www.mercadopago.com.br/checkout/test',live_mode:false})};
+    };
+    const created=await invoke(createPreference,request({payMethod:method}));
+    assert.equal(created.statusCode,200);
+    assert.equal(created.body.total,method==='pix'?91.15:94.9);
+    const allowedType={pix:'bank_transfer',card:'credit_card',boleto:'ticket'}[method];
+    assert.equal(preference.payment_methods.excluded_payment_types.some(p=>p.id===allowedType),false);
+    if(method==='card')assert.equal(preference.payment_methods.installments,3);
+    for(const status of ['pending','rejected','approved']){
+      global.fetch=async(url,options)=>{
+        assert.equal(url,'https://api.mercadopago.com/v1/payments/123');
+        assert.equal(options.method,undefined);
+        return {ok:true,status:200,json:async()=>({
+          id:123,external_reference:created.body.order_id,status,
+          transaction_amount:method==='pix'?71.25:75,shipping_amount:19.9,
+          currency_id:'BRL',live_mode:false,payment_type_id:allowedType,
+          payment_method_id:{pix:'pix',card:'visa',boleto:'bolbradesco'}[method]
+        })};
+      };
+      const confirmed=await invoke(paymentStatus,{method:'GET',headers:{'x-checkout-proof':created.body.checkout_proof},query:{payment_id:'123',order_id:created.body.order_id}});
+      assert.equal(confirmed.statusCode,200);
+      assert.equal(confirmed.body.status,status);
+      assert.equal(confirmed.body.order_id,created.body.order_id);
+    }
+  });
+}
+
+test('InfinitePay: criação e retorno conferem o principal com Pix, cartão parcelado e pendência', async () => {
+  infiniteLive();
+  let payload;
+  global.fetch=async(url,options)=>{
+    assert.equal(url,'https://api.checkout.infinitepay.io/links');
+    payload=JSON.parse(options.body);
+    return {ok:true,status:200,json:async()=>({url:'https://checkout.infinitepay.com.br/synthetic-handle?lenc=fixture'})};
+  };
+  const created=await invoke(createPreference,request({payMethod:'infinitepay'}));
+  assert.equal(created.statusCode,200);
+  assert.equal(created.body.total,94.9);
+  assert.equal(payload.items.reduce((total,item)=>total+item.price*item.quantity,0),9490);
+  for(const payment of [
+    {success:true,paid:false,amount:9490},
+    {success:true,paid:true,amount:9490,paid_amount:9490,installments:1,capture_method:'pix'},
+    {success:true,paid:true,amount:9490,paid_amount:11000,installments:12,capture_method:'credit_card'}
+  ]){
+    global.fetch=async(url,options)=>{
+      assert.equal(url,'https://api.checkout.infinitepay.io/payment_check');
+      assert.equal(JSON.parse(options.body).order_nsu,created.body.order_id);
+      return {ok:true,status:200,json:async()=>payment};
+    };
+    const confirmed=await invoke(infinitePayStatus,{method:'GET',headers:{'x-checkout-proof':created.body.checkout_proof},query:{order_id:created.body.order_id,transaction_nsu:'transaction-test',slug:'invoice-test'}});
+    assert.equal(confirmed.statusCode,200);
+    assert.equal(confirmed.body.status,payment.paid?'approved':'pending');
+  }
+});
+
 test('missing, expired, modified or cross-provider proof never contacts payment provider', async () => {
   const valid = proof();
   const changed = Buffer.from(JSON.stringify({ ...JSON.parse(Buffer.from(valid.split('.')[0], 'base64url')), totalCents: 1 })).toString('base64url') + '.' + valid.split('.')[1];

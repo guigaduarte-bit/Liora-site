@@ -3,7 +3,7 @@
 const { randomUUID } = require('node:crypto');
 const CATALOG = require('./catalog');
 const { SHIP_FREE, cleanZip, quoteShipping, roundCurrency } = require('./_shipping');
-const { configuration, siteOrigin, signProof, httpsUrl, providerRequest, fail, respondError, responseHeaders } = require('./_payment');
+const { configuration, siteOrigin, signProof, pixSubtotal, httpsUrl, providerRequest, fail, respondError, responseHeaders } = require('./_payment');
 
 const PAYMENT_TYPES = ['credit_card', 'debit_card', 'ticket', 'bank_transfer'];
 const PAYMENT_METHODS = new Set(['pix', 'card', 'boleto', 'infinitepay']);
@@ -75,14 +75,14 @@ function buildPaymentItems(cart, payMethod, subtotal) {
   // Checkout Pro não deve receber item com preço negativo. No Pix, cada linha
   // vira uma unidade com o total já descontado; a última absorve os centavos de
   // arredondamento para manter exatamente 5% no total do carrinho.
-  const discountedSubtotal = roundCurrency(subtotal * 0.95);
+  const discountedSubtotal = pixSubtotal(subtotal);
   let allocated = 0;
   return cart.map((item, index) => {
     const isLast = index === cart.length - 1;
     const lineTotal = roundCurrency(item.price * item.quantity);
     const unitPrice = isLast
       ? roundCurrency(discountedSubtotal - allocated)
-      : roundCurrency(lineTotal * 0.95);
+      : pixSubtotal(lineTotal);
     allocated = roundCurrency(allocated + unitPrice);
     return {
       id: item.id,
@@ -191,7 +191,7 @@ module.exports = async function handler(req, res) {
       shippingCost = subtotal >= SHIP_FREE ? 0 : selectedQuote.price;
     }
     const productTotal = selectedPayment === 'pix'
-      ? roundCurrency(subtotal * 0.95)
+      ? pixSubtotal(subtotal)
       : subtotal;
     const total = roundCurrency(productTotal + shippingCost);
     const orderId = `LIORA-${Date.now().toString(36).toUpperCase()}-${randomUUID().slice(0, 8).toUpperCase()}`;

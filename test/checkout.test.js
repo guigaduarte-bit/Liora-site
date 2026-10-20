@@ -181,6 +181,28 @@ test('cotação aplica tarifa fixa em Curitiba e frete grátis a partir de R$ 15
   assert.ok(free.body.quotes.every((quote) => quote.price === 0));
 });
 
+test('Pix arredonda o desconto em centavos e mantém preferência, frete e comprovante iguais', async () => {
+  process.env.MP_ACCESS_TOKEN='TEST-token';
+  process.env.SITE_URL='https://liora.example';
+  delete process.env.SUPERFRETE_TOKEN;
+  let sent;
+  global.fetch=async(url,options)=>{
+    assert.equal(url,'https://api.mercadopago.com/checkout/preferences');
+    sent=JSON.parse(options.body);
+    return {ok:true,status:201,json:async()=>({id:'pref-test',init_point:'https://www.mercadopago.com.br/checkout/test'})};
+  };
+  for(const [price,expectedProducts,expectedTotal] of [[19.9,18.9,38.8],[34.5,32.77,52.67],[149.9,142.4,162.3],[150,142.5,142.5]]){
+    const handler=loadApi('create-preference.js',{catalog:{botanique:{name:'Produto sintético',price,stock:10}}});
+    const result=await invoke(handler,validRequest({items:[{id:'botanique',qty:1}],shipping:{method:'delivery',serviceId:'curitiba-fixed'}}));
+    assert.equal(result.statusCode,200);
+    assert.equal(result.body.total,expectedTotal);
+    assert.equal(sent.items[0].unit_price,expectedProducts);
+    const proof=JSON.parse(Buffer.from(result.body.checkout_proof.split('.')[0],'base64url').toString());
+    assert.equal(proof.totalCents,Math.round(expectedTotal*100));
+    assert.equal(Math.round((sent.items[0].unit_price+sent.shipments.cost)*100),proof.totalCents);
+  }
+});
+
 test('estoque é somado por produto mesmo com fragrâncias diferentes', async () => {
   process.env.MP_ACCESS_TOKEN = 'TEST-token';
   process.env.SITE_URL = 'https://liora.example';
