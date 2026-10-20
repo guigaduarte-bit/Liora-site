@@ -9,6 +9,8 @@
     { "source": "/privacidade", "destination": "/politica-de-privacidade.html", "permanent": true },
     { "source": "/essenciais", "destination": "/velas-decorativas/", "permanent": true },
     { "source": "/essenciais/", "destination": "/velas-decorativas/", "permanent": true },
-    { "source": "/esculturas", "destination": "/velas-decorativas/", "permanent": true }
+    { "source": "/esculturas", "destination": "/velas-decorativas/", "permanent": true },
+    { "source": "/kits-e-presentes", "destination": "/velas-aromaticas/", "permanent": true },
+    { "source": "/kits-e-presentes/", "destination": "/velas-aromaticas/", "permanent": true }
   ]
 }

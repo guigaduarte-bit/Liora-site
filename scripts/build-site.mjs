@@ -5,7 +5,7 @@ import {createRequire} from 'node:module';
 import {normalizeBusinessIdentity,applyBusinessIdentity} from './business-identity.mjs';
 const require=createRequire(import.meta.url);
 const catalog=require('../api/catalog.js');
-const {lioraEscape:e,lioraMoney:money,lioraImage,lioraGallery,lioraCardHTML,lioraTabsHTML,lioraAromasHTML}=require('../assets/components.js');
+const {lioraEscape:e,lioraMoney:money,lioraGallery,lioraCardHTML,lioraTabsHTML,lioraAromasHTML}=require('../assets/components.js');
 const root=path.resolve(import.meta.dirname||path.dirname(new URL(import.meta.url).pathname),'..');
 const read=f=>fs.readFileSync(path.join(root,f),'utf8');
 const json=f=>JSON.parse(read(f));
@@ -39,8 +39,7 @@ const categories=[
  {name:'Esculturas',path:'/velas-decorativas/',title:'Velas decorativas da coleção Esculturas',description:'Bustos, relevos e formas delicadas em velas feitas à mão. Lady Veil, Anjo em Vitral, Pequeno Amor e Mini Bubble se encontram na coleção Esculturas.',ids:products.filter(p=>p.cats.includes('Esculturas')).map(p=>p.id)},
  {name:'Clássico',path:'/classico/',title:'Coleção Clássico',description:'Formas geométricas, curvas e texturas para compor ambientes: descubra Pérolas, Bolhas, Lumina e Chama Esculpida.',ids:products.filter(p=>p.cats.includes('Clássico')).map(p=>p.id)},
  {name:'Boho Glass',path:'/boho-glass/',title:'Coleção Boho Glass',description:'Velas em vidro com detalhes que encantam. Explore as versões Botanique de 70 g, 150 g e 250 g junto ao Kit Boho Glass.',ids:products.filter(p=>p.cats.includes('Boho Glass')).map(p=>p.id)},
- {name:'Flora Linea',path:'/flora-linea/',title:'Flora Línea: flores para encantar',description:'Arranjos de velas florais em vasos de gesso, cerâmica e metal, caixas para presentear e formas delicadas. Conheça as composições da coleção Flora Línea.',ids:products.filter(p=>p.cats.includes('Flora Linea')).map(p=>p.id)},
- {name:'Kits e Presentes',path:'/kits-e-presentes/',title:'Kits Liora para decorar e presentear',description:'Conheça Kit Silhouette e Kit Boho Glass. Consulte a apresentação de cada modelo; composição e embalagem devem ser confirmadas com a Liora antes da compra.',ids:['kit-silhouette','kit-boho-glass']}
+ {name:'Flora Linea',path:'/flora-linea/',title:'Flora Línea: flores para encantar',description:'Arranjos de velas florais em vasos de gesso, cerâmica e metal, caixas para presentear e formas delicadas. Conheça as composições da coleção Flora Línea.',ids:products.filter(p=>p.cats.includes('Flora Linea')).map(p=>p.id)}
 ];
 const script=read('assets/storefront.js');
 const families=vm.runInNewContext(script.match(/const AROMA_FAMILIES=(\[.*?\]);/s)[1]);
@@ -75,8 +74,7 @@ fs.writeFileSync(path.join(out,'index.html'),home);
 function readDist(f){return fs.readFileSync(path.join(out,f),'utf8');}
 for(const c of categories){
  const items=products.filter(p=>c.ids.includes(p.id));
- const feature=c.name==='Flora Linea'?`<figure class="collection-feature">${lioraImage({img:'/assets/images/flora-linea-arranjos.webp',imageMeta:imageManifest['/assets/images/flora-linea-arranjos.webp'],displayName:'Arranjos florais Liora em vasos de cerâmica e metal'})}<figcaption>Composições florais da coleção Flora Línea. Cada modelo é vendido por unidade.</figcaption></figure>`:'';
- page({url:c.path,title:`${c.title} | Liora`,description:c.description,schemas:[crumbSchema([{name:c.name,path:c.path}])]},`<section class="wrap category-page">${crumbs([{name:c.name}])}<div class="page-intro"><p class="eyebrow">Coleções Liora</p><h1 class="display">${c.title}</h1><p>${c.description}</p></div><nav class="tabs" id="tabsBar" aria-label="Coleções">${lioraTabsHTML(categories,c.name)}</nav><div class="grid" id="grid">${items.map(p=>lioraCardHTML(p)).join('')}</div>${feature}<p class="product-help">Frete grátis a partir de R$ 150 em produtos, antes do desconto Pix. Confira as <a href="/termos-de-uso.html">condições de compra</a>.</p></section>`,c.name);
+ page({url:c.path,title:`${c.title} | Liora`,description:c.description,schemas:[crumbSchema([{name:c.name,path:c.path}])]},`<section class="wrap category-page">${crumbs([{name:c.name}])}<div class="page-intro"><p class="eyebrow">Coleções Liora</p><h1 class="display">${c.title}</h1><p>${c.description}</p></div><nav class="tabs" id="tabsBar" aria-label="Coleções">${lioraTabsHTML(categories,c.name)}</nav><div class="grid" id="grid">${items.map(p=>lioraCardHTML(p)).join('')}</div><p class="product-help">Frete grátis a partir de R$ 150 em produtos, antes do desconto Pix. Confira as <a href="/termos-de-uso.html">condições de compra</a>.</p></section>`,c.name);
 }
 for(const p of products){
  const url=`/produtos/${p.id}/`,cat=categories.find(c=>c.name===p.cats[0])||categories[0];
