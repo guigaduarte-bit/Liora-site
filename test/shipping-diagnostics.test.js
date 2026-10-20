@@ -18,6 +18,7 @@ afterEach(() => {
 
 function configure() {
   process.env.VERCEL_ENV = 'preview';
+  process.env.LIORA_SHIPPING_ESTIMATE = 'true';
   process.env.SUPERFRETE_TOKEN = 'private-test-token-never-log';
   process.env.SHIP_ORIGIN_CEP = '80010000';
   process.env.SUPERFRETE_BASE_URL = 'https://sandbox.superfrete.com';

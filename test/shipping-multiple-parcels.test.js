@@ -21,7 +21,7 @@ afterEach(() => {
 
 function setup(handler) {
   Object.assign(process.env, {
-    VERCEL_ENV: 'preview', SUPERFRETE_TOKEN: 'test-only-shipping-token',
+    VERCEL_ENV: 'preview', LIORA_SHIPPING_ESTIMATE: 'true', SUPERFRETE_TOKEN: 'test-only-shipping-token',
     SHIP_ORIGIN_CEP: '80010000', SUPERFRETE_BASE_URL: 'https://sandbox.superfrete.com',
     SUPERFRETE_SERVICES: '1,2'
   });

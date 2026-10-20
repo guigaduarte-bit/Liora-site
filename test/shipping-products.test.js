@@ -8,7 +8,7 @@ const shippingData = require('../content/shipping-products.json');
 const { loadApi, confirmedShipping } = require('./helpers/isolated-api.cjs');
 
 const originalFetch = global.fetch;
-const environmentKeys = ['SUPERFRETE_TOKEN', 'SHIP_ORIGIN_CEP', 'SUPERFRETE_BASE_URL', 'SUPERFRETE_SERVICES', 'SITE_URL', 'MP_ACCESS_TOKEN', 'PAYMENT_MODE', 'CHECKOUT_SIGNING_SECRET', 'VERCEL_ENV'];
+const environmentKeys = ['SUPERFRETE_TOKEN', 'SHIP_ORIGIN_CEP', 'SUPERFRETE_BASE_URL', 'SUPERFRETE_SERVICES', 'SITE_URL', 'MP_ACCESS_TOKEN', 'PAYMENT_MODE', 'CHECKOUT_SIGNING_SECRET', 'VERCEL_ENV', 'LIORA_SHIPPING_ESTIMATE'];
 const originalEnv = Object.fromEntries(environmentKeys.map((key) => [key, process.env[key]]));
 
 beforeEach(() => {
@@ -52,8 +52,8 @@ async function invoke(handler, body) {
 test('dados extraídos cobrem todos os SKUs e não aprovam pesos comerciais para expedição', () => {
   assert.deepEqual(Object.keys(shippingData).sort(), Object.keys(catalog).sort());
   assert.equal(Object.values(shippingData).filter((item) => item.weightGrams !== null).length, 31);
-  assert.equal(Object.values(shippingData).filter((item) => item.dimensionsCm !== null).length, 29);
-  assert.equal(Object.values(shippingData).filter((item) => item.dimensionsEstimated === true).length, 5);
+  assert.equal(Object.values(shippingData).filter((item) => item.dimensionsCm !== null).length, 24);
+  assert.equal(Object.values(shippingData).filter((item) => item.dimensionsEstimated === true).length, 0);
   for (const product of products) {
     const data = shippingData[product.id];
     assert.equal(data.confirmedForShipping, false);
@@ -92,23 +92,16 @@ for (const [label, invalid] of [
   ['confirmação ausente', { confirmedForShipping: false }],
   ['peso em texto', { weightGrams: '100' }]
 ]) {
-  test(`frete impede cotação parcial: ${label}`, async () => {
-    configureShipping();
+  test(`cadastro logístico isolado recusa ${label}, sem condicionar o checkout padrão`, () => {
     const data = fixtureData();
     data.peonia = confirmedShipping(invalid);
-    const handler = loadApi('shipping-quote.js', { shippingProducts: data });
-    const response = await invoke(handler, {
-      cep: '20020050',
-      items: [{ id: 'ursinho', qty: 1 }, { id: 'peonia', qty: 1 }]
-    });
-    assert.equal(response.statusCode, 503);
-    assert.equal(response.body.code, 'SHIPPING_DATA_INCOMPLETE');
-    assert.match(response.body.error, /frete.*configurado/i);
-    assert.equal(response.body.quotes, undefined);
+    const { buildShippingProducts } = loadApi('_shipping-products.js', { shippingProducts: data });
+    assert.throws(() => buildShippingProducts([{ id: 'ursinho', quantity: 1 }, { id: 'peonia', quantity: 1 }]),
+      { code: 'SHIPPING_DATA_INCOMPLETE' });
   });
 }
 
-test('endpoint usa pesos do servidor e envia products completo, sem package e sem dados pessoais', async () => {
+test('endpoint restaura pacote padrão por quantidade e ignora pesos, medidas e dados pessoais do navegador', async () => {
   configureShipping();
   let request;
   global.fetch = async (url, options) => {
@@ -128,11 +121,10 @@ test('endpoint usa pesos do servidor e envia products completo, sem package e se
     ]
   });
   assert.equal(response.statusCode, 200);
-  assert.deepEqual(request.products, [
-    { quantity: 5, weight: 0.058, height: 8, width: 9, length: 10 },
-    { quantity: 1, weight: 0.125, height: 8, width: 9, length: 10 }
-  ]);
-  assert.equal(Object.hasOwn(request, 'package'), false);
+  assert.deepEqual(request.package, { width: 20, height: 30, length: 20, weight: 2.1 });
+  assert.equal(Object.hasOwn(request, 'products'), false);
+  assert.equal(response.body.preview, false);
+  assert.equal(response.body.packaging, undefined);
   assert.equal(request.options.insurance_value, 62);
   assert.equal(request.options.use_insurance_value, true);
   assert.deepEqual(request.from, { postal_code: '80000000' });
@@ -140,17 +132,51 @@ test('endpoint usa pesos do servidor e envia products completo, sem package e se
   assert.doesNotMatch(JSON.stringify(request), /nao-enviar|Dado que|Lavanda|Baunilha/);
 });
 
-test('produto sem registro impede chamada ao provedor mesmo com metadados falsos no navegador', async () => {
+test('todos os produtos à venda cotam sem dados logísticos em produção e preview', async () => {
   configureShipping();
+  let calls = 0;
+  global.fetch = async (_url, options) => {
+    calls++;
+    assert.deepEqual(JSON.parse(options.body).package, { width: 20, height: 15, length: 20, weight: 0.35 });
+    return { ok: true, status: 200, json: async () => [{ id: 1, name: 'PAC', price: 26.4, delivery_time: 5 }] };
+  };
   const handler = loadApi('shipping-quote.js', { shippingProducts: {} });
-  const response = await invoke(handler, {
-    cep: '20020050', items: [{ id: 'ursinho', qty: 1, ...confirmedShipping() }]
-  });
-  assert.equal(response.statusCode, 503);
-  assert.equal(response.body.code, 'SHIPPING_DATA_INCOMPLETE');
+  const available = Object.entries(catalog).filter(([, product]) => !product.soldout && product.stock > 0);
+  for (const environment of ['production', 'preview']) {
+    process.env.VERCEL_ENV = environment;
+    for (const [id] of available) {
+      const response = await invoke(handler, {
+        cep: '20020050', preview: true, LIORA_SHIPPING_ESTIMATE: true,
+        items: [{ id, qty: 1, weight: 999, dimensionsCm: { length: 1, width: 1, height: 1 } }]
+      });
+      assert.equal(response.statusCode, 200, id);
+      assert.equal(response.body.quotes[0].preview, false, id);
+      assert.equal(response.body.packaging, undefined, id);
+    }
+  }
+  assert.equal(calls, available.length * 2);
 });
 
-test('estoque continua agregado por SKU antes da cotação por peso', async () => {
+test('o limite de altura e as quantidades da configuração anterior são mantidos', async () => {
+  configureShipping();
+  global.fetch = async (_url, options) => {
+    assert.deepEqual(JSON.parse(options.body).package, { width: 20, height: 60, length: 20, weight: 7 });
+    return { ok: true, status: 200, json: async () => [{ id: 1, name: 'PAC', price: 26.4, delivery_time: 5 }] };
+  };
+  const response = await invoke(loadApi('shipping-quote.js'), { cep: '20020050', items: [{ id: 'ursinho', qty: 20 }] });
+  assert.equal(response.statusCode, 200);
+});
+
+test('itens indisponíveis e desconhecidos continuam bloqueados antes da cotação', async () => {
+  configureShipping();
+  const handler = loadApi('shipping-quote.js');
+  for (const id of ['caixa-flor-solitaria', 'produto-inexistente']) {
+    const response = await invoke(handler, { cep: '20020050', items: [{ id, qty: 1 }] });
+    assert.equal(response.statusCode, 400);
+  }
+});
+
+test('estoque continua agregado por SKU antes da cotação padrão', async () => {
   configureShipping();
   const handler = loadApi('shipping-quote.js', { shippingProducts: fixtureData() });
   const response = await invoke(handler, {
@@ -171,6 +197,7 @@ test('sem credenciais mantém demonstração; dados pendentes nunca são enviado
 
 test('dados pendentes preservam entrega Curitiba de R$ 19,90 e gratuidade em R$ 150', async () => {
   configureShipping();
+  global.fetch = async () => { throw new Error('Transportadora indisponível no teste'); };
   const handler = loadApi('shipping-quote.js');
   for (const quantity of [1, 2]) {
     const response = await invoke(handler, {
@@ -185,19 +212,34 @@ test('dados pendentes preservam entrega Curitiba de R$ 19,90 e gratuidade em R$ 
   }
 });
 
-test('checkout recusa frete incompleto antes de iniciar pagamento e devolve o erro de configuração', async () => {
+test('checkout revalida o frete padrão e permite pagamento sem peso ou dimensões por peça', async () => {
   configureShipping();
   process.env.SITE_URL = 'https://liora.example';
   process.env.MP_ACCESS_TOKEN = 'fixture-mercadopago';
   process.env.PAYMENT_MODE = 'test';
   process.env.CHECKOUT_SIGNING_SECRET = 'synthetic-checkout-signing-key-for-tests-only';
-  const response = await invoke(loadApi('create-preference.js'), {
+  let sentPreference;
+  let quoteCalls = 0;
+  global.fetch = async (url, options) => {
+    if (String(url).includes('superfrete')) {
+      quoteCalls++;
+      assert.deepEqual(JSON.parse(options.body).package, { width: 20, height: 15, length: 20, weight: 0.35 });
+      return { ok: true, status: 200, json: async () => [{ id: 1, name: 'PAC', price: 26.4, delivery_time: 5 }] };
+    }
+    assert.equal(url, 'https://api.mercadopago.com/checkout/preferences');
+    sentPreference = JSON.parse(options.body);
+    return { ok: true, status: 201, json: async () => ({ id: 'test-preference', init_point: 'https://www.mercadopago.com.br/checkout' }) };
+  };
+  const response = await invoke(loadApi('create-preference.js', { shippingProducts: {} }), {
     items: [{ id: 'botanique', qty: 1 }],
     payMethod: 'pix',
     shipping: { method: 'delivery', serviceId: '1' },
     payer: { name: 'Cliente Sintético', email: 'cliente@example.com', cep: '20020050', addr: 'Rua de Teste', num: '100' }
   });
-  assert.equal(response.statusCode, 503);
-  assert.equal(response.body.code, 'SHIPPING_DATA_INCOMPLETE');
-  assert.equal(response.body.init_point, undefined);
+  assert.equal(response.statusCode, 200);
+  assert.equal(quoteCalls, 1);
+  assert.equal(sentPreference.metadata.subtotal, 75);
+  assert.equal(sentPreference.shipments.cost, 26.4);
+  assert.equal(response.body.total, 97.65);
+  assert.ok(response.body.init_point);
 });

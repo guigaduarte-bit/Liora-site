@@ -1,6 +1,5 @@
 'use strict';
 
-const { buildShippingProducts } = require('./_shipping-products');
 const { estimateCartPackaging, isShippingEstimatePreview } = require('./_shipping-estimate');
 const { automaticCoverageBRL } = require('../content/shipping-insurance.json');
 const CATALOG = require('./catalog');
@@ -14,6 +13,19 @@ const MAX_QUOTE_PARCELS = 20;
 const PARCEL_CONCURRENCY = 3;
 const QUOTE_DEADLINE_MS = 15000;
 const REQUEST_TIMEOUT_MS = 8000;
+
+// Regra original de cotação da loja, anterior ao cadastro logístico por SKU.
+// Parâmetros automáticos do pedido: não representam medidas de cada peça e
+// não dependem de shipping-products.json ou de dados enviados pelo navegador.
+function packageFor(cart) {
+  const quantity = cart.reduce((sum, item) => sum + item.quantity, 0);
+  return {
+    width: 20,
+    height: Math.min(60, 12 + quantity * 3),
+    length: 20,
+    weight: roundCurrency(Math.max(0.3, quantity * 0.35))
+  };
+}
 
 class ShippingQuoteError extends Error {
   constructor(code, message, { status = 502, sandbox = false } = {}) {
@@ -137,7 +149,7 @@ function minimumInsuranceRetryServices(attempt, subtotal) {
   }).map(quote => String(quote.id || quote.service)))];
 }
 
-async function requestSuperFrete({ baseUrl, token, destination, products, package: parcel, subtotal, services, additionalInsurance = true, deadline }) {
+async function requestSuperFrete({ baseUrl, token, destination, package: parcel, subtotal, services, additionalInsurance = true, deadline }) {
   const origin = cleanZip(process.env.SHIP_ORIGIN_CEP);
   const timeoutMs = Math.min(REQUEST_TIMEOUT_MS, deadline - Date.now());
   if (!(timeoutMs > 0)) throw new ShippingQuoteError('SHIPPING_PROVIDER_TIMEOUT', 'A cotação demorou mais que o esperado. Tente novamente.', { status: 503 });
@@ -169,7 +181,7 @@ async function requestSuperFrete({ baseUrl, token, destination, products, packag
           insurance_value: additionalInsurance ? subtotal : 0,
           use_insurance_value: additionalInsurance && subtotal > 0
         },
-        ...(parcel ? { package: parcel } : { products })
+        package: parcel
       })
     });
     const data = await response.json().catch(() => null);
@@ -193,11 +205,10 @@ async function superFreteQuotes({ destination, cart, subtotal, estimatedParcel, 
     return { preview: true, quotes: previewQuotes(destination) };
   }
 
-  const products = estimatedParcel ? undefined : buildShippingProducts(cart);
   const parcel = estimatedParcel ? {
     ...estimatedParcel.dimensionsCm,
     weight: estimatedParcel.totalWeightGrams / 1000
-  } : undefined;
+  } : packageFor(cart);
   const baseUrl = process.env.SUPERFRETE_BASE_URL || 'https://api.superfrete.com';
   const sandbox = /sandbox\.superfrete\.com/i.test(baseUrl);
   const requestedServices = process.env.SUPERFRETE_SERVICES || DEFAULT_SERVICES;
@@ -207,7 +218,6 @@ async function superFreteQuotes({ destination, cart, subtotal, estimatedParcel, 
     baseUrl,
     token,
     destination,
-    products,
     package: parcel,
     subtotal,
     deadline,
@@ -220,7 +230,6 @@ async function superFreteQuotes({ destination, cart, subtotal, estimatedParcel, 
       baseUrl,
       token,
       destination,
-      products,
       package: parcel,
       subtotal,
       deadline,
@@ -237,7 +246,7 @@ async function superFreteQuotes({ destination, cart, subtotal, estimatedParcel, 
   if (retryServices.length) {
     try {
       const retry = await requestSuperFrete({
-        baseUrl, token, destination, products, package: parcel, subtotal, deadline,
+        baseUrl, token, destination, package: parcel, subtotal, deadline,
         services: retryServices.join(','), additionalInsurance: false
       });
       attempts.push(retry);
@@ -402,9 +411,10 @@ async function quoteShipping({ zipCode, cart, subtotal }) {
     deliveryDays: null,
     preview: false
   }] : [];
-  // Estimates are enabled only by the deployment environment, never by a client
-  // flag. Production retains the validated shipping-product path.
-  const packaging = isShippingEstimatePreview() ? estimateCartPackaging(cart) : null;
+  // O checkout mantém a regra original, inclusive no preview. O experimento
+  // por peça exige ativação explícita no servidor e só funciona em preview.
+  const packaging = isShippingEstimatePreview() && process.env.LIORA_SHIPPING_ESTIMATE === 'true'
+    ? estimateCartPackaging(cart) : null;
   let superFrete;
   try {
     if (packaging && packaging.status !== 'estimated') {

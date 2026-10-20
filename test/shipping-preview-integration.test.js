@@ -28,6 +28,7 @@ async function invoke(handler, method, body) {
 
 function previewEnv(withProvider = false) {
   process.env.VERCEL_ENV = 'preview';
+  process.env.LIORA_SHIPPING_ESTIMATE = 'true';
   delete process.env.SUPERFRETE_TOKEN;
   delete process.env.SHIP_ORIGIN_CEP;
   if (withProvider) {
@@ -65,9 +66,7 @@ test('preview catalogue exposes only public product fields and no contact data',
   for (const product of response.body.products) {
     assert.deepEqual(Object.keys(product).sort(), ['dimensionsCm', 'dimensionsEstimated', 'id', 'name', 'stock', 'weightGrams']);
   }
-  assert.deepEqual(response.body.products.filter(product => product.dimensionsEstimated).map(product => product.id).sort(), [
-    'caixa-flor-solitaria', 'caixa-floral-grande', 'caixa-quadrada-media', 'caixa-redonda-floral', 'vaso-floral-metal'
-  ]);
+  assert.deepEqual(response.body.products.filter(product => product.dimensionsEstimated), []);
 });
 
 test('all 32 models are evaluated by the deployed API handler without external calls', async () => {
@@ -80,7 +79,7 @@ test('all 32 models are evaluated by the deployed API handler without external c
     assert.equal(result.statusCode, 200, product.id);
     counts[result.body.packaging.status] = (counts[result.body.packaging.status] || 0) + 1;
   }
-  assert.deepEqual(counts, { incomplete: 3, estimated: 26, unavailable: 3 });
+  assert.deepEqual(counts, { incomplete: 8, estimated: 23, unavailable: 1 });
 });
 
 test('simulation allows hypothetical quantities while checkout enforces inventory', async () => {
@@ -197,15 +196,16 @@ test('server rejects a payment using estimated shipping before any payment-provi
 test('production does not activate estimates through a forged preview flag', async () => {
   previewEnv(true);
   process.env.VERCEL_ENV = 'production';
-  let calls = 0;
-  global.fetch = async () => { calls++; throw new Error('Unexpected request'); };
+  const calls = [];
+  providerStub(calls);
   const response = await invoke(shippingQuote, 'POST', {
-    cep: '95900180', preview: true, items: [{ id: 'peonia', qty: 1 }]
+    cep: '95900180', preview: true, LIORA_SHIPPING_ESTIMATE: true, items: [{ id: 'peonia', qty: 1 }]
   });
-  assert.equal(response.statusCode, 503);
-  assert.equal(response.body.code, 'SHIPPING_DATA_INCOMPLETE');
+  assert.equal(response.statusCode, 200);
   assert.equal(response.body.packaging, undefined);
-  assert.equal(calls, 0);
+  assert.equal(response.body.quotes[0].preview, false);
+  assert.deepEqual(calls[0].package, { width: 20, height: 15, length: 20, weight: 0.35 });
+  assert.equal(calls.length, 1);
 });
 
 test('simulator rejects invalid payloads instead of accepting unknown products or unlimited quantities', async () => {

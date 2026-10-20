@@ -422,7 +422,7 @@
     "id": "caixa-redonda-floral",
     "displayName": "Caixa redonda floral",
     "description": "Arranjo de velas florais em caixa redonda com detalhes vazados. As duas composições fotografadas estão reunidas neste modelo da coleção Flora Línea.",
-    "detail": "Preço por unidade. As fotos mostram opções de apresentação; confirme a cor e a composição com a Liora antes da compra. Medidas aproximadas da peça completa, sujeitas a conferência.",
+    "detail": "Preço por unidade. As fotos mostram opções de apresentação; confirme a cor e a composição com a Liora antes da compra.",
     "specs": [
       {
         "label": "Apresentação",
@@ -431,10 +431,6 @@
       {
         "label": "Peso total da peça",
         "value": "460 g"
-      },
-      {
-        "label": "Medidas estimadas (C × L × A)",
-        "value": "20 × 20 × 12 cm"
       },
       {
         "label": "Valor",
@@ -450,7 +446,7 @@
     "id": "vaso-floral-metal",
     "displayName": "Vaso floral de metal",
     "description": "Arranjo de velas florais em vaso de metal. A apresentação fotografada reúne flores claras e um pássaro em uma composição da coleção Flora Línea.",
-    "detail": "Preço por unidade. As fotos mostram opções de apresentação; confirme a cor e a composição com a Liora antes da compra. Medidas aproximadas da peça completa, sujeitas a conferência.",
+    "detail": "Preço por unidade. As fotos mostram opções de apresentação; confirme a cor e a composição com a Liora antes da compra.",
     "specs": [
       {
         "label": "Apresentação",
@@ -459,10 +455,6 @@
       {
         "label": "Peso total da peça",
         "value": "265 g"
-      },
-      {
-        "label": "Medidas estimadas (C × L × A)",
-        "value": "16 × 16 × 22 cm"
       },
       {
         "label": "Valor",
@@ -478,7 +470,7 @@
     "id": "caixa-flor-solitaria",
     "displayName": "Caixa flor solitária",
     "description": "Uma vela em formato de flor apresentada em caixa individual. Um detalhe da coleção Flora Línea para presentear.",
-    "detail": "Preço por unidade. As fotos mostram opções de apresentação; confirme a cor e a composição com a Liora antes da compra. Medidas aproximadas da peça completa, sujeitas a conferência.",
+    "detail": "Preço por unidade. As fotos mostram opções de apresentação; confirme a cor e a composição com a Liora antes da compra.",
     "specs": [
       {
         "label": "Apresentação",
@@ -487,10 +479,6 @@
       {
         "label": "Peso total da peça",
         "value": "100 g"
-      },
-      {
-        "label": "Medidas estimadas (C × L × A)",
-        "value": "10 × 10 × 6 cm"
       },
       {
         "label": "Valor",
@@ -506,7 +494,7 @@
     "id": "caixa-quadrada-media",
     "displayName": "Caixa quadrada média",
     "description": "Composição de velas florais em caixa média com tampa decorada. Flores em diferentes tons se encontram nesta apresentação da coleção Flora Línea.",
-    "detail": "Preço por unidade. As fotos mostram opções de apresentação; confirme a cor e a composição com a Liora antes da compra. Medidas aproximadas da peça completa, sujeitas a conferência.",
+    "detail": "Preço por unidade. As fotos mostram opções de apresentação; confirme a cor e a composição com a Liora antes da compra.",
     "specs": [
       {
         "label": "Apresentação",
@@ -515,10 +503,6 @@
       {
         "label": "Peso total da peça",
         "value": "420 g"
-      },
-      {
-        "label": "Medidas estimadas (C × L × A)",
-        "value": "20 × 20 × 10 cm"
       },
       {
         "label": "Valor",
@@ -534,7 +518,7 @@
     "id": "caixa-floral-grande",
     "displayName": "Caixa floral grande",
     "description": "Arranjo de velas florais em caixa grande com contorno de flor e tampa decorada. Uma composição da coleção Flora Línea para ocasiões especiais.",
-    "detail": "Preço por unidade. As fotos mostram opções de apresentação; confirme a cor e a composição com a Liora antes da compra. Medidas aproximadas da peça completa, sujeitas a conferência.",
+    "detail": "Preço por unidade. As fotos mostram opções de apresentação; confirme a cor e a composição com a Liora antes da compra.",
     "specs": [
       {
         "label": "Apresentação",
@@ -543,10 +527,6 @@
       {
         "label": "Peso total da peça",
         "value": "480 g"
-      },
-      {
-        "label": "Medidas estimadas (C × L × A)",
-        "value": "24 × 24 × 10 cm"
       },
       {
         "label": "Valor",
