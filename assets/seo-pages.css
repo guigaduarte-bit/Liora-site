@@ -12,6 +12,9 @@
 .page-intro h1{font-size:clamp(42px,5.8vw,72px);margin:16px 0 22px}
 .page-intro p:last-child{max-width:65ch;margin:auto;color:var(--ink-soft)}
 .page-intro .eyebrow{font-size:10px}
+.collection-intro .collection-tagline{max-width:30ch;margin:0 auto 22px;font-family:var(--display);font-size:clamp(25px,2.4vw,32px);font-style:italic;line-height:1.25;color:var(--gold-deep)}
+.collection-intro .collection-description{max-width:65ch;margin:0 auto;color:var(--ink-soft)}
+.collection-intro .collection-invitation{max-width:60ch;margin:20px auto 0;color:var(--ink)}
 .category-page{padding-bottom:80px}
 .product-page{padding-bottom:80px}
 .product-layout{display:grid;grid-template-columns:1fr 1fr;gap:clamp(30px,6vw,84px);align-items:start;margin-bottom:70px}

@@ -22,6 +22,7 @@ for(const [src,meta] of Object.entries(imageManifest)){
  }
 }
 const editorial=json('content/product-editorial.json');
+const collectionEditorial=json('content/collection-editorial.json');
 const original=json('content/products.json');
 const productIds=original.map(p=>p.id);
 if(new Set(productIds).size!==original.length||editorial.length!==original.length||Object.keys(catalog).length!==original.length||new Set(editorial.map(p=>p.id)).size!==original.length)throw Error('Product catalogue IDs must be unique and synchronized');
@@ -74,7 +75,9 @@ fs.writeFileSync(path.join(out,'index.html'),home);
 function readDist(f){return fs.readFileSync(path.join(out,f),'utf8');}
 for(const c of categories){
  const items=products.filter(p=>c.ids.includes(p.id));
- page({url:c.path,title:`${c.title} | Liora`,description:c.description,schemas:[crumbSchema([{name:c.name,path:c.path}])]},`<section class="wrap category-page">${crumbs([{name:c.name}])}<div class="page-intro"><p class="eyebrow">Coleções Liora</p><h1 class="display">${c.title}</h1><p>${c.description}</p></div><nav class="tabs" id="tabsBar" aria-label="Coleções">${lioraTabsHTML(categories,c.name)}</nav><div class="grid" id="grid">${items.map(p=>lioraCardHTML(p)).join('')}</div><p class="product-help">Frete grátis a partir de R$ 150 em produtos, antes do desconto Pix. Confira as <a href="/termos-de-uso.html">condições de compra</a>.</p></section>`,c.name);
+ const copy=collectionEditorial[c.name];
+ const intro=copy?`<h1 class="display">${e(c.name)}</h1><p class="collection-tagline">${e(copy.tagline)}</p><p class="collection-description">${e(copy.description)}</p><p class="collection-invitation">${e(copy.invitation)}</p>`:`<h1 class="display">${e(c.title)}</h1><p>${e(c.description)}</p>`;
+ page({url:c.path,title:`${c.title} | Liora`,description:c.description,schemas:[crumbSchema([{name:c.name,path:c.path}])]},`<section class="wrap category-page">${crumbs([{name:c.name}])}<div class="page-intro${copy?' collection-intro':''}"><p class="eyebrow">Coleções Liora</p>${intro}</div><nav class="tabs" id="tabsBar" aria-label="Coleções">${lioraTabsHTML(categories,c.name)}</nav><div class="grid" id="grid">${items.map(p=>lioraCardHTML(p)).join('')}</div><p class="product-help">Frete grátis a partir de R$ 150 em produtos, antes do desconto Pix. Confira as <a href="/termos-de-uso.html">condições de compra</a>.</p></section>`,c.name);
 }
 for(const p of products){
  const url=`/produtos/${p.id}/`,cat=categories.find(c=>c.name===p.cats[0])||categories[0];
