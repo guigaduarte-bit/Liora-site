@@ -2,6 +2,7 @@
 
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
+const path = require('node:path');
 const { before, after, beforeEach, afterEach, test } = require('node:test');
 const { createHmac } = require('node:crypto');
 const { PGlite } = require('@electric-sql/pglite');
@@ -20,8 +21,12 @@ const dbOrigin = 'https://abcdefghijklmnopqrst.supabase.co';
 before(async () => {
   db = new PGlite();
   await db.exec('create role anon; create role authenticated; create role service_role bypassrls;');
-  const sql = fs.readFileSync(require.resolve('../supabase/migrations/20261021122453_liora_orders.sql'), 'utf8');
-  await db.exec(sql);
+  // Match the platform defaults observed in the real Supabase project.
+  await db.exec('alter default privileges in schema public grant all on tables to service_role;');
+  const migrations = path.join(__dirname, '../supabase/migrations');
+  for (const filename of fs.readdirSync(migrations).filter(name => name.endsWith('.sql')).sort()) {
+    await db.exec(fs.readFileSync(path.join(migrations, filename), 'utf8'));
+  }
 });
 after(async () => { await db.close(); });
 beforeEach(async () => {
@@ -243,4 +248,15 @@ test('tabelas, fila e função não são acessíveis por visitantes nem clientes
     }
     await db.exec('reset role');
   }
+});
+test('servidor não pode excluir pedidos nem escrever pela consulta administrativa', async () => {
+  await invoke(createCheckout, request());
+  await db.exec('set role service_role');
+  for (const sql of [
+    'delete from liora_order_payments',
+    'delete from liora_orders',
+    'truncate liora_orders, liora_order_payments',
+    "update liora_paid_orders set customer = '{}'::jsonb"
+  ]) await assert.rejects(db.query(sql), /permission denied/);
+  assert.equal((await db.query('select count(*)::int as n from liora_orders')).rows[0].n, 1);
 });
