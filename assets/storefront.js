@@ -58,7 +58,9 @@ let checkoutForm={name:'',email:'',cep:'',num:'',addr:''};
 let shippingState={status:'idle',quotes:[],preview:false,packaging:null,notice:'',error:'',code:'',sandbox:false,cep:''};
 let shippingRequestId=0;
 let paymentReturn=null, paymentView={status:'idle',test:false}, paymentCheckRunning=false;
-let checkoutSubmitting=false;
+let checkoutSubmitting=false, paymentPollTimer=null, paymentPolls=0;
+const checkoutV2=window.LIORA_CHECKOUT_V2===true;
+const interestFree=window.LIORA_PAYMENT_POLICY?.interestFreeInstallments===3;
 const infinitePayAvailable=window.LIORA_PAYMENT_ENVIRONMENT==='production';
 
 const $=id=>document.getElementById(id);
@@ -67,7 +69,7 @@ const roundCurrency=v=>Math.round((v+Number.EPSILON)*100)/100;
 const escapeAttr=v=>String(v||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const prod=id=>PRODUCTS.find(p=>p.id===id);
 const instOf=p=>p.price>=15?3:(p.price>=10?2:0);
-const instTxt=p=>{const n=instOf(p);return n?`${n} x de ${money(p.price/n)} sem juros`:'À vista'};
+const instTxt=p=>{const n=instOf(p);return n?(interestFree?`${n} x de ${money(p.price/n)} sem juros`:`Até ${n}x no cartão · condições no pagamento`):'À vista'};
 const offPct=p=>p.old?Math.round((1-p.price/p.old)*100):0;
 
 /* ============ TABS + GRID ============ */
@@ -248,19 +250,20 @@ function renderCheckout(){
     <p class="production-note"><strong>Produção: 10 dias úteis.</strong> A contagem começa quando pagamento e personalização estiverem confirmados. Some o prazo de transporte calculado pelo CEP.</p>
     ${shippingOptionsHTML(st)}
     ${packagingEstimateHTML()}
-    ${paymentOptionsHTML()}`;
+    ${paymentOptionsHTML()}
+    ${checkoutV2&&payMethod==='pix'?`<div class="field"><label for="fCPF">CPF do pagador</label><input id="fCPF" inputmode="numeric" autocomplete="off" maxlength="14" value="${escapeAttr(checkoutForm.cpf)}" oninput="checkoutForm.cpf=this.value" aria-describedby="cpfHelp"><small id="cpfHelp">Necessário para gerar o Pix no Mercado Pago.</small></div>`:''}`;
   $('drawerFoot').innerHTML=`
     <div class="sum-row"><span>Subtotal</span><span>${money(st)}</span></div>
     <div class="sum-row"><span>Frete</span><span>${shipMethod==='delivery'&&!selectedQuote?'A calcular':ship?money(ship):'<span class="free">Grátis</span>'}</span></div>
     ${disc?`<div class="sum-row"><span>Desconto Pix (5%)</span><span style="color:var(--gold-deep)">− ${money(disc)}</span></div>`:''}
     <div class="sum-row total"><span>${previewOnly?'Total estimado':checkoutReady?'Total':'Total parcial'}</span><span>${money(total)}</span></div>
     <button class="btn btn-solid w-full" style="margin-top:14px" onclick="confirmOrder()" ${checkoutReady&&!checkoutSubmitting?'':'disabled'}>${checkoutSubmitting?'Gerando pagamento…':checkoutReady?`${payMethod==='pix'?'Pagar com Pix':payMethod==='boleto'?'Gerar boleto':payMethod==='infinitepay'?'Pagar com InfinitePay':'Confirmar pedido'} · ${money(total)}`:previewOnly?'Simulação · pagamento indisponível':payMethod==='infinitepay'&&!infinitePayAvailable?'InfinitePay indisponível neste preview':'Calcule o frete para continuar'}</button>
-    <p style="text-align:center;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin-top:12px">Você será redirecionado ao ambiente seguro ${payMethod==='infinitepay'?'da InfinitePay':'do Mercado Pago'}</p>`;
+    <p style="text-align:center;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin-top:12px">${checkoutV2&&payMethod==='pix'?'O QR Code e o código Pix aparecerão aqui.':`Você será redirecionado ao ambiente seguro ${payMethod==='infinitepay'?'da InfinitePay':'do Mercado Pago'}`}</p>`;
 }
 function paymentOptionsHTML(){
   const options=[
     {id:'pix',name:'Pix',detail:'5% de desconto extra'},
-    {id:'card',name:'Cartão de crédito',detail:'até 3x sem juros'},
+    {id:'card',name:'Cartão de crédito',detail:interestFree?'até 3x sem juros':'até 3x · condições no Mercado Pago'},
     {id:'boleto',name:'Boleto bancário',detail:'aprovação após compensação'},
     {id:'infinitepay',name:'InfinitePay',description:'Pix, cartão em até 12x e carteiras digitais',detail:infinitePayAvailable?'Opção adicional':'Indisponível neste preview',disabled:!infinitePayAvailable}
   ];
@@ -383,7 +386,9 @@ async function confirmOrder(){
   const selectedQuote=shippingState.quotes.find(q=>q.id===selectedShippingService);
   if(shipMethod==='delivery'&&selectedQuote?.preview){toast('Esta opção é uma simulação. O pagamento ficará disponível após a conferência do frete.');return}
   const name=$('fN').value.trim(),email=$('fE').value.trim(),cep=$('fC').value.trim(),num=$('fNum').value.trim(),addr=$('fA').value.trim();
-  checkoutForm={name,email,cep,num,addr};
+  const cpf=checkoutV2&&payMethod==='pix'?$('fCPF').value.replace(/\D/g,''):'';
+  checkoutForm={name,email,cep,num,addr,cpf};
+  if(checkoutV2&&payMethod==='pix'&&!/^\d{11}$/.test(cpf)){toast('Informe o CPF do pagador para gerar o Pix');return}
   if(!name||!email||!$('fE').checkValidity()){toast('Preencha nome e e-mail válidos para continuar');return}
   if(shipMethod==='delivery'&&(!cep||!addr)){toast('Preencha o endereço de entrega');return}
   if(shipMethod==='delivery'&&!selectedQuote){toast('Selecione uma opção de entrega');return}
@@ -398,26 +403,34 @@ async function confirmOrder(){
       items:cart.map(i=>({id:i.id,qty:i.qty,frag:i.frag})),
       payMethod,
       shipping:{method:shipMethod,serviceId:selectedShippingService},
-      payer:{name,email,cep,num,addr},
+      payer:{name,email,cep,num,addr,...(cpf?{cpf}:{})},
       returnOrigin:window.location.origin
     };
+    if(checkoutV2){
+      const bytes=await window.crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(payload)));
+      const fingerprint=Array.from(new Uint8Array(bytes),b=>b.toString(16).padStart(2,'0')).join('');
+      const previous=JSON.parse(sessionStorage.getItem('liora_checkout_attempt')||'null');
+      payload.checkoutKey=previous?.fingerprint===fingerprint?previous.key:window.crypto.randomUUID();
+      sessionStorage.setItem('liora_checkout_attempt',JSON.stringify({fingerprint,key:payload.checkoutKey}));
+    }
     const resp=await fetch('/api/create-preference',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify(payload)
     });
     const data=await resp.json().catch(()=>({}));
-    if(!resp.ok||!data.init_point||!data.order_id||!data.checkout_proof){
+    if(!resp.ok||(!data.init_point&&!data.pix)||!data.order_id||!data.checkout_proof){
       toast(data.error||'Não foi possível iniciar o pagamento. Tente novamente.');
       return;
     }
     sessionStorage.setItem(`liora_checkout_proof:${data.order_id}`,data.checkout_proof);
     sessionStorage.setItem(`liora_checkout_cart:${data.order_id}`,JSON.stringify(payload.items));
     sessionStorage.setItem('liora_checkout_order',data.order_id);
-    paymentReturn={orderId:data.order_id,provider:data.provider||(payMethod==='infinitepay'?'infinitepay':'mercadopago')};
+    paymentReturn={orderId:data.order_id,provider:data.provider||(payMethod==='infinitepay'?'infinitepay':'mercadopago'),...(data.pix?{pix:data.pix,paymentId:data.payment_id,total:data.total}:{})};
     savePaymentReturn();
-    window.location.href=data.init_point;
     redirecting=true;
+    if(data.pix){checkoutSubmitting=false;paymentPolls=0;await retryPaymentConfirmation()}
+    else window.location.href=data.init_point;
   }catch(err){
     toast('Erro de conexão. Tente novamente.');
   }finally{
@@ -430,21 +443,35 @@ window.addEventListener('pageshow',event=>{
 function renderPaymentStatus(){
   const status=paymentView.status,approved=status==='approved';
   const terminal=['rejected','cancelled','refunded','charged_back'].includes(status);
-  const headings={checking:'Confirmando pagamento…',approved:paymentView.test?'Pagamento de teste aprovado':'Pagamento confirmado',pending:'Aguardando confirmação',in_process:'Pagamento em análise',authorized:'Aguardando conclusão',rejected:'Pagamento não aprovado',cancelled:'Pagamento cancelado',refunded:'Pagamento devolvido',charged_back:'Pagamento contestado',in_mediation:'Pagamento em análise',error:'Confirmação em aberto'};
+  const headings={checking:'Confirmando pagamento…',approved:paymentView.test?'Pagamento de teste aprovado':'Pagamento confirmado',pending:'Aguardando confirmação',in_process:'Pagamento em análise',authorized:'Aguardando conclusão',rejected:'Pagamento não aprovado',cancelled:'Pagamento cancelado',refunded:'Pagamento devolvido',charged_back:'Pagamento contestado',in_mediation:'Pagamento em análise',review_required:'Pagamento recebido · pedido em conferência',error:'Confirmação em aberto'};
   const title=headings[status]||'Consultar pagamento';
   let message='Confira a situação no provedor antes de tentar pagar novamente. Use o botão abaixo para consultar este mesmo pagamento.';
   if(status==='checking')message='Consultando o pagamento já iniciado. Aguarde a resposta do provedor.';
   else if(approved)message=paymentView.test?'Nenhum pedido será produzido. Este pagamento pertence ao ambiente de testes.':'Obrigada pelo seu pedido. O prazo de produção é de 10 dias úteis após a confirmação do pagamento e da personalização.';
   else if(['pending','in_process','authorized','in_mediation'].includes(status))message='O provedor ainda não confirmou a conclusão. Você pode consultar novamente sem fazer outro pagamento.';
+  else if(status==='review_required')message='O pagamento foi recebido, mas as condições precisam ser conferidas pela Liora. Não pague novamente. Entre em contato informando o número do pedido.';
   else if(terminal)message=['rejected','cancelled'].includes(status)?'O provedor informou que este pagamento não foi concluído. Os produtos continuam no carrinho.':'Consulte os detalhes no provedor e entre em contato com a Liora sobre este pedido.';
   $('drawerTitle').textContent=title;
   $('drawerBody').innerHTML=`<div class="success" role="status" aria-live="polite">
     ${approved?'<div class="ok-ring"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5"/></svg></div>':''}
     <h3>${title}</h3><p>${message}</p>
+    ${pixPaymentHTML(status)}
     ${paymentReturn?`<p class="order">Pedido ${escapeAttr(paymentReturn.orderId)}</p>`:''}
     ${!approved&&!terminal?`<button class="btn btn-ink w-full" onclick="retryPaymentConfirmation()" ${paymentCheckRunning?'disabled':''}>${paymentCheckRunning?'Consultando…':'Verificar pagamento novamente'}</button>`:''}
     <button class="btn btn-outline w-full payment-close" onclick="closeAll()">Continuar no site</button></div>`;
   $('drawerFoot').innerHTML='';
+}
+
+function pixPaymentHTML(status){
+  const pix=paymentReturn?.pix;
+  if(!pix||!['pending','checking','error'].includes(status))return '';
+  if(Date.parse(pix.expires_at)<=Date.now())return '<p>Este código Pix expirou. Consulte o pagamento antes de iniciar outro pedido.</p>';
+  if(!/^[A-Za-z0-9+/]+={0,2}$/.test(pix.image||'')||!String(pix.code).startsWith('000201'))return '';
+  return `<div class="pix-payment"><p>Pix de ${money(paymentReturn.total)}. Pague pelo aplicativo do seu banco.</p><img src="data:image/png;base64,${pix.image}" alt="QR Code para pagar este pedido por Pix" width="240" height="240"><label for="pixCode">Código Pix copia e cola</label><textarea id="pixCode" readonly rows="3">${escapeAttr(pix.code)}</textarea><button class="btn btn-outline w-full" onclick="copyPixCode()">Copiar código Pix</button><p>Válido até ${escapeAttr(new Date(pix.expires_at).toLocaleString('pt-BR'))}. A confirmação aparece nesta tela.</p></div>`;
+}
+async function copyPixCode(){
+  try{await navigator.clipboard.writeText(paymentReturn.pix.code);toast('Código Pix copiado')}
+  catch{$('pixCode')?.focus();$('pixCode')?.select();toast('Selecione e copie o código Pix acima')}
 }
 
 /* ============ QUICK VIEW ============ */
@@ -500,7 +527,7 @@ function renderQuick(){
       <div class="m-specs">
         <div><svg viewBox="0 0 24 24"><path d="M12 3c3.5 4.2 5.5 7.2 5.5 10a5.5 5.5 0 0 1-11 0c0-2.8 2-5.8 5.5-10z"/></svg>Feito à mão</div>
         <div><svg viewBox="0 0 24 24"><path d="M1 7h13v10H1zM14 10h5l3 3v4h-8z"/><circle cx="6" cy="18.5" r="1.8"/><circle cx="17.5" cy="18.5" r="1.8"/></svg>Todo o Brasil</div>
-        <div><svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M2.5 10h19"/></svg>Até 3x sem juros</div>
+        <div><svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M2.5 10h19"/></svg>${interestFree?'Até 3x sem juros':'Cartão em até 3x'}</div>
       </div>
       <div style="margin-top:26px">
         <details><summary>Pagamento</summary><p>Mercado Pago com Pix (5% de desconto), cartão em até 3x ou boleto. Como alternativa, use InfinitePay com Pix, cartão em até 12x e carteiras digitais.</p></details>
@@ -539,6 +566,7 @@ function doSearch(q){
 /* ============ MENU / OVERLAYS ============ */
 function openMenu(){$('mmenu').classList.add('on');document.body.style.overflow='hidden'}
 function closeAll(){
+  clearTimeout(paymentPollTimer);
   ['drawer','scrim','modal','mmenu'].forEach(i=>$(i).classList.remove('on'));
   document.body.style.overflow='';
 }
@@ -590,17 +618,19 @@ async function retryPaymentConfirmation(){
     }else if(context.paymentId)query.set('payment_id',context.paymentId);
     const resp=await fetch(`${endpoint}?${query}`,{headers:{'X-Checkout-Proof':checkoutProof},cache:'no-store'});
     const data=await resp.json().catch(()=>({}));
-    if(!resp.ok||data.order_id!==orderId||!['approved','pending','in_process','authorized','rejected','cancelled','refunded','charged_back','in_mediation'].includes(data.status))throw new Error('Falha ao confirmar pagamento');
+    if(!resp.ok||data.order_id!==orderId||!['approved','pending','in_process','authorized','rejected','cancelled','refunded','charged_back','in_mediation','review_required'].includes(data.status))throw new Error('Falha ao confirmar pagamento');
     paymentView={status:data.status,test:data.payment_mode==='test'};
     if(data.status==='approved'){
       removePurchasedItems(orderId);
       checkoutForm={name:'',email:'',cep:'',num:'',addr:''};
       if(sessionStorage.getItem('liora_checkout_order')===orderId)sessionStorage.removeItem('liora_checkout_order');
+      sessionStorage.removeItem('liora_checkout_attempt');
       sessionStorage.removeItem('liora_checkout_return');
       sessionStorage.removeItem(`liora_checkout_proof:${orderId}`);
       sessionStorage.removeItem(`liora_checkout_cart:${orderId}`);
       toast(paymentView.test?'Pagamento de teste aprovado. Nenhum pedido será produzido.':'Pagamento aprovado ✦ Obrigada pelo seu pedido!');
     }else{
+      if(['rejected','cancelled','refunded','charged_back'].includes(data.status))sessionStorage.removeItem('liora_checkout_attempt');
       if(data.payment_id&&/^\d{1,30}$/.test(String(data.payment_id)))context.paymentId=String(data.payment_id);
       savePaymentReturn();
       toast(['pending','in_process','authorized'].includes(data.status)?'Pagamento pendente ou em análise. Consulte novamente sem repetir o pagamento.':'Situação do pagamento atualizada. Confira os detalhes na tela.');
@@ -611,6 +641,8 @@ async function retryPaymentConfirmation(){
   }finally{
     paymentCheckRunning=false;
     if(drawerView==='payment')renderPaymentStatus();
+    clearTimeout(paymentPollTimer);
+    if(context.pix&&$('drawer').classList.contains('on')&&['pending','in_process'].includes(paymentView.status)&&paymentPolls++<30&&Date.parse(context.pix.expires_at)>Date.now())paymentPollTimer=setTimeout(retryPaymentConfirmation,8000);
   }
 }
 (async function checkPaymentReturn(){

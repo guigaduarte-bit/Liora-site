@@ -1,5 +1,8 @@
 'use strict';
 
+const orders = require('./_orders');
+const { cpf, createPix } = require('./_pix');
+const paymentPolicy = require('../content/payment-policy.json');
 const { randomUUID } = require('node:crypto');
 const CATALOG = require('./catalog');
 const { SHIP_FREE, cleanZip, quoteShipping, roundCurrency } = require('./_shipping');
@@ -102,7 +105,7 @@ function paymentSettings(payMethod) {
   if (payMethod === 'boleto') allowed = ['ticket'];
   if (payMethod === 'card') {
     allowed = ['credit_card'];
-    installments = 3;
+    installments = paymentPolicy.maxInstallments;
   }
 
   return {
@@ -137,7 +140,7 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const { items, payMethod, shipping, payer, returnOrigin } = parseBody(req);
+    const { items, payMethod, shipping, payer, returnOrigin, checkoutKey } = parseBody(req);
     const selectedPayment = cleanText(payMethod, 20);
     const selectedShipping = cleanText(shipping && shipping.method, 20);
 
@@ -150,6 +153,11 @@ module.exports = async function handler(req, res) {
 
     const provider = selectedPayment === 'infinitepay' ? 'infinitepay' : 'mercadopago';
     const config = configuration(provider);
+    const durable = orders.enabled();
+    if (durable) {
+      orders.settings();
+      if (!process.env.MP_WEBHOOK_SECRET || process.env.MP_WEBHOOK_SECRET.length < 32) fail('PAYMENT_WEBHOOK_NOT_CONFIGURED');
+    }
     const siteUrl = siteOrigin(config);
     if (returnOrigin !== undefined && returnOrigin !== siteUrl) {
       fail('CHECKOUT_ORIGIN_MISMATCH', 'Abra a loja pelo endereço configurado para este checkout antes de continuar.', 409);
@@ -169,6 +177,7 @@ module.exports = async function handler(req, res) {
     }
 
     const cart = validateCart(items);
+    if (durable && selectedPayment === 'pix' && !cpf(payer?.cpf)) fail('PIX_CPF_INVALID', 'Informe um CPF válido para gerar o Pix.', 400);
     const subtotal = roundCurrency(cart.reduce(
       (sum, item) => sum + item.price * item.quantity,
       0
@@ -194,9 +203,28 @@ module.exports = async function handler(req, res) {
       ? pixSubtotal(subtotal)
       : subtotal;
     const total = roundCurrency(productTotal + shippingCost);
-    const orderId = `LIORA-${Date.now().toString(36).toUpperCase()}-${randomUUID().slice(0, 8).toUpperCase()}`;
-    const checkoutProof = signProof({ orderId, provider, totalCents: Math.round(total * 100), method: selectedPayment }, config);
+    const orderId = durable ? orders.identity(checkoutKey, config) : `LIORA-${Date.now().toString(36).toUpperCase()}-${randomUUID().slice(0, 8).toUpperCase()}`;
+    const checkoutProof = signProof({ orderId, provider, totalCents: Math.round(total * 100), method: selectedPayment, registered: durable }, config);
     const returnUrl = `${siteUrl}/?checkout=return&order_id=${encodeURIComponent(orderId)}`;
+
+    if (durable) {
+      const snapshot = { id: orderId, provider, environment: config.environment, mode: config.mode, method: selectedPayment,
+        total_cents: Math.round(total * 100), subtotal_cents: Math.round(subtotal * 100), discount_cents: Math.round((subtotal - productTotal) * 100),
+        shipping_cents: Math.round(shippingCost * 100), interest_free_installments: paymentPolicy.interestFreeInstallments,
+        customer: { name, email, cep: zipCode, number: streetNumber || 'S/N', address }, items: cart,
+        shipping: { id: selectedQuote.id, name: selectedQuote.name, carrier: selectedQuote.carrier, deliveryDays: selectedQuote.deliveryDays || 0 } };
+      const registered = await orders.register(snapshot, { snapshot, cpf: selectedPayment === 'pix' ? cpf(payer.cpf) : null });
+      if (registered.order.checkout_response) return res.status(200).json({ ...registered.order.checkout_response, checkout_proof: checkoutProof });
+      if (!registered.created && selectedPayment !== 'pix') fail('ORDER_ALREADY_STARTED', 'Este pedido já está sendo processado. Consulte o pagamento antes de tentar novamente.', 409);
+    }
+    const finish = async (data) => {
+      if (durable) await orders.saveCheckout(orderId, config.environment, data);
+      return res.status(200).json({ ...data, checkout_proof: checkoutProof });
+    };
+    if (durable && selectedPayment === 'pix') {
+      const pix = await createPix({ orderId, total, payer: { name, email, cpf: payer.cpf }, config, notificationUrl: `${siteUrl}/api/payment-webhook?provider=mercadopago` });
+      return await finish({ ...pix, order_id: orderId, provider, payment_mode: config.mode, total });
+    }
 
     if (selectedPayment === 'infinitepay') {
       const infinitePayReturnUrl = `${siteUrl}/?checkout=infinitepay-return&order_id=${encodeURIComponent(orderId)}`;
@@ -212,7 +240,8 @@ module.exports = async function handler(req, res) {
         },
         items: buildInfinitePayItems(cart, shippingCost, selectedQuote)
       };
-      if (process.env.INFINITEPAY_WEBHOOK_URL) {
+      if (durable) checkoutPayload.webhook_url = `${siteUrl}/api/payment-webhook?provider=infinitepay`;
+      else if (process.env.INFINITEPAY_WEBHOOK_URL) {
         const webhookUrl = httpsUrl(process.env.INFINITEPAY_WEBHOOK_URL, [new URL(siteUrl).hostname]);
         if (!webhookUrl) fail('PAYMENT_WEBHOOK_URL_INVALID');
         checkoutPayload.webhook_url = webhookUrl.toString();
@@ -225,12 +254,11 @@ module.exports = async function handler(req, res) {
       });
       const checkoutUrl = httpsUrl(data.url, ['checkout.infinitepay.com.br']);
       if (!checkoutUrl) fail('PAYMENT_PROVIDER_INVALID_RESPONSE', 'Não foi possível iniciar o pagamento pela InfinitePay.', 502);
-      return res.status(200).json({
+      return await finish({
         id: data.invoice_slug || orderId,
         init_point: checkoutUrl.toString(),
         order_id: orderId,
         provider: 'infinitepay',
-        checkout_proof: checkoutProof,
         payment_mode: config.mode,
         total
       });
@@ -272,7 +300,8 @@ module.exports = async function handler(req, res) {
       }
     };
 
-    if (process.env.MP_WEBHOOK_URL) {
+    if (durable) preference.notification_url = `${siteUrl}/api/payment-webhook?provider=mercadopago`;
+    else if (process.env.MP_WEBHOOK_URL) {
       const webhookUrl = httpsUrl(process.env.MP_WEBHOOK_URL, [new URL(siteUrl).hostname]);
       if (!webhookUrl) fail('PAYMENT_WEBHOOK_URL_INVALID');
       preference.notification_url = webhookUrl.toString();
@@ -290,12 +319,11 @@ module.exports = async function handler(req, res) {
     if (!checkoutUrl || typeof data.id !== 'string' || !data.id || data.id.length > 200) fail('PAYMENT_PROVIDER_INVALID_RESPONSE', 'Não foi possível iniciar o pagamento.', 502);
     if (typeof data.live_mode !== 'undefined' && data.live_mode !== (config.mode === 'live')) fail('PAYMENT_ENVIRONMENT_MISMATCH');
 
-    return res.status(200).json({
+    return await finish({
       id: data.id,
       init_point: checkoutUrl.toString(),
       order_id: orderId,
       provider: 'mercadopago',
-      checkout_proof: checkoutProof,
       payment_mode: config.mode,
       total
     });

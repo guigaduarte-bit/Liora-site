@@ -7,7 +7,7 @@ const vm = require('node:vm');
 const { test } = require('node:test');
 const products = require('../content/products.json');
 
-function storefront({ saved = {}, blockedStorage = false, search = '', fetch, environment = 'production' } = {}) {
+function storefront({ saved = {}, blockedStorage = false, search = '', fetch, environment = 'production', checkoutV2 = false } = {}) {
   const storage = new Map(Object.entries(saved));
   const nodes = new Map();
   const element = (id) => {
@@ -23,6 +23,9 @@ function storefront({ saved = {}, blockedStorage = false, search = '', fetch, en
     LIORA_PRODUCTS: structuredClone(products),
     LIORA_CATEGORIES: [],
     LIORA_PAYMENT_ENVIRONMENT: environment,
+    LIORA_CHECKOUT_V2: checkoutV2,
+    LIORA_PAYMENT_POLICY: { maxInstallments: 3, interestFreeInstallments: 0 },
+    crypto: require('node:crypto').webcrypto,
     location: { search, pathname: '/', href: 'https://liora.example/', origin: 'https://liora.example' },
     history: { replaceState() {} },
     addEventListener() {}
@@ -42,7 +45,7 @@ function storefront({ saved = {}, blockedStorage = false, search = '', fetch, en
     },
     IntersectionObserver: class { observe() {} unobserve() {} },
     setTimeout() { return 1; }, clearTimeout() {},
-    URLSearchParams, TextEncoder,
+    URLSearchParams, TextEncoder, Uint8Array,
     fetch: fetch || (async () => { assert.fail('O teste não pode acessar a rede'); })
   });
   // Captura somente a promessa de inicialização para observar falhas assíncronas.
@@ -184,7 +187,7 @@ test('storage bloqueado e JSON corrompido não impedem comprar durante a sessão
   }
 });
 
-for (const status of ['approved', 'pending', 'rejected']) {
+for (const status of ['approved', 'pending', 'rejected', 'review_required']) {
   test(`retorno ${status} só limpa o carrinho quando a API confirma aprovação`, async () => {
     let calls = 0;
     const app = storefront({
@@ -362,4 +365,46 @@ test('status aprovado adulterado na URL ou resposta de outro pedido não esvazia
   await app.done;
   assert.equal(app.run('cartQty()'), 1);
   assert.match(app.nodes.get('drawerBody').innerHTML, /Confirmação em aberto/);
+});
+
+test('Pix direto mostra QR e copia e cola, consulta o pagamento e guarda só a tentativa sem CPF', async () => {
+  const payloads=[];
+  const app=storefront({checkoutV2:true,fetch:async(url,options)=>{
+    if(url==='/api/create-preference'){
+      payloads.push(JSON.parse(options.body));
+      return {ok:true,json:async()=>({order_id:'LIORA-TESTE-12345678',checkout_proof:'signed-fixture',provider:'mercadopago',payment_id:'123',total:91.15,pix:{code:'000201-SYNTHETIC-PIX',image:'aW1hZ2U=',expires_at:'2099-01-01T00:00:00Z'}})};
+    }
+    assert.match(url,/payment_id=123/);
+    return {ok:true,json:async()=>({order_id:'LIORA-TESTE-12345678',status:'pending'})};
+  }});
+  await app.done;
+  app.run("addToCart('botanique',1); shippingState={status:'ready',quotes:[{id:'curitiba-fixed',price:19.9}]}; selectedShippingService='curitiba-fixed'; $('fN').value='Pessoa Fictícia'; $('fE').value='cliente@example.com'; $('fC').value='80000000'; $('fNum').value='1'; $('fA').value='Rua Fictícia'; $('fCPF').value='19119119100';");
+  await app.run('confirmOrder()');
+  assert.equal(payloads.length,1);
+  assert.match(payloads[0].checkoutKey,/^[a-f0-9-]{36}$/);
+  assert.equal(payloads[0].payer.cpf,'19119119100');
+  assert.match(app.nodes.get('drawerBody').innerHTML,/QR Code para pagar este pedido por Pix/);
+  assert.match(app.nodes.get('drawerBody').innerHTML,/Copiar código Pix/);
+  assert.equal(app.run('window.location.href'),'https://liora.example/');
+  assert.equal(app.run('cartQty()'),1);
+  assert.doesNotMatch(JSON.stringify([...app.storage]),/19119119100|cliente@example|Fictícia|80000000/);
+});
+
+test('repetição após falha de rede mantém chave de idempotência e mudança de compra gera outra', async()=>{
+  const keys=[];
+  const app=storefront({checkoutV2:true,fetch:async(url,options)=>{keys.push(JSON.parse(options.body).checkoutKey);throw Error('offline')}});
+  await app.done;
+  app.run("addToCart('botanique',1); payMethod='card'; shippingState={status:'ready',quotes:[{id:'curitiba-fixed',price:19.9}]}; selectedShippingService='curitiba-fixed'; $('fN').value='Pessoa Fictícia'; $('fE').value='cliente@example.com'; $('fC').value='80000000'; $('fA').value='Rua Fictícia';");
+  await app.run('confirmOrder()');await app.run('confirmOrder()');
+  assert.equal(keys[0],keys[1]);
+  app.run("$('fN').value='Outra Pessoa Fictícia'");await app.run('confirmOrder()');
+  assert.notEqual(keys[2],keys[1]);
+});
+
+test('sem validação comercial não anuncia juros zero nem valores de parcela garantidos',async()=>{
+  const app=storefront();await app.done;
+  assert.doesNotMatch(app.run('paymentOptionsHTML()'),/sem juros/);
+  assert.match(app.run("instTxt(prod('botanique'))"),/condições no pagamento/);
+  const {lioraCardHTML}=require('../assets/components');
+  assert.doesNotMatch(lioraCardHTML(products.find(p=>p.id==='botanique')),/sem juros/);
 });

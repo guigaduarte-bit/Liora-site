@@ -458,3 +458,4 @@ details p{font-size:13px;color:var(--ink-soft);padding-bottom:16px}
 }
 html,body{overflow-x:hidden}
 button,a{-webkit-tap-highlight-color:transparent}
+.pix-payment{display:grid;gap:14px;text-align:left;margin:24px 0}.pix-payment img{max-width:100%;height:auto;justify-self:center}.pix-payment textarea{width:100%;font:14px monospace;resize:vertical;overflow-wrap:anywhere;padding:12px}.pix-payment label{font-size:13px}

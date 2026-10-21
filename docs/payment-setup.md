@@ -1,3 +1,5 @@
+> Estado atualizado em 21/10/2026: veja [a implementação e os requisitos de ativação](payment-activation.md). As seções abaixo preservam o histórico; declarações antigas de ausência de banco/webhook foram substituídas por código pronto, ainda desativado até configurar os serviços.
+
 # Liora — configuração e homologação dos pagamentos
 
 ## Revisão de 20/10/2026

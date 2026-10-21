@@ -68,9 +68,9 @@ function siteOrigin(config) {
   return url.origin;
 }
 
-function signProof({ orderId, provider, totalCents, method }, config, now = Date.now()) {
+function signProof({ orderId, provider, totalCents, method, registered = false }, config, now = Date.now()) {
   const iat = Math.floor(now / 1000);
-  const payload = { v: 1, orderId, provider, totalCents, currency: 'BRL', method, mode: config.mode, environment: config.environment, iat, exp: iat + PROOF_TTL_SECONDS };
+  const payload = { v: 1, orderId, provider, totalCents, currency: 'BRL', method, mode: config.mode, environment: config.environment, ...(registered ? { registered: true } : {}), iat, exp: iat + PROOF_TTL_SECONDS };
   const encoded = Buffer.from(JSON.stringify(payload)).toString('base64url');
   const signature = createHmac('sha256', config.secret).update(encoded).digest('base64url');
   return `${encoded}.${signature}`;

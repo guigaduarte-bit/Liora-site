@@ -62,7 +62,7 @@ test('conteúdo inclui garantias essenciais de consumo e privacidade', () => {
   assert.match(privacy, /não são armazenados pela Liora/);
   assert.match(privacy, /inscrição na newsletter está indisponível/i);
   assert.match(privacy, /não coleta e-mails para o envio de novidades/i);
-  assert.match(privacy, /Nome, e-mail, CEP e endereço não são guardados nesse armazenamento/);
+  assert.match(privacy, /Nome, e-mail, CPF, CEP e endereço não são guardados nesse armazenamento/);
 });
 
 test('rodapé da loja aponta para as três páginas e não usa mais aviso em toast', () => {
