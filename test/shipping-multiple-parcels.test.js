@@ -166,14 +166,14 @@ test('free shipping keeps the full multivolume carrier cost and both estimated p
     PAYMENT_MODE: 'test', CHECKOUT_SIGNING_SECRET: 'test-only-checkout-secret-at-least-32-characters',
     MP_ACCESS_TOKEN: 'test-only-payment-token', INFINITEPAY_HANDLE: 'test-store'
   });
-  for (const payMethod of ['pix', 'infinitepay']) {
+  for (const payMethod of ['pix', 'card', 'boleto']) {
     const response = await invoke(createPreference, {
       items: [{ id: 'sagrada-familia', qty: 5 }], payMethod,
       shipping: { method: 'delivery', serviceId: '1', preview: false },
       payer: { name: 'Teste Automatizado', email: 'teste@example.com', cep: '95900180', num: '1', addr: 'Endereço fictício de teste' }
     });
     assert.equal(response.statusCode, 503);
-    assert.equal(response.body.code, payMethod === 'infinitepay' ? 'INFINITEPAY_PREVIEW_UNAVAILABLE' : 'SHIPPING_ESTIMATE_NOT_VALIDATED');
+    assert.equal(response.body.code, 'SHIPPING_ESTIMATE_NOT_VALIDATED');
   }
 });
 

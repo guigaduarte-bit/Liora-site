@@ -9,7 +9,7 @@ const { SHIP_FREE, cleanZip, quoteShipping, roundCurrency } = require('./_shippi
 const { configuration, siteOrigin, signProof, pixSubtotal, httpsUrl, providerRequest, fail, respondError, responseHeaders } = require('./_payment');
 
 const PAYMENT_TYPES = ['credit_card', 'debit_card', 'ticket', 'bank_transfer'];
-const PAYMENT_METHODS = new Set(['pix', 'card', 'boleto', 'infinitepay']);
+const PAYMENT_METHODS = new Set(['pix', 'card', 'boleto']);
 const SHIPPING_METHODS = new Set(['delivery']);
 
 function cleanText(value, maxLength) {
@@ -116,22 +116,6 @@ function paymentSettings(payMethod) {
   };
 }
 
-function buildInfinitePayItems(cart, shippingCost, selectedQuote) {
-  const items = cart.map((item) => ({
-    quantity: item.quantity,
-    price: Math.round(item.price * 100),
-    description: titleFor(item).slice(0, 120)
-  }));
-  if (shippingCost > 0) {
-    items.push({
-      quantity: 1,
-      price: Math.round(shippingCost * 100),
-      description: `Frete — ${selectedQuote.name}`.slice(0, 120)
-    });
-  }
-  return items;
-}
-
 module.exports = async function handler(req, res) {
   responseHeaders(res);
   if (req.method !== 'POST') {
@@ -145,13 +129,13 @@ module.exports = async function handler(req, res) {
     const selectedShipping = cleanText(shipping && shipping.method, 20);
 
     if (!PAYMENT_METHODS.has(selectedPayment)) {
-      return res.status(400).json({ error: 'Meio de pagamento inválido' });
+      return res.status(400).json({ code: 'PAYMENT_METHOD_UNAVAILABLE', error: 'Escolha Pix, cartão ou boleto para continuar.' });
     }
     if (!SHIPPING_METHODS.has(selectedShipping)) {
       return res.status(400).json({ error: 'Meio de envio inválido' });
     }
 
-    const provider = selectedPayment === 'infinitepay' ? 'infinitepay' : 'mercadopago';
+    const provider = 'mercadopago';
     const config = configuration(provider);
     const durable = orders.enabled();
     if (durable) {
@@ -224,51 +208,6 @@ module.exports = async function handler(req, res) {
     if (durable && selectedPayment === 'pix') {
       const pix = await createPix({ orderId, total, payer: { name, email, cpf: payer.cpf }, config, notificationUrl: `${siteUrl}/api/payment-webhook?provider=mercadopago` });
       return await finish({ ...pix, order_id: orderId, provider, payment_mode: config.mode, total });
-    }
-
-    if (selectedPayment === 'infinitepay') {
-      const infinitePayReturnUrl = `${siteUrl}/?checkout=infinitepay-return&order_id=${encodeURIComponent(orderId)}`;
-      const checkoutPayload = {
-        handle: config.credential,
-        redirect_url: infinitePayReturnUrl,
-        order_nsu: orderId,
-        customer: { name, email },
-        address: {
-          cep: zipCode,
-          number: streetNumber || 'S/N',
-          complement: address
-        },
-        items: buildInfinitePayItems(cart, shippingCost, selectedQuote)
-      };
-      if (durable) checkoutPayload.webhook_url = `${siteUrl}/api/payment-webhook?provider=infinitepay`;
-      else if (process.env.INFINITEPAY_WEBHOOK_URL) {
-        const webhookUrl = httpsUrl(process.env.INFINITEPAY_WEBHOOK_URL, [new URL(siteUrl).hostname]);
-        if (!webhookUrl) fail('PAYMENT_WEBHOOK_URL_INVALID');
-        checkoutPayload.webhook_url = webhookUrl.toString();
-      }
-
-      const data = await providerRequest('https://api.checkout.infinitepay.io/links', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify(checkoutPayload)
-      });
-      const checkoutUrl = httpsUrl(data.url ?? data.checkout_url ?? data.link, ['checkout.infinitepay.com.br']);
-      if (!checkoutUrl) {
-        // Diagnose response-shape changes without exposing link tokens or buyer data.
-        const fields = Object.fromEntries(['url', 'checkout_url', 'link'].map(key => [key,
-          data[key] == null ? 'missing' : httpsUrl(data[key], ['checkout.infinitepay.com.br']) ? 'valid' : 'invalid'
-        ]));
-        console.warn(JSON.stringify({ event: 'infinitepay_checkout_link_invalid', fields }));
-        fail('PAYMENT_PROVIDER_INVALID_RESPONSE', 'Não foi possível iniciar o pagamento pela InfinitePay.', 502);
-      }
-      return await finish({
-        id: data.invoice_slug || orderId,
-        init_point: checkoutUrl.toString(),
-        order_id: orderId,
-        provider: 'infinitepay',
-        payment_mode: config.mode,
-        total
-      });
     }
 
     const preference = {

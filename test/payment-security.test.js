@@ -74,7 +74,7 @@ test('Preview cannot use live mode or InfinitePay and Production cannot use test
   assert.equal((await invoke(createPreference, request())).body.code, 'PAYMENT_ENVIRONMENT_MISMATCH');
   process.env.PAYMENT_MODE = 'test';
   process.env.INFINITEPAY_HANDLE = 'synthetic-handle';
-  assert.equal((await invoke(createPreference, request({ payMethod: 'infinitepay' }))).body.code, 'INFINITEPAY_PREVIEW_UNAVAILABLE');
+  assert.equal((await invoke(createPreference, request({ payMethod: 'infinitepay' }))).body.code, 'PAYMENT_METHOD_UNAVAILABLE');
   assert.equal((await invoke(infinitePayStatus, { method: 'GET' })).body.code, 'INFINITEPAY_PREVIEW_UNAVAILABLE');
   process.env.VERCEL_ENV = 'production';
   assert.equal((await invoke(createPreference, request())).body.code, 'PAYMENT_ENVIRONMENT_MISMATCH');
@@ -140,33 +140,23 @@ for (const method of ['pix','card','boleto']) {
   });
 }
 
-test('InfinitePay: criação e retorno conferem o principal com Pix, cartão parcelado e pendência', async () => {
+test('retornos legados InfinitePay continuam conferindo principal sem permitir novas cobranças', async () => {
   infiniteLive();
-  let payload;
-  global.fetch=async(url,options)=>{
-    assert.equal(url,'https://api.checkout.infinitepay.io/links');
-    payload=JSON.parse(options.body);
-    return {ok:true,status:200,json:async()=>({url:'https://checkout.infinitepay.com.br/synthetic-handle?lenc=fixture'})};
-  };
-  const created=await invoke(createPreference,request({payMethod:'infinitepay'}));
-  assert.equal(created.statusCode,200);
-  assert.equal(created.body.total,94.9);
-  assert.equal(payload.items.reduce((total,item)=>total+item.price*item.quantity,0),9490);
-  for(const payment of [
+  for (const payment of [
     {success:true,paid:false,amount:9490},
     {success:true,paid:true,amount:9490,paid_amount:9490,installments:1,capture_method:'pix'},
     {success:true,paid:true,amount:9490,paid_amount:11000,installments:12,capture_method:'credit_card'}
-  ]){
-    global.fetch=async(url,options)=>{
+  ]) {
+    global.fetch=async(url)=>{
       assert.equal(url,'https://api.checkout.infinitepay.io/payment_check');
-      assert.equal(JSON.parse(options.body).order_nsu,created.body.order_id);
       return {ok:true,status:200,json:async()=>payment};
     };
-    const confirmed=await invoke(infinitePayStatus,{method:'GET',headers:{'x-checkout-proof':created.body.checkout_proof},query:{order_id:created.body.order_id,transaction_nsu:'transaction-test',slug:'invoice-test'}});
+    const confirmed=await invoke(infinitePayStatus,statusRequest('infinitepay'));
     assert.equal(confirmed.statusCode,200);
     assert.equal(confirmed.body.status,payment.paid?'approved':'pending');
   }
 });
+
 
 test('missing, expired, modified or cross-provider proof never contacts payment provider', async () => {
   const valid = proof();
@@ -308,29 +298,20 @@ test('checkout rejects HTTP, credential-bearing and lookalike provider URLs', as
     mockResponse({ id: 'pref-123', init_point: url });
     assert.equal((await invoke(createPreference, request())).statusCode, 502);
   }
-  infiniteLive();
-  mockResponse({ url: 'http://checkout.infinitepay.com.br/x' });
-  assert.equal((await invoke(createPreference, request({ payMethod: 'infinitepay' }))).statusCode, 502);
 });
 
-test('InfinitePay checkout accepts URL response aliases without relaxing destination validation', async () => {
-  infiniteLive();
-  const url = 'https://checkout.infinitepay.com.br/synthetic-handle?lenc=fixture';
-  for (const field of ['url', 'checkout_url', 'link']) {
-    mockResponse({ [field]: url });
-    const created = await invoke(createPreference, request({ payMethod: 'infinitepay' }));
-    assert.equal(created.statusCode, 200, field);
-    assert.equal(created.body.init_point, url);
-    assert.equal(created.body.total, 94.9);
-    assert.equal(created.body.provider, 'infinitepay');
-    for (const unsafe of ['http://checkout.infinitepay.com.br/x', 'https://checkout.infinitepay.com.br.evil.example/x', 'https://secret@checkout.infinitepay.com.br/x', '/relative', null, {}, 12]) {
-      mockResponse({ [field]: unsafe });
-      assert.equal((await invoke(createPreference, request({ payMethod: 'infinitepay' }))).statusCode, 502, `${field}: invalid URL`);
-    }
+test('InfinitePay removida não cria cobrança mesmo com configuração e resposta válidas', async () => {
+  for (const environment of ['production','preview','development']) {
+    process.env.VERCEL_ENV=environment;
+    process.env.PAYMENT_MODE=environment==='production'?'live':'test';
+    process.env.INFINITEPAY_HANDLE='synthetic-handle';
+    global.fetch=async()=>assert.fail('Nenhum serviço deve ser consultado');
+    const result=await invoke(createPreference,request({payMethod:'infinitepay'}));
+    assert.equal(result.statusCode,400);
+    assert.equal(result.body.code,'PAYMENT_METHOD_UNAVAILABLE');
   }
-  mockResponse({ url: 'https://evil.example/x', checkout_url: url });
-  assert.equal((await invoke(createPreference, request({ payMethod: 'infinitepay' }))).statusCode, 502);
 });
+
 
 test('provider errors and timeouts log no credential, proof, provider body or personal data', async () => {
   const logs = [];

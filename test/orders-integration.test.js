@@ -10,7 +10,6 @@ const { loadApi } = require('./helpers/isolated-api.cjs');
 const createCheckout = loadApi('create-preference.js');
 const webhook = require('../api/payment-webhook');
 const paymentStatus = require('../api/payment-status');
-const infinitePayStatus = require('../api/infinitepay-status');
 const { validatePayment } = require('../api/_mp-validation');
 const { cpf } = require('../api/_pix');
 const originalEnv = { ...process.env }, originalFetch = global.fetch;
@@ -87,7 +86,6 @@ async function mockedFetch(url, options = {}) {
     return response(payment);
   }
   if (url === 'https://api.mercadopago.com/checkout/preferences') return response({ id: 'pref-123', init_point: 'https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=pref-123' });
-  if (url === 'https://api.checkout.infinitepay.io/links') return response({ invoice_slug: 'invoice-123', url: 'https://checkout.infinitepay.com.br/invoice-123' });
   if (url === 'https://api.checkout.infinitepay.io/payment_check') return response({ success: true, paid: true, amount: 9490, paid_amount: 9490, installments: 1, capture_method: 'credit_card' });
   assert.fail(`Unexpected network call: ${url}`);
 }
@@ -220,17 +218,16 @@ test('cartão limita parcelas e registra a condição sem prometer juros zero n�
   await invoke(createCheckout, request({ payMethod: 'card' }));
   assert.equal(calls.filter(c => c.url.endsWith('/checkout/preferences')).length, 1);
 });
-test('InfinitePay confirma por consulta própria, ignorando status e valores falsos no webhook', async () => {
-  Object.assign(process.env, { PAYMENT_MODE: 'live', VERCEL_ENV: 'production', INFINITEPAY_HANDLE: 'synthetic-handle' });
-  const checkout = (await invoke(createCheckout, request({ payMethod: 'infinitepay' }))).body;
-  const req = { method: 'POST', query: { provider: 'infinitepay' }, body: { order_nsu: checkout.order_id, transaction_nsu: 'txn-123', invoice_slug: 'invoice-123', paid: true, amount: 1 } };
-  assert.equal((await invoke(webhook, req)).statusCode, 200);
-  assert.equal((await row(checkout.order_id)).status, 'approved');
-  assert.ok(calls.some(c => c.url.endsWith('/payment_check')));
-  assert.equal((await db.query('select * from liora_paid_orders')).rows.length, 1);
-  const status = await invoke(infinitePayStatus, { method: 'GET', headers: { 'x-checkout-proof': checkout.checkout_proof }, query: { order_id: checkout.order_id, transaction_nsu: 'txn-123', slug: 'invoice-123' } });
-  assert.equal(status.body.status, 'approved');
+test('InfinitePay removida não registra pedido nem chama processadores', async () => {
+  Object.assign(process.env, { PAYMENT_MODE: 'live', VERCEL_ENV: 'production' });
+  const result = await invoke(createCheckout, request({ payMethod: 'infinitepay' }));
+  assert.equal(result.statusCode, 400);
+  assert.equal(result.body.code, 'PAYMENT_METHOD_UNAVAILABLE');
+  assert.equal(calls.length, 0);
+  assert.equal((await db.query('select * from liora_orders')).rows.length, 0);
 });
+
+
 test('falha no registro da notificação retorna erro para permitir nova entrega', async () => {
   await invoke(createCheckout, request()); payments.get('123').status = 'approved';
   storageDown = true;

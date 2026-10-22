@@ -1,4 +1,6 @@
 'use strict';
+// Read-only reconciliation for payments initiated before this provider was removed.
+// New checkouts are accepted exclusively through Mercado Pago.
 const { providerRequest, fail } = require('./_payment');
 async function checkInfinitePay({ config, proof, transactionNsu, slug }) {
   if (typeof transactionNsu !== 'string' || !/^[A-Za-z0-9_-]{1,120}$/.test(transactionNsu) || typeof slug !== 'string' || !/^[A-Za-z0-9_-]{1,160}$/.test(slug)) fail('PAYMENT_IDENTIFICATION_INVALID', 'Identificação do pagamento inválida.', 400);

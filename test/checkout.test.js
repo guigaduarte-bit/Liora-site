@@ -227,7 +227,7 @@ test('checkout recusa formas de pagamento removidas da interface', async () => {
     shipping: { method: 'delivery', serviceId: 'curitiba-fixed' }
   }));
   assert.equal(res.statusCode, 400);
-  assert.match(res.body.error, /pagamento inválido/i);
+  assert.equal(res.body.code, 'PAYMENT_METHOD_UNAVAILABLE');
 });
 
 test('checkout recusa retirada gratuita removida do site', async () => {
@@ -350,34 +350,15 @@ test('CEP válido sem modalidade é distinguido de CEP inválido', async () => {
   assert.doesNotMatch(res.body.error, /inválido|revise/i);
 });
 
-test('InfinitePay recebe itens, frete e dados do pedido em centavos', async () => {
-  process.env.SITE_URL = 'https://liora.example';
-  process.env.INFINITEPAY_HANDLE = 'liora-aromas';
+test('InfinitePay removida rejeita novos pagamentos antes de consultar serviços externos', async () => {
   process.env.PAYMENT_MODE = 'live';
   process.env.VERCEL_ENV = 'production';
-  let sentCheckout;
-  global.fetch = async (url, options) => {
-    assert.equal(url, 'https://api.checkout.infinitepay.io/links');
-    sentCheckout = JSON.parse(options.body);
-    return {
-      ok: true,
-      status: 200,
-      json: async () => ({ url: 'https://checkout.infinitepay.com.br/liora-aromas?lenc=abc123' })
-    };
-  };
-  const res = await invoke(createPreference, validRequest({
-    items: [{ id: 'botanique', qty: 1, frag: 'Lavanda' }],
-    payMethod: 'infinitepay',
-    shipping: { method: 'delivery', serviceId: 'curitiba-fixed' }
-  }));
-  assert.equal(res.statusCode, 200);
-  assert.equal(res.body.provider, 'infinitepay');
-  assert.equal(res.body.total, 94.9);
-  assert.equal(sentCheckout.handle, 'liora-aromas');
-  assert.match(sentCheckout.order_nsu, /^LIORA-/);
-  assert.match(sentCheckout.redirect_url, /checkout=infinitepay-return/);
-  assert.deepEqual(sentCheckout.items.map((item) => item.price), [7500, 1990]);
+  global.fetch = async () => assert.fail('Não deve consultar nenhum provedor');
+  const res = await invoke(createPreference, validRequest({ payMethod: 'infinitepay' }));
+  assert.equal(res.statusCode, 400);
+  assert.equal(res.body.code, 'PAYMENT_METHOD_UNAVAILABLE');
 });
+
 
 test('retorno InfinitePay é confirmado na API antes de aprovar o pedido', async () => {
   process.env.INFINITEPAY_HANDLE = 'liora-aromas';

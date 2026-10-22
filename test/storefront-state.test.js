@@ -10,6 +10,7 @@ const products = require('../content/products.json');
 function storefront({ saved = {}, blockedStorage = false, search = '', fetch, environment = 'production', checkoutV2 = false } = {}) {
   const storage = new Map(Object.entries(saved));
   const nodes = new Map();
+  const windowEvents = new Map();
   const element = (id) => {
     if (['grid', 'tabsBar'].includes(id)) return null;
     if (!nodes.has(id)) nodes.set(id, {
@@ -28,7 +29,7 @@ function storefront({ saved = {}, blockedStorage = false, search = '', fetch, en
     crypto: require('node:crypto').webcrypto,
     location: { search, pathname: '/', href: 'https://liora.example/', origin: 'https://liora.example' },
     history: { replaceState() {} },
-    addEventListener() {}
+    addEventListener(name, handler) { windowEvents.set(name,handler); }
   };
   const context = vm.createContext({
     window,
@@ -45,14 +46,14 @@ function storefront({ saved = {}, blockedStorage = false, search = '', fetch, en
     },
     IntersectionObserver: class { observe() {} unobserve() {} },
     setTimeout() { return 1; }, clearTimeout() {},
-    URLSearchParams, TextEncoder, Uint8Array,
+    URL, URLSearchParams, TextEncoder, Uint8Array,
     fetch: fetch || (async () => { assert.fail('O teste não pode acessar a rede'); })
   });
   // Captura somente a promessa de inicialização para observar falhas assíncronas.
   const source = fs.readFileSync(path.join(__dirname, '..', 'assets', 'storefront.js'), 'utf8')
     .replace('(async function checkPaymentReturn(){', 'globalThis.paymentReturnDone=(async function checkPaymentReturn(){');
   vm.runInContext(source, context, { filename: 'assets/storefront.js' });
-  return { storage, nodes, done: context.paymentReturnDone, run: (code) => vm.runInContext(code, context) };
+  return { storage, nodes, done: context.paymentReturnDone, emit: (name,event) => windowEvents.get(name)?.(event), run: (code) => vm.runInContext(code, context) };
 }
 
 test('carrinho atravessa páginas guardando somente ID, quantidade e fragrância', async () => {
@@ -278,17 +279,21 @@ test('falha na criação permite uma nova tentativa sem apagar o carrinho', asyn
   assert.equal(app.run('cartQty()'),1);
 });
 
-test('InfinitePay indisponível no preview não cria checkout nem permite seleção', async () => {
-  const app = storefront({environment:'preview'});
-  await app.done;
-  app.run("addToCart('botanique',1); shippingState={status:'ready',quotes:[]}; renderCheckout();");
-  assert.match(app.nodes.get('drawerBody').innerHTML, /<input[^>]+id="payment-infinitepay"[^>]+disabled/);
-  app.run("selectPayment('infinitepay')");
-  assert.equal(app.run('payMethod'),'pix');
-  app.run("payMethod='infinitepay'");
-  await app.run('confirmOrder()');
-  assert.match(app.nodes.get('toastMsg').textContent,/InfinitePay.*preview/);
+test('InfinitePay removida não aparece nem permite seleção em produção ou preview', async () => {
+  for(const environment of ['production','preview']) {
+    const app = storefront({environment});
+    await app.done;
+    app.run("addToCart('botanique',1); shippingState={status:'ready',quotes:[]}; renderCheckout();");
+    assert.doesNotMatch(app.nodes.get('drawerBody').innerHTML,/infinitepay/i);
+    for(const method of ['pix','card','boleto']) assert.match(app.nodes.get('drawerBody').innerHTML,new RegExp('id="payment-'+method+'"'));
+    app.run("selectPayment('infinitepay')");
+    assert.equal(app.run('payMethod'),'pix');
+    app.run("payMethod='infinitepay'");
+    await app.run('confirmOrder()');
+    assert.match(app.nodes.get('toastMsg').textContent,/Escolha Pix, cartão ou boleto/);
+  }
 });
+
 
 test('aprovação de teste é identificada e pendência não promete e-mail inexistente', async () => {
   for (const status of ['approved', 'pending']) {
@@ -407,4 +412,79 @@ test('sem validação comercial não anuncia juros zero nem valores de parcela g
   assert.match(app.run("instTxt(prod('botanique'))"),/condições no pagamento/);
   const {lioraCardHTML}=require('../assets/components');
   assert.doesNotMatch(lioraCardHTML(products.find(p=>p.id==='botanique')),/sem juros/);
+});
+
+test('retorno sem pagamento localizado preserva pedido e permite retomar o mesmo checkout', async () => {
+  const orderId='LIORA-TESTE-12345678';
+  const checkoutUrl='https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=pref-test';
+  let calls=0;
+  const app=storefront({
+    saved:{liora_cart:JSON.stringify([{id:'botanique',qty:1}]),
+      ['liora_checkout_proof:'+orderId]:'synthetic-proof',
+      liora_checkout_return:JSON.stringify({orderId,provider:'mercadopago',checkoutUrl})},
+    search:'?checkout=return&order_id='+orderId,
+    fetch:async(url,options)=>{
+      calls++; assert.match(url,/^\/api\/payment-status\?/); assert.equal(options.method,undefined);
+      return {ok:false,status:404,json:async()=>({code:'PAYMENT_NOT_FOUND'})};
+    }
+  });
+  await app.done;
+  assert.equal(calls,1);
+  assert.equal(app.run('paymentView.status'),'not_found');
+  assert.equal(app.run('cartQty()'),1);
+  assert.equal(app.storage.get('liora_checkout_proof:'+orderId),'synthetic-proof');
+  assert.equal(JSON.parse(app.storage.get('liora_checkout_return')).checkoutUrl,checkoutUrl);
+  assert.match(app.nodes.get('drawerBody').innerHTML,/Pagamento ainda não localizado/);
+  assert.match(app.nodes.get('drawerBody').innerHTML,/Retomar pagamento no Mercado Pago/);
+  assert.match(app.nodes.get('drawerBody').innerHTML,/Se já pagou, aguarde e consulte novamente/);
+  assert.doesNotMatch(app.nodes.get('drawerBody').innerHTML,/Pagamento confirmado/);
+});
+
+test('falha do provedor não é confundida com pedido sem pagamento nem oferece pagar novamente', async () => {
+  const orderId='LIORA-TESTE-12345678';
+  const app=storefront({
+    saved:{liora_cart:JSON.stringify([{id:'botanique',qty:1}]),
+      ['liora_checkout_proof:'+orderId]:'synthetic-proof',
+      liora_checkout_return:JSON.stringify({orderId,provider:'mercadopago',checkoutUrl:'https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=pref-test'})},
+    fetch:async()=>({ok:false,status:502,json:async()=>({code:'PAYMENT_PROVIDER_UNAVAILABLE'})})
+  });
+  await app.done;
+  assert.equal(app.run('paymentView.status'),'error');
+  assert.equal(app.run('cartQty()'),1);
+  assert.match(app.nodes.get('drawerBody').innerHTML,/Confirmação em aberto/);
+  assert.doesNotMatch(app.nodes.get('drawerBody').innerHTML,/Retomar pagamento/);
+});
+
+test('checkout não redireciona nem oferece retomada para destinos adulterados', async () => {
+  for(const checkoutUrl of ['http://www.mercadopago.com.br/checkout/x','https://www.mercadopago.com.br.evil.example/checkout/x','https://secret@www.mercadopago.com.br/checkout/x','https://www.mercadopago.com.br:444/checkout/x','javascript:alert(1)','https://checkout.infinitepay.com.br/test']){
+    const app=storefront({fetch:async()=>({ok:true,json:async()=>({init_point:checkoutUrl,order_id:'LIORA-TESTE-12345678',checkout_proof:'signed-fixture'})})});
+    await app.done;
+    app.run("addToCart('botanique',1); shippingState={status:'ready',quotes:[{id:'curitiba-fixed',price:19.9}]}; selectedShippingService='curitiba-fixed'; $('fN').value='Cliente Fictício'; $('fE').value='cliente@example.com'; $('fC').value='80000000'; $('fA').value='Rua Fictícia';");
+    await app.run('confirmOrder()');
+    assert.equal(app.run('window.location.href'),'https://liora.example/');
+    assert.equal(app.storage.get('liora_checkout_order'),undefined);
+    assert.equal(app.run('cartQty()'),1);
+    app.run('paymentView={status:"not_found"};paymentReturn={orderId:"LIORA-TESTE-12345678",checkoutUrl:'+JSON.stringify(checkoutUrl)+'};renderPaymentStatus();');
+    assert.doesNotMatch(app.nodes.get('drawerBody').innerHTML,/Retomar pagamento/);
+  }
+});
+
+test('voltar pelo navegador após redirecionamento consulta o pedido existente sem criar outra preferência', async () => {
+  const requests=[];
+  const orderId='LIORA-TESTE-12345678';
+  const app=storefront({fetch:async(url,options)=>{
+    requests.push({url,method:options.method});
+    if(url==='/api/create-preference')return {ok:true,json:async()=>({provider:'mercadopago',init_point:'https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=pref-test',order_id:orderId,checkout_proof:'signed-fixture'})};
+    return {ok:false,status:404,json:async()=>({code:'PAYMENT_NOT_FOUND'})};
+  }});
+  await app.done;
+  app.run("addToCart('botanique',1); shippingState={status:'ready',quotes:[{id:'curitiba-fixed',price:19.9}]}; selectedShippingService='curitiba-fixed'; $('fN').value='Cliente Fictício'; $('fE').value='cliente@example.com'; $('fC').value='80000000'; $('fA').value='Rua Fictícia';");
+  await app.run('confirmOrder()');
+  await app.emit('pageshow',{persisted:true});
+  assert.equal(requests.filter(r=>r.method==='POST').length,1);
+  assert.match(requests[1].url,/^\/api\/payment-status\?/);
+  assert.equal(app.run('drawerView'),'payment');
+  assert.equal(app.run('paymentView.status'),'not_found');
+  assert.equal(app.run('cartQty()'),1);
+  assert.match(app.nodes.get('drawerBody').innerHTML,/Retomar pagamento no Mercado Pago/);
 });

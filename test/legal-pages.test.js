@@ -53,7 +53,7 @@ test('conteúdo inclui garantias essenciais de consumo e privacidade', () => {
 
   const terms = read('termos-de-uso.html');
   assert.match(terms, /Código de Defesa do Consumidor/);
-  assert.match(terms, /Mercado Pago ou pela InfinitePay/);
+  assert.match(terms, /pagamentos são processados pelo Mercado Pago/);
   assert.match(terms, /Política de Trocas e Devoluções/);
   assert.match(terms, /cor e a fragrância confirmadas/);
 
