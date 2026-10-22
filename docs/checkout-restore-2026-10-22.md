@@ -1,5 +1,11 @@
 # Verificação do checkout — 22/10/2026
 
+## Validação do responsável e produção confirmada — 22/10/2026
+
+O responsável informou: “testei transação e validou aba do Mercado Pago” e solicitou colocar o site em produção. Esse relato confirma a abertura/validação da etapa do Mercado Pago pelo responsável; não informa explicitamente liquidação ou aprovação financeira.
+
+Após essa confirmação, o painel Vercel foi consultado novamente: o deployment `dpl_2W1vD4Li9JnqNhnZcBGnoGoQhsmJ`, commit `296365cca85cd6e78c3199585e124f2e8561e2cd`, está **Ready, Production, Current**, com `lioraaromasdeluxo.com.br` atribuído. A branch `main` aponta para esse commit. O domínio já serve a versão corrigida e validada; nenhuma republicação de código foi necessária. Os commits posteriores na branch de homologação alteram apenas este registro.
+
 ## Navegador independente — 22/10/2026, 17h47 UTC
 
 A pedido do responsável, o teste foi executado em uma sessão independente do TinyFish, com perfil padrão `lite`, sem stealth, proxy configurado ou credenciais armazenadas.
