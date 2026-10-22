@@ -8,7 +8,11 @@ Após autorização do responsável, foi criado o projeto Supabase exclusivo `li
 
 O script `test/remote-orders-smoke.sql` passou no banco remoto: registro de aprovação, repetição sem duplicação, evento atrasado, conferência por saldo, estorno, exclusão dos testes da consulta de pedidos reais e negação de acesso a visitantes/clientes. Todos os dados são fictícios e a transação termina com `ROLLBACK`; a conferência posterior encontrou zero pedidos e zero pagamentos. Esse teste valida o banco, não a liquidação nem a entrega de notificações pelos provedores.
 
-O navegador autorizado abriu o login da Vercel. A solicitação segura de autenticação não retornou confirmação e as tentativas documentadas de verificar a sessão expiraram por falta de resposta do navegador. O estado do login é desconhecido. Nenhuma variável foi alterada por esse caminho; o acesso à configuração da Vercel e à conta Mercado Pago ainda precisa ser restabelecido.
+Em 22/10/2026, o responsável concluiu a autenticação pelo navegador compartilhado. O painel da Vercel confirmou acesso a `circulo-de-cuidado/liora-site` e a publicação de produção `8a1b7ce73739e9dd8bb5e65628cc43cf0eaebfa8` como `Ready`. A autenticação do painel não equivale a restabelecer o escopo do conector Vercel, que anteriormente retornava 404.
+
+No projeto Vercel, foram salvas e conferidas as variáveis **somente de produção** `ORDERS_SUPABASE_URL` (Config) e `ORDERS_SUPABASE_SECRET_KEY` (Secret, sem revelação após salvar). A chave backend foi transferida do projeto Supabase `liora-orders` diretamente para o gerenciador de segredos; seu valor não foi gravado no código nem em arquivos. Ainda não houve novo deploy para aplicar essas variáveis. O novo checkout permanece desativado.
+
+O painel Mercado Pago e seu endereço oficial de login exibiram a mensagem de erro “Hubo un error accediendo a esta pagina...” antes de apresentar um formulário utilizável. Não foi possível configurar ou validar `MP_WEBHOOK_SECRET`, as notificações, as credenciais de homologação ou o parcelamento comercial. Nenhuma configuração da conta Mercado Pago foi alterada nesta etapa.
 
 O novo fluxo fica **desativado por padrão**. A implementação mantém o checkout existente até haver banco, credenciais, configuração de notificações e homologação externa. Não marcar as três pendências como concluídas só porque o código foi publicado.
 
@@ -31,10 +35,10 @@ O novo fluxo fica **desativado por padrão**. A implementação mantém o checko
 
 ## Serviços e configurações necessários
 
-1. Restaurar acesso ao projeto Vercel `liora-site`, time `circulo-de-cuidado`. O conector disponível retornou 404 para o projeto/variáveis e 403 ao tentar acessar o preview protegido. A integração GitHub → Vercel continua funcionando, mas não permite administrar configurações por este acesso.
+1. **Concluído pelo navegador compartilhado em 22/10/2026:** acesso ao projeto Vercel `liora-site`, time `circulo-de-cuidado`. O conector anteriormente retornou 404 para o projeto/variáveis e 403 para o preview protegido; não presumir que o login do navegador corrigiu o conector ou o CLI. A integração GitHub → Vercel continua funcionando.
 2. **Concluído:** criar o banco exclusivo da Liora, com organização autorizada e custo informado pelo serviço. Os projetos de outros aplicativos não foram modificados. Ainda falta preparar o ambiente de homologação e suas credenciais; preferir banco separado de produção.
 3. **Concluído no projeto `liora-orders`:** aplicar `supabase/migrations/20261021152148_liora_orders.sql` e `supabase/migrations/20261021172806_liora_order_privileges.sql`, verificar tabelas, função, RLS e negação de acesso para `anon`/`authenticated`. As migrações foram geradas pelo CLI Supabase 2.121.0; os nomes locais foram alinhados às versões efetivamente registradas pelo serviço remoto. A segunda migração remove os privilégios padrão de exclusão/limpeza do servidor e deixa a consulta administrativa somente para leitura.
-4. Instalar as configurações abaixo pelo gerenciador de segredos da Vercel. Não enviar valores ao chat nem armazená-los no repositório.
+4. **Parcialmente concluído:** URL e chave privada do banco salvas em Production na Vercel. Faltam as configurações do Mercado Pago, a homologação, a ativação da flag e o deploy correspondente. Preview ainda não recebeu as novas configurações. Não enviar valores de segredos ao chat nem armazená-los no repositório.
 
 | Configuração | Uso |
 |---|---|
