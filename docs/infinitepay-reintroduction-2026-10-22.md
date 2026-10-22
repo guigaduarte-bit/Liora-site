@@ -40,6 +40,10 @@ Build preparado e validado: `dpl_34sSEUgT7JL6j3gXEWceY2kjDV55`, Production / Sta
 - Retorno à loja sem pagar exibiu “Confirmação em aberto” e “Retomar pagamento na InfinitePay”.
 - Retomada abriu exatamente o mesmo link e total, sem criar outra cobrança nem declarar aprovação.
 - A confirmação de pagamento liquidado continua coberta por testes automatizados da consulta autenticada ao provedor; não foi realizada transação financeira real.
-- A produção anterior permaneceu no domínio público durante toda esta validação. A atribuição automática de domínios foi suspensa para preparar o build e será restabelecida após a promoção manual.
+- A produção anterior permaneceu no domínio público durante toda esta validação. A atribuição automática de domínios foi suspensa para preparar o build e foi restabelecida após a promoção manual.
 
-Publicação do build validado autorizada pelo pedido do usuário; promoção em andamento.
+Publicação concluída: `dpl_34sSEUgT7JL6j3gXEWceY2kjDV55` foi promovido diretamente, sem rebuild. O painel confirmou **Ready / Production / Current**, com `lioraaromasdeluxo.com.br` atribuído. O domínio público exibe as quatro opções: Pix, cartão, boleto e InfinitePay. A publicação automática foi restabelecida.
+
+A branch `main` contém o mesmo código funcional e o registro da validação (`ae2e248f86a5c9307d903f94688e6ed82bb45781`); a diferença para o commit do build publicado é apenas documentação. A revisão automática inicialmente bloqueou a atualização de main enquanto faltava a validação externa, e a autorizou após os testes externos e o registro das evidências.
+
+Evidência visual da interface pública: `liora-infinitepay-producao-final-20261022.jpg`, sem dados pessoais de comprador ou dados financeiros.
