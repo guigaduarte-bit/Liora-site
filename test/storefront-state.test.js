@@ -521,7 +521,7 @@ test('voltar pelo navegador após redirecionamento consulta o pedido existente s
 
 
 test('InfinitePay guarda o link e volta sem pagamento sem nova cobrança ou falsa aprovação', async () => {
-  const orderId='LIORA-TESTE-12345678',checkoutUrl='https://checkout.infinitepay.com.br/synthetic-link';
+  const orderId='LIORA-TESTE-12345678',checkoutUrl='https://checkout.infinitepay.io/synthetic-link';
   let calls=0;
   const app=storefront({fetch:async(url,options)=>{
     calls++; assert.equal(url,'/api/create-preference');
@@ -574,5 +574,15 @@ test('InfinitePay não aceita destino adulterado nem resposta de outro processad
     await app.run('confirmOrder()');
     assert.equal(app.run('window.location.href'),'https://liora.example/');
     assert.equal(app.storage.get('liora_checkout_order'),undefined);
+  }
+});
+
+
+test('retomada InfinitePay aceita domínio atual e legado sem aceitar credenciais ou hosts semelhantes', async () => {
+  const app=storefront(); await app.done;
+  for(const host of ['checkout.infinitepay.io','checkout.infinitepay.com.br']){
+    for(const [url,valid] of [['https://'+host+'/test',true],['https://'+host+'.evil.example/test',false],['https://secret@'+host+'/test',false],['https://'+host+':444/test',false]]){
+      assert.equal(Boolean(app.run('providerCheckoutUrl('+JSON.stringify(url)+',"infinitepay")')),valid);
+    }
   }
 });

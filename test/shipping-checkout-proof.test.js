@@ -150,7 +150,7 @@ test('InfinitePay reutiliza o mesmo frete assinado e inclui centavos exatos no l
     assert.equal(url,'https://api.checkout.infinitepay.io/links');
     const sent=JSON.parse(options.body);
     assert.deepEqual(sent.items.map(i=>[i.quantity,i.price]),[[1,2500],[1,2813]]);
-    return {ok:true,status:200,json:async()=>({url:'https://checkout.infinitepay.com.br/synthetic-link'})};
+    return {ok:true,status:200,json:async()=>({url:'https://checkout.infinitepay.io/synthetic-link'})};
   };
   const result=await invoke(createPreference,{...request({quoteProof:token}),payMethod:'infinitepay'});
   assert.equal(result.statusCode,200);

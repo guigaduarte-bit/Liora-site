@@ -355,3 +355,16 @@ test('provider errors and timeouts log no credential, proof, provider body or pe
   assert.equal(signal.aborted, true);
   assert.doesNotMatch(logs.join('\n'), /private|Fictícia|APP_USR|eyJ|secret/);
 });
+
+
+test('InfinitePay aceita os dois hosts oficiais exatos e recusa seus domínios semelhantes', async () => {
+  infiniteLive();
+  for(const host of ['checkout.infinitepay.io','checkout.infinitepay.com.br']){
+    mockResponse({url:'https://'+host+'/synthetic-link'});
+    const valid=await invoke(createPreference,request({payMethod:'infinitepay'}));
+    assert.equal(valid.statusCode,200);
+    assert.equal(new URL(valid.body.init_point).hostname,host);
+    mockResponse({url:'https://'+host+'.evil.example/synthetic-link'});
+    assert.equal((await invoke(createPreference,request({payMethod:'infinitepay'}))).statusCode,502);
+  }
+});

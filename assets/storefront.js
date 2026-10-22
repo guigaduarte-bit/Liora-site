@@ -464,7 +464,7 @@ function providerCheckoutUrl(value,provider){
   if(provider!=='infinitepay')return mercadoPagoCheckoutUrl(value);
   try{
     const url=new URL(value);
-    return url.protocol==='https:'&&!url.username&&!url.password&&!url.port&&url.hostname==='checkout.infinitepay.com.br'&&url.pathname!=='/'?url.href:'';
+    return url.protocol==='https:'&&!url.username&&!url.password&&!url.port&&['checkout.infinitepay.io','checkout.infinitepay.com.br'].includes(url.hostname)&&url.pathname!=='/'?url.href:'';
   }catch{return ''}
 }
 function renderPaymentStatus(){

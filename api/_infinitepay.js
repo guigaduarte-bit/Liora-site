@@ -17,7 +17,7 @@ async function createInfinitePay({ config, orderId, siteUrl, cart, shippingCost,
   const data = await providerRequest('https://api.checkout.infinitepay.io/links', {
     method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(payload)
   });
-  const checkoutUrl = httpsUrl(data.url, ['checkout.infinitepay.com.br']);
+  const checkoutUrl = httpsUrl(data.url, ['checkout.infinitepay.io', 'checkout.infinitepay.com.br']);
   if (!checkoutUrl || checkoutUrl.pathname === '/') {
     // Diagnose the response contract without recording customer data or payment URLs.
     console.warn(JSON.stringify({ event: 'infinitepay_invalid_checkout_response', hasUrl: typeof data.url === 'string',

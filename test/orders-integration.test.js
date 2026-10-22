@@ -86,7 +86,7 @@ async function mockedFetch(url, options = {}) {
     return response(payment);
   }
   if (url === 'https://api.mercadopago.com/checkout/preferences') return response({ id: 'pref-123', init_point: 'https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=pref-123' });
-  if (url === 'https://api.checkout.infinitepay.io/links') return response({url:'https://checkout.infinitepay.com.br/synthetic-link'});
+  if (url === 'https://api.checkout.infinitepay.io/links') return response({url:'https://checkout.infinitepay.io/synthetic-link'});
   if (url === 'https://api.checkout.infinitepay.io/payment_check') return response({ success: true, paid: true, amount: 9490, paid_amount: 9490, installments: 1, capture_method: 'credit_card' });
   assert.fail(`Unexpected network call: ${url}`);
 }

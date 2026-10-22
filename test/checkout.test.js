@@ -356,7 +356,7 @@ test('InfinitePay cria link com catálogo e frete em centavos sem alterar o Merc
   global.fetch=async(url,options)=>{
     assert.equal(url,'https://api.checkout.infinitepay.io/links');
     sent=JSON.parse(options.body);
-    return {ok:true,status:200,json:async()=>({url:'https://checkout.infinitepay.com.br/synthetic-link'})};
+    return {ok:true,status:200,json:async()=>({url:'https://checkout.infinitepay.io/synthetic-link'})};
   };
   const res=await invoke(createPreference,validRequest({payMethod:'infinitepay',items:[{id:'botanique',qty:1}],shipping:{method:'delivery',serviceId:'curitiba-fixed'}}));
   assert.equal(res.statusCode,200);
