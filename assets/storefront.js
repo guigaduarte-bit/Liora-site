@@ -400,12 +400,13 @@ async function confirmOrder(){
     const payload={
       items:cart.map(i=>({id:i.id,qty:i.qty,frag:i.frag})),
       payMethod,
-      shipping:{method:shipMethod,serviceId:selectedShippingService},
+      shipping:{method:shipMethod,serviceId:selectedShippingService,...(selectedQuote?.quoteProof?{quoteProof:selectedQuote.quoteProof}:{})},
       payer:{name,email,cep,num,addr,...(cpf?{cpf}:{})},
       returnOrigin:window.location.origin
     };
     if(checkoutV2){
-      const bytes=await window.crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(payload)));
+      const fingerprintPayload={...payload,shipping:{method:payload.shipping.method,serviceId:payload.shipping.serviceId}};
+      const bytes=await window.crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(fingerprintPayload)));
       const fingerprint=Array.from(new Uint8Array(bytes),b=>b.toString(16).padStart(2,'0')).join('');
       const previous=JSON.parse(sessionStorage.getItem('liora_checkout_attempt')||'null');
       payload.checkoutKey=previous?.fingerprint===fingerprint?previous.key:window.crypto.randomUUID();
@@ -417,6 +418,12 @@ async function confirmOrder(){
       body:JSON.stringify(payload)
     });
     const data=await resp.json().catch(()=>({}));
+    if(!resp.ok&&['SHIPPING_QUOTE_INVALID','SHIPPING_QUOTE_EXPIRED','SHIPPING_QUOTE_CHANGED'].includes(data.code)){
+      await buscarCEP(cep.replace(/\D/g,''));
+      checkoutForm.addr=addr;
+      toast(shippingState.status==='ready'?'O frete foi atualizado. Confira o total e confirme o pedido novamente.':shippingState.error);
+      return;
+    }
     const checkoutUrl=mercadoPagoCheckoutUrl(data.init_point);
     if(!resp.ok||(!checkoutUrl&&!data.pix)||!data.order_id||!data.checkout_proof||(data.provider&&data.provider!=='mercadopago')){
       toast(data.error||'Não foi possível iniciar o pagamento. Tente novamente.');

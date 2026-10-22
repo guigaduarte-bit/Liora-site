@@ -5,8 +5,9 @@ const { cpf, createPix } = require('./_pix');
 const paymentPolicy = require('../content/payment-policy.json');
 const { randomUUID } = require('node:crypto');
 const CATALOG = require('./catalog');
-const { SHIP_FREE, cleanZip, quoteShipping, roundCurrency } = require('./_shipping');
-const { configuration, siteOrigin, signProof, pixSubtotal, httpsUrl, providerRequest, fail, respondError, responseHeaders } = require('./_payment');
+const { SHIP_FREE, cleanZip, quoteShipping, roundCurrency, ShippingQuoteError } = require('./_shipping');
+const { verifyQuote } = require('./_shipping-proof');
+const { PaymentError, configuration, siteOrigin, signProof, pixSubtotal, httpsUrl, providerRequest, fail, respondError, responseHeaders } = require('./_payment');
 
 const PAYMENT_TYPES = ['credit_card', 'debit_card', 'ticket', 'bank_transfer'];
 const PAYMENT_METHODS = new Set(['pix', 'card', 'boleto']);
@@ -169,9 +170,14 @@ module.exports = async function handler(req, res) {
     let selectedQuote = null;
     let shippingCost = 0;
     if (selectedShipping === 'delivery') {
-      const quoteResult = await quoteShipping({ zipCode, cart, subtotal });
       const serviceId = cleanText(shipping && shipping.serviceId, 80);
-      selectedQuote = quoteResult.quotes.find((quote) => quote.id === serviceId);
+      if (shipping.quoteProof !== undefined) {
+        selectedQuote = verifyQuote(shipping.quoteProof, { zipCode, cart, serviceId }, config);
+      } else {
+        // Compatibilidade com páginas abertas antes da atualização.
+        const quoteResult = await quoteShipping({ zipCode, cart, subtotal });
+        selectedQuote = quoteResult.quotes.find((quote) => quote.id === serviceId);
+      }
       if (!selectedQuote) return res.status(400).json({ error: 'Selecione novamente a opção de entrega' });
       if (selectedQuote.preview) {
         return res.status(503).json({
@@ -274,6 +280,11 @@ module.exports = async function handler(req, res) {
       total
     });
   } catch (error) {
+    if (error instanceof ShippingQuoteError) {
+      console.warn(JSON.stringify({ event: 'checkout_shipping_failed', code: error.code }));
+      return res.status(error.status).json({ code: error.code, error: error.message });
+    }
+    if (error instanceof PaymentError) return respondError(res, error);
     if (error instanceof SyntaxError) {
       return res.status(400).json({ error: 'Dados do checkout inválidos' });
     }

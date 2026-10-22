@@ -2,6 +2,7 @@
 
 const CATALOG = require('./catalog');
 const { cleanZip, quoteShipping, roundCurrency } = require('./_shipping');
+const { attachQuoteProofs } = require('./_shipping-proof');
 
 function parseBody(req) {
   if (req.body && typeof req.body === 'object' && !Buffer.isBuffer(req.body)) return req.body;
@@ -40,7 +41,7 @@ module.exports = async function handler(req, res) {
     const cart = validateCart(items);
     const subtotal = roundCurrency(cart.reduce((sum, item) => sum + item.price * item.quantity, 0));
     const result = await quoteShipping({ zipCode, cart, subtotal });
-    return res.status(200).json(result);
+    return res.status(200).json(attachQuoteProofs(result, { zipCode, cart }));
   } catch (error) {
     if (error instanceof SyntaxError) return res.status(400).json({ error: 'Dados inválidos', code: 'INVALID_DATA' });
     if (error && error.code) {

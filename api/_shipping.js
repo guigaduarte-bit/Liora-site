@@ -189,6 +189,9 @@ async function requestSuperFrete({ baseUrl, token, destination, package: parcel,
   })();
   try {
     return await Promise.race([request, expiry]);
+  } catch (error) {
+    if (error instanceof ShippingQuoteError) throw error;
+    throw new ShippingQuoteError('SHIPPING_PROVIDER_UNAVAILABLE', 'Não foi possível consultar o frete agora. Tente novamente.', { status: 503 });
   } finally {
     clearTimeout(timeout);
   }

@@ -226,9 +226,10 @@ test('checkout transmite origem e guarda comprovante sem persistir dados pessoai
     return { ok: true, json: async () => ({ init_point: 'https://www.mercadopago.com.br/checkout/teste', order_id: 'LIORA-TESTE-12345678', checkout_proof: 'signed-fixture' }) };
   } });
   await app.done;
-  app.run("addToCart('botanique',1); shippingState={status:'ready',quotes:[{id:'curitiba-fixed',price:19.9,preview:false}]}; selectedShippingService='curitiba-fixed'; $('fN').value='Cliente Fictício'; $('fE').value='cliente@example.com'; $('fC').value='80000000'; $('fNum').value='100'; $('fA').value='Rua Fictícia';");
+  app.run("addToCart('botanique',1); shippingState={status:'ready',quotes:[{id:'curitiba-fixed',price:19.9,preview:false,quoteProof:'signed-shipping-fixture'}]}; selectedShippingService='curitiba-fixed'; $('fN').value='Cliente Fictício'; $('fE').value='cliente@example.com'; $('fC').value='80000000'; $('fNum').value='100'; $('fA').value='Rua Fictícia';");
   await app.run('confirmOrder()');
   assert.equal(sent.returnOrigin, 'https://liora.example');
+  assert.equal(sent.shipping.quoteProof, 'signed-shipping-fixture');
   assert.equal(app.storage.get('liora_checkout_proof:LIORA-TESTE-12345678'), 'signed-fixture');
   assert.doesNotMatch(JSON.stringify([...app.storage]), /cliente@example|Fictício|Fictícia|80000000/);
 });
@@ -400,10 +401,39 @@ test('repetição após falha de rede mantém chave de idempotência e mudança 
   const app=storefront({checkoutV2:true,fetch:async(url,options)=>{keys.push(JSON.parse(options.body).checkoutKey);throw Error('offline')}});
   await app.done;
   app.run("addToCart('botanique',1); payMethod='card'; shippingState={status:'ready',quotes:[{id:'curitiba-fixed',price:19.9}]}; selectedShippingService='curitiba-fixed'; $('fN').value='Pessoa Fictícia'; $('fE').value='cliente@example.com'; $('fC').value='80000000'; $('fA').value='Rua Fictícia';");
-  await app.run('confirmOrder()');await app.run('confirmOrder()');
+  await app.run('confirmOrder()');
+  app.run("shippingState.quotes[0].quoteProof='renewed-shipping-proof'");
+  await app.run('confirmOrder()');
   assert.equal(keys[0],keys[1]);
   app.run("$('fN').value='Outra Pessoa Fictícia'");await app.run('confirmOrder()');
   assert.notEqual(keys[2],keys[1]);
+});
+
+test('cotação vencida é atualizada e exige nova confirmação sem reenviar o pagamento',async()=>{
+  let attempts=0,quotes=0;
+  const app=storefront({fetch:async(url,options)=>{
+    if(url==='/api/create-preference'){
+      attempts++;
+      assert.equal(JSON.parse(options.body).shipping.quoteProof,'expired-proof');
+      return {ok:false,json:async()=>({code:'SHIPPING_QUOTE_EXPIRED',error:'A cotação expirou.'})};
+    }
+    if(url==='/api/shipping-quote'){
+      quotes++;
+      return {ok:true,json:async()=>({quotes:[{id:'1',price:29.5,quoteProof:'renewed-proof'}]})};
+    }
+    assert.match(url,/viacep/);
+    return {json:async()=>({logradouro:'Endereço automático',localidade:'Rio de Janeiro',uf:'RJ'})};
+  }});
+  await app.done;
+  app.run("addToCart('botanique',1); payMethod='card'; shippingState={status:'ready',quotes:[{id:'1',price:28.13,quoteProof:'expired-proof'}]}; selectedShippingService='1'; $('fN').value='Pessoa Fictícia'; $('fE').value='cliente@example.com'; $('fC').value='20020050'; $('fNum').value='10'; $('fA').value='Endereço ajustado pelo cliente';");
+  await app.run('confirmOrder()');
+  assert.equal(attempts,1);
+  assert.equal(quotes,1);
+  assert.equal(app.run('checkoutSubmitting'),false);
+  assert.equal(app.run('shippingState.quotes[0].quoteProof'),'renewed-proof');
+  assert.equal(app.run('checkoutForm.addr'),'Endereço ajustado pelo cliente');
+  assert.equal(app.run('window.location.href'),'https://liora.example/');
+  assert.match(app.nodes.get('toastMsg').textContent,/Confira o total e confirme/);
 });
 
 test('sem validação comercial não anuncia juros zero nem valores de parcela garantidos',async()=>{

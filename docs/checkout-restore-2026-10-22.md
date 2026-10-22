@@ -1,5 +1,21 @@
 # Verificação do checkout — 22/10/2026
 
+## Falha identificada no teste do responsável e correção — 22/10/2026
+
+A captura enviada pelo responsável mostra “Não foi possível processar o pagamento” ainda na Liora. Os registros das tentativas de 14:08:40 e 14:09:06 (UTC−3) confirmam `POST /api/create-preference` com HTTP 500 / `PAYMENT_INTERNAL_ERROR`, duração de aproximadamente 8 segundos e chamada à SuperFrete Sandbox. A tentativa de 14:09:06 lista somente `sandbox.superfrete.com/api/v0/calculator`, sem chamada ao Mercado Pago. O prazo por requisição da transportadora no código é de 8 segundos. A cotação inicial de frete havia respondido HTTP 200 às 14:08:17.
+
+O checkout consultava a transportadora novamente ao confirmar o pedido. O erro tipado de frete dessa segunda consulta era tratado como erro interno de pagamento. Isso é uma falha distinta da página externa do Mercado Pago observada no navegador remoto.
+
+Correção implementada:
+
+- A API de frete assina cada cotação utilizável, com validade de 15 minutos, vinculada ao CEP, produtos, quantidades, preços do catálogo e ambiente. Valores enviados sem assinatura nunca substituem o frete calculado pelo servidor.
+- O checkout verifica o comprovante e reutiliza o frete válido sem nova chamada à SuperFrete. Cotações simuladas ou de embalagem pendente não recebem assinatura.
+- Comprovantes adulterados, vencidos ou incompatíveis não criam pagamento. A interface recalcula, preserva o endereço informado e exige nova confirmação do total.
+- Páginas abertas antes da atualização mantêm a conferência pelo servidor, mas uma falha da transportadora retorna o código e mensagem de frete, sem ser atribuída ao Mercado Pago.
+- A renovação da cotação não altera a chave de idempotência da mesma compra no fluxo durável, que continua desativado.
+
+Validação local: **234 testes aprovados, zero falhas**. Inclui o cenário da captura (R$ 25,00 + R$ 28,13 = R$ 53,13), com a transportadora falhando após a primeira cotação e a preferência sendo criada sem a segunda chamada. Inclui adulteração de valor, mudança de CEP/carrinho/preço do catálogo, ambiente, expiração e preservação da idempotência. As respostas externas nesses testes são simuladas; isso não comprova pagamento liquidado.
+
 ## Diagnóstico adicional — 22/10/2026, 17h UTC
 
 A solicitação atual autoriza publicar após corrigir e testar. Nesta nova execução, `npm test` terminou com **226 aprovados, zero falhas**. A suíte utiliza respostas simuladas dos provedores.
