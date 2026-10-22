@@ -252,8 +252,15 @@ module.exports = async function handler(req, res) {
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify(checkoutPayload)
       });
-      const checkoutUrl = httpsUrl(data.url, ['checkout.infinitepay.com.br']);
-      if (!checkoutUrl) fail('PAYMENT_PROVIDER_INVALID_RESPONSE', 'Não foi possível iniciar o pagamento pela InfinitePay.', 502);
+      const checkoutUrl = httpsUrl(data.url ?? data.checkout_url ?? data.link, ['checkout.infinitepay.com.br']);
+      if (!checkoutUrl) {
+        // Diagnose response-shape changes without exposing link tokens or buyer data.
+        const fields = Object.fromEntries(['url', 'checkout_url', 'link'].map(key => [key,
+          data[key] == null ? 'missing' : httpsUrl(data[key], ['checkout.infinitepay.com.br']) ? 'valid' : 'invalid'
+        ]));
+        console.warn(JSON.stringify({ event: 'infinitepay_checkout_link_invalid', fields }));
+        fail('PAYMENT_PROVIDER_INVALID_RESPONSE', 'Não foi possível iniciar o pagamento pela InfinitePay.', 502);
+      }
       return await finish({
         id: data.invoice_slug || orderId,
         init_point: checkoutUrl.toString(),

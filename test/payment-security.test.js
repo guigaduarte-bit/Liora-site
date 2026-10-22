@@ -313,6 +313,25 @@ test('checkout rejects HTTP, credential-bearing and lookalike provider URLs', as
   assert.equal((await invoke(createPreference, request({ payMethod: 'infinitepay' }))).statusCode, 502);
 });
 
+test('InfinitePay checkout accepts URL response aliases without relaxing destination validation', async () => {
+  infiniteLive();
+  const url = 'https://checkout.infinitepay.com.br/synthetic-handle?lenc=fixture';
+  for (const field of ['url', 'checkout_url', 'link']) {
+    mockResponse({ [field]: url });
+    const created = await invoke(createPreference, request({ payMethod: 'infinitepay' }));
+    assert.equal(created.statusCode, 200, field);
+    assert.equal(created.body.init_point, url);
+    assert.equal(created.body.total, 94.9);
+    assert.equal(created.body.provider, 'infinitepay');
+    for (const unsafe of ['http://checkout.infinitepay.com.br/x', 'https://checkout.infinitepay.com.br.evil.example/x', 'https://secret@checkout.infinitepay.com.br/x', '/relative', null, {}, 12]) {
+      mockResponse({ [field]: unsafe });
+      assert.equal((await invoke(createPreference, request({ payMethod: 'infinitepay' }))).statusCode, 502, `${field}: invalid URL`);
+    }
+  }
+  mockResponse({ url: 'https://evil.example/x', checkout_url: url });
+  assert.equal((await invoke(createPreference, request({ payMethod: 'infinitepay' }))).statusCode, 502);
+});
+
 test('provider errors and timeouts log no credential, proof, provider body or personal data', async () => {
   const logs = [];
   console.warn = value => logs.push(value);
