@@ -1,5 +1,24 @@
 # Verificação do checkout — 22/10/2026
 
+## Publicação e verificação em produção — 22/10/2026, 17h31 UTC
+
+O commit `296365cca85cd6e78c3199585e124f2e8561e2cd` foi publicado após corrigir a falha de frete reproduzida pelo responsável e validar a criação real do checkout. A branch `main` avançou por fast-forward a partir de `8a1b7ce73739e9dd8bb5e65628cc43cf0eaebfa8`. O deployment `dpl_2W1vD4Li9JnqNhnZcBGnoGoQhsmJ` está **Ready / Production / Current**, com o domínio `lioraaromasdeluxo.com.br` atribuído. As seções abaixo preservam o histórico anterior à publicação.
+
+| Verificação | Evidência |
+|---|---|
+| Suíte local | 234 testes aprovados, zero falhas; build de 44 páginas e 32 produtos |
+| Criação no preview corrigido | 17:22:43 UTC: HTTP 200, execução de 370 ms; somente chamada ao Mercado Pago, sem segunda consulta à SuperFrete |
+| Frete em produção | 17:27:10 UTC: HTTP 200; opções reais Jadlog, Loggi, PAC e Sedex |
+| Criação em produção | 17:28:08 UTC: `POST /api/create-preference` HTTP 200, execução de 389 ms e resposta total de 415 ms; somente `POST api.mercadopago.com/checkout/preferences` nas APIs externas |
+| Valores de produção | Botanique 70 g R$ 25,00 + Jadlog R$ 14,96 = R$ 39,96, cartão selecionado |
+| Meios de pagamento | Pix, cartão e boleto; InfinitePay ausente |
+| Retorno sem pagar | Pedido e carrinho preservados; “Pagamento ainda não localizado” e link para retomar a mesma preferência |
+| Compra paga | **Não validada**; a página externa ainda exibiu erro genérico no navegador remoto, antes do formulário |
+
+Foram utilizados dados sintéticos. Nenhum cartão foi informado, nenhum pagamento foi efetuado e nenhuma liquidação ou estorno foi realizado. A criação da preferência e o redirecionamento foram confirmados; não comprovam aprovação de pagamento. A publicação corrige o erro da Liora demonstrado pela captura enviada, mas não resolve nem identifica a causa do erro de acesso à página externa neste navegador.
+
+Não foram alteradas credenciais ou variáveis de ambiente. Registro durável, Pix direto e anúncio de parcelamento sem juros continuam desativados. Os registros do teste não contêm dados reais de comprador, segredos ou URLs de preferência.
+
 ## Falha identificada no teste do responsável e correção — 22/10/2026
 
 A captura enviada pelo responsável mostra “Não foi possível processar o pagamento” ainda na Liora. Os registros das tentativas de 14:08:40 e 14:09:06 (UTC−3) confirmam `POST /api/create-preference` com HTTP 500 / `PAYMENT_INTERNAL_ERROR`, duração de aproximadamente 8 segundos e chamada à SuperFrete Sandbox. A tentativa de 14:09:06 lista somente `sandbox.superfrete.com/api/v0/calculator`, sem chamada ao Mercado Pago. O prazo por requisição da transportadora no código é de 8 segundos. A cotação inicial de frete havia respondido HTTP 200 às 14:08:17.
