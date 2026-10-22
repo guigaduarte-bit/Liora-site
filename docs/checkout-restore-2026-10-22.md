@@ -1,5 +1,19 @@
 # Verificação do checkout — 22/10/2026
 
+## Diagnóstico adicional — 22/10/2026, 17h UTC
+
+A solicitação atual autoriza publicar após corrigir e testar. Nesta nova execução, `npm test` terminou com **226 aprovados, zero falhas**. A suíte utiliza respostas simuladas dos provedores.
+
+O link de retomada da preferência existente foi acionado uma vez. O Mercado Pago voltou a exibir “Hubo un error accediendo a esta pagina...” antes de apresentar qualquer formulário. A abertura independente de `https://www.mercadopago.com.br/`, sem parâmetros de checkout, apresentou a mesma mensagem. Assim, a falha de acesso também ocorre fora do fluxo da Liora neste navegador; sua causa técnica exata não é informada pela página. Não há evidência suficiente para afirmar bloqueio por automação, indisponibilidade geral ou credencial inválida.
+
+O painel de registros da Vercel confirmou:
+
+- `POST /api/create-preference` no preview configurado, em 16:51:32 UTC: **HTTP 200**.
+- `GET /api/payment-status` no retorno em 16:52:20 UTC: **HTTP 404**, com código de aplicação `PAYMENT_NOT_FOUND`, esperado para a tentativa ainda não paga; não se trata de rota ausente.
+- O preview original sem escopo de configuração respondeu **HTTP 503 / PAYMENT_MODE_NOT_CONFIGURED**; o preview estável configurado superou essa falha.
+
+A captura da mensagem externa foi registrada, sem dados de comprador ou pagamento. Não houve nova cobrança, preenchimento de cartão, mudança de credencial, alteração adicional de código ou publicação em produção nesta execução. A validação de ponta a ponta continua pendente de acesso funcional ao checkout do Mercado Pago com o comprador e cartão oficiais de teste. O sucesso HTTP da criação de preferência não comprova pagamento aprovado.
+
 ## Retomada da validação — 22/10/2026
 
 O código `23191b965179795628f5c3e137c1da96d72c70c7` remove novas cobranças InfinitePay e permite retomar a mesma preferência Mercado Pago quando ainda não há pagamento. A suíte foi executada novamente: **226 testes aprovados, zero falhas**; as respostas dos provedores nos testes locais são simuladas.
