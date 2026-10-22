@@ -19,7 +19,7 @@ Base pública preservada: `296365cca85cd6e78c3199585e124f2e8561e2cd`.
 
 `npm test`: 242 testes passaram, incluindo criação InfinitePay, conferência de retorno, retomada, isolamento de provedor, idempotência opcional e reutilização do frete assinado. Build de 44 páginas e 32 produtos concluído.
 
-Validação externa e publicação ainda pendentes nesta revisão. Nenhum pagamento foi liquidado por estes testes automatizados.
+Validação externa concluída no build preparado abaixo. Nenhum pagamento foi liquidado; não foram fornecidos dados de cartão nem autorizado débito.
 
 
 ## Causa identificada no teste externo
@@ -27,3 +27,19 @@ Validação externa e publicação ainda pendentes nesta revisão. Nenhum pagame
 No build preparado `dpl_4JhAc189U8PcA8fyiTKpK666CrvC` (sem o domínio público), a API real respondeu à criação do link em 22/10/2026 às 18:09:50 UTC. O campo `url` usou o host `checkout.infinitepay.io`. A validação anterior aceitava somente `checkout.infinitepay.com.br`, rejeitando a resposta com `PAYMENT_PROVIDER_INVALID_RESPONSE`.
 
 Correção: permitir os dois hosts exatos, no servidor e no navegador, preservando rejeição de HTTP, credenciais na URL, portas e domínios semelhantes. O caminho ou identificador do link, os dados do cliente e as credenciais não são registrados no diagnóstico.
+
+
+## Validação externa concluída
+
+Commit funcional: `6410738011e120d1f5d70cd01471aa254488bbdb`.
+Build preparado e validado: `dpl_34sSEUgT7JL6j3gXEWceY2kjDV55`, Production / Staged, sem atribuição do domínio público.
+
+- Checkout da InfinitePay abriu na conta pública `$lioraaromasdeluxo`.
+- Botanique 70 g: R$ 25,00; frete JADLOG: R$ 14,96; total: R$ 39,96, sem alteração entre loja e provedor.
+- Contato sintético e endereço do teste aceitos; a etapa Pagamento exibiu Crédito, Pix e Apple Pay.
+- Retorno à loja sem pagar exibiu “Confirmação em aberto” e “Retomar pagamento na InfinitePay”.
+- Retomada abriu exatamente o mesmo link e total, sem criar outra cobrança nem declarar aprovação.
+- A confirmação de pagamento liquidado continua coberta por testes automatizados da consulta autenticada ao provedor; não foi realizada transação financeira real.
+- A produção anterior permaneceu no domínio público durante toda esta validação. A atribuição automática de domínios foi suspensa para preparar o build e será restabelecida após a promoção manual.
+
+Publicação do build validado autorizada pelo pedido do usuário; promoção em andamento.
