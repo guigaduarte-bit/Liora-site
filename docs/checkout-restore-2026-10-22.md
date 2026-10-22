@@ -1,5 +1,24 @@
 # Verificação do checkout — 22/10/2026
 
+## Navegador independente — 22/10/2026, 17h47 UTC
+
+A pedido do responsável, o teste foi executado em uma sessão independente do TinyFish, com perfil padrão `lite`, sem stealth, proxy configurado ou credenciais armazenadas.
+
+O primeiro teste tentou o preview estável e parou no login da Vercel, antes da loja. O acesso pelo conector Vercel também foi negado (HTTP 403, projeto/time fora do escopo autorizado do conector). A proteção não foi desativada. Não foi possível concluir pagamento simulado no ambiente de homologação por esse navegador.
+
+Em seguida, foi verificado o fluxo público em produção, somente até a seleção do meio de pagamento:
+
+- Uma unidade de Botanique 70 g, R$ 25,00; Jadlog Econômico, R$ 14,96; total R$ 39,96, cartão selecionado.
+- Dados de contato fictícios; sem CPF, cartão ou dados bancários reais.
+- `POST /api/create-preference` em 17:45:38.114 UTC confirmou **HTTP 200** nos registros da Vercel.
+- O navegador independente abriu a página hospedada do Mercado Pago normalmente, com o título “Como você prefere pagar?” e as opções de conta Mercado Pago, cartão sem conta e dois cartões.
+- O produto e o frete apareceram com os valores corretos. Não apareceu o erro genérico observado no primeiro navegador.
+- A execução parou antes de inserir dados de cartão ou enviar pagamento. O link “Voltar à loja” estava disponível; o retorno não foi executado nessa sessão.
+
+A comparação comprova que a página externa consegue abrir em outra sessão de navegador. A causa técnica do erro no navegador inicial continua sem identificação; não atribuir automaticamente a bloqueio por automação ou falha da integração. **Aprovação e liquidação de pagamento continuam não homologadas.**
+
+O código corrigido `296365cca85cd6e78c3199585e124f2e8561e2cd` permanece em produção. Não foi necessária alteração adicional de código nem republicação para a página externa abrir no navegador independente. Este acréscimo atualiza apenas o registro de verificação na branch de documentação/homologação.
+
 ## Publicação e verificação em produção — 22/10/2026, 17h31 UTC
 
 O commit `296365cca85cd6e78c3199585e124f2e8561e2cd` foi publicado após corrigir a falha de frete reproduzida pelo responsável e validar a criação real do checkout. A branch `main` avançou por fast-forward a partir de `8a1b7ce73739e9dd8bb5e65628cc43cf0eaebfa8`. O deployment `dpl_2W1vD4Li9JnqNhnZcBGnoGoQhsmJ` está **Ready / Production / Current**, com o domínio `lioraaromasdeluxo.com.br` atribuído. As seções abaixo preservam o histórico anterior à publicação.
