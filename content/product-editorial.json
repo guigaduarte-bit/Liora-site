@@ -537,5 +537,309 @@
         "value": "Cor e composição a combinar antes da compra"
       }
     ]
+  },
+  {
+    "id": "natal-cavalinho-de-balanco",
+    "displayName": "Cavalinho de balanço",
+    "description": "O cavalinho de balanço revisita a delicadeza dos brinquedos de outros tempos, com curvas suaves e detalhes ornamentais na base. Uma vela que traz a ternura das lembranças de infância à decoração de Natal e aos presentes escolhidos com afeto.",
+    "specs": [
+      {
+        "label": "Coleção",
+        "value": "Natal"
+      },
+      {
+        "label": "Medidas",
+        "value": "10,6 × 8,6 cm"
+      },
+      {
+        "label": "Valor por unidade",
+        "value": "R$ 9,90"
+      }
+    ]
+  },
+  {
+    "id": "natal-boneco-de-neve-com-coracao",
+    "displayName": "Boneco de neve com coração",
+    "description": "Com gorro, pequenos presentes e um coração em relevo, este boneco de neve reúne detalhes que despertam um sorriso. Uma presença delicada para compor cantinhos natalinos ou oferecer como lembrança a quem torna a celebração mais especial.",
+    "specs": [
+      {
+        "label": "Coleção",
+        "value": "Natal"
+      },
+      {
+        "label": "Medidas",
+        "value": "11,2 × 10,2 cm"
+      },
+      {
+        "label": "Valor por unidade",
+        "value": "R$ 20,00"
+      }
+    ]
+  },
+  {
+    "id": "natal-arvore-de-natal-com-enfeites",
+    "displayName": "Árvore de Natal com enfeites",
+    "description": "Uma estrela coroa os ramos de contornos suaves, decorados com pequenas esferas em relevo. Esta árvore em forma de vela traduz o encanto do Natal em uma peça delicada, para acompanhar a mesa de celebração ou completar uma composição de presentes.",
+    "specs": [
+      {
+        "label": "Coleção",
+        "value": "Natal"
+      },
+      {
+        "label": "Medidas",
+        "value": "8,0 × 7,2 cm"
+      },
+      {
+        "label": "Valor por unidade",
+        "value": "R$ 20,00"
+      }
+    ]
+  },
+  {
+    "id": "natal-arvore-de-natal-geometrica",
+    "displayName": "Árvore de Natal geométrica",
+    "description": "Três camadas de linhas definidas se encontram sob uma estrela, formando uma árvore de desenho contemporâneo. A beleza da peça está na simplicidade dos contornos, que acrescentam um toque natalino elegante a mesas, aparadores e pequenos espaços.",
+    "specs": [
+      {
+        "label": "Coleção",
+        "value": "Natal"
+      },
+      {
+        "label": "Medidas",
+        "value": "8,0 × 6,8 cm"
+      },
+      {
+        "label": "Valor por unidade",
+        "value": "R$ 20,00"
+      }
+    ]
+  },
+  {
+    "id": "natal-floco-de-neve",
+    "displayName": "Floco de neve",
+    "description": "Seis pontas e delicados desenhos em baixo-relevo revelam a beleza geométrica de um floco de neve. Uma vela para acrescentar textura às composições natalinas, acompanhar outras peças da coleção ou surpreender como uma pequena lembrança.",
+    "specs": [
+      {
+        "label": "Coleção",
+        "value": "Natal"
+      },
+      {
+        "label": "Medidas",
+        "value": "6,8 × 5,8 cm"
+      },
+      {
+        "label": "Valor por unidade",
+        "value": "R$ 10,00"
+      }
+    ]
+  },
+  {
+    "id": "natal-gnomo-natalino",
+    "displayName": "Gnomo natalino",
+    "description": "O gorro alongado, as tranças e o pequeno trevo em relevo dão personalidade a este gnomo. Entre fantasia e delicadeza, a peça convida a criar uma decoração de Natal acolhedora, com detalhes que encantam de perto.",
+    "specs": [
+      {
+        "label": "Coleção",
+        "value": "Natal"
+      },
+      {
+        "label": "Medidas",
+        "value": "8,3 × 4,8 cm"
+      },
+      {
+        "label": "Valor por unidade",
+        "value": "R$ 20,00"
+      }
+    ]
+  },
+  {
+    "id": "natal-anjo-com-coracao-em-relevo",
+    "displayName": "Anjo com coração em relevo",
+    "description": "As asas abertas envolvem um coração, enquanto os desenhos do vestido revelam o cuidado com cada detalhe. Um anjo em forma de vela que expressa afeto e proteção, para presentear com significado ou acompanhar um lugar especial da casa.",
+    "specs": [
+      {
+        "label": "Coleção",
+        "value": "Natal"
+      },
+      {
+        "label": "Medidas",
+        "value": "9,7 × 9,1 cm"
+      },
+      {
+        "label": "Valor por unidade",
+        "value": "R$ 20,00"
+      }
+    ]
+  },
+  {
+    "id": "natal-boneco-de-biscoito",
+    "displayName": "Boneco de biscoito",
+    "description": "Inspirado nos tradicionais biscoitos natalinos, este pequeno personagem combina um sorriso delicado, botões e detalhes que lembram glacê. Uma vela de espírito alegre, para trazer leveza à decoração e carinho aos presentes de fim de ano.",
+    "specs": [
+      {
+        "label": "Coleção",
+        "value": "Natal"
+      },
+      {
+        "label": "Medidas",
+        "value": "7,2 × 6,2 cm"
+      },
+      {
+        "label": "Valor por unidade",
+        "value": "R$ 19,90"
+      }
+    ]
+  },
+  {
+    "id": "natal-rena-natalina",
+    "displayName": "Rena natalina",
+    "description": "De contornos suaves e galhadas marcantes, a rena ganha um toque especial com a fita vermelha e o delicado pingente. Uma peça que reúne a simplicidade do desenho e o encanto dos símbolos natalinos, para decorar ou presentear.",
+    "specs": [
+      {
+        "label": "Coleção",
+        "value": "Natal"
+      },
+      {
+        "label": "Medidas",
+        "value": "11 × 7 cm"
+      },
+      {
+        "label": "Valor por unidade",
+        "value": "R$ 19,90"
+      }
+    ]
+  },
+  {
+    "id": "natal-sagrada-familia-em-relevo",
+    "displayName": "Sagrada Família em relevo",
+    "description": "Maria, José e o menino Jesus aparecem em uma cena esculpida na superfície da vela, emoldurada por ramos e folhas. Uma composição que expressa fé, união e acolhimento, para acompanhar momentos de contemplação e celebrações em família.",
+    "specs": [
+      {
+        "label": "Coleção",
+        "value": "Natal"
+      },
+      {
+        "label": "Medidas",
+        "value": "7,5 × 5,5 cm"
+      },
+      {
+        "label": "Valor por unidade",
+        "value": "R$ 30,00"
+      }
+    ]
+  },
+  {
+    "id": "natal-anjo-com-coracao-vazado",
+    "displayName": "Anjo com coração vazado",
+    "description": "Linhas suaves desenham um anjo de asas abertas, com um coração vazado no centro da peça. A delicadeza da forma expressa afeto com simplicidade, tornando esta vela uma lembrança especial para celebrar vínculos e desejar um Natal de paz.",
+    "specs": [
+      {
+        "label": "Coleção",
+        "value": "Natal"
+      },
+      {
+        "label": "Medidas",
+        "value": "9,7 × 9,1 cm"
+      },
+      {
+        "label": "Valor por unidade",
+        "value": "R$ 20,00"
+      }
+    ]
+  },
+  {
+    "id": "natal-pinheiro-de-tres-camadas",
+    "displayName": "Pinheiro de três camadas",
+    "description": "Três camadas de contornos ondulados dão volume a este pequeno pinheiro, finalizado por uma estrela. Uma vela de presença delicada, para compor a mesa de Natal, combinar com outras peças ou oferecer como um gesto de carinho.",
+    "specs": [
+      {
+        "label": "Coleção",
+        "value": "Natal"
+      },
+      {
+        "label": "Medidas",
+        "value": "7 × 6,3 cm"
+      },
+      {
+        "label": "Valor por unidade",
+        "value": "R$ 20,00"
+      }
+    ]
+  },
+  {
+    "id": "natal-livro-de-natal",
+    "displayName": "Livro de Natal",
+    "description": "Um livro aberto revela uma pequena história natalina: o Papai Noel no trenó, as crianças e os flocos de neve ganham vida em relevo. Uma vela rica em detalhes, que convida a um olhar demorado e celebra a alegria de compartilhar histórias.",
+    "specs": [
+      {
+        "label": "Coleção",
+        "value": "Natal"
+      },
+      {
+        "label": "Medidas",
+        "value": "9,1 × 7,7 cm"
+      },
+      {
+        "label": "Valor por unidade",
+        "value": "R$ 39,90"
+      }
+    ]
+  },
+  {
+    "id": "natal-boneco-de-neve-com-cachecol",
+    "displayName": "Boneco de neve com cachecol",
+    "description": "O chapéu de abas largas, o cachecol texturizado e o floco de neve em relevo dão charme a este boneco de formas arredondadas. Uma peça acolhedora para acrescentar personalidade à decoração natalina ou encantar alguém querido.",
+    "specs": [
+      {
+        "label": "Coleção",
+        "value": "Natal"
+      },
+      {
+        "label": "Medidas",
+        "value": "6,5 × 4,2 cm"
+      },
+      {
+        "label": "Valor por unidade",
+        "value": "R$ 20,00"
+      }
+    ]
+  },
+  {
+    "id": "natal-arvore-bubble-de-quatro-camadas",
+    "displayName": "Árvore Bubble de quatro camadas",
+    "description": "Volumes arredondados se sobrepõem em quatro camadas, formando uma árvore coroada por uma estrela. Com desenho contemporâneo e curvas generosas, esta vela traz uma interpretação delicada do Natal para composições que valorizam forma e textura.",
+    "specs": [
+      {
+        "label": "Coleção",
+        "value": "Natal"
+      },
+      {
+        "label": "Medidas",
+        "value": "7 × 6 cm"
+      },
+      {
+        "label": "Valor por unidade",
+        "value": "R$ 20,00"
+      }
+    ]
+  },
+  {
+    "id": "natal-casinha-de-natal",
+    "displayName": "Casinha de Natal",
+    "description": "O telhado texturizado, a pequena porta e o floco de neve na fachada fazem desta casinha uma peça cheia de descobertas. Uma vela que evoca o aconchego de estar em casa e a beleza dos encontros que dão sentido ao Natal.",
+    "specs": [
+      {
+        "label": "Coleção",
+        "value": "Natal"
+      },
+      {
+        "label": "Medidas",
+        "value": "10 × 7 cm"
+      },
+      {
+        "label": "Valor por unidade",
+        "value": "R$ 30,00"
+      }
+    ]
   }
 ]

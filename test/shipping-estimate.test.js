@@ -49,7 +49,8 @@ const incompleteIds = [
   'vela-decorativa-anjo-em-vitral-1sbe9',
   'botanique-150-gr-1gyzj',
   'caixa-redonda-floral', 'vaso-floral-metal', 'caixa-flor-solitaria',
-  'caixa-quadrada-media', 'caixa-floral-grande'
+  'caixa-quadrada-media', 'caixa-floral-grande',
+  ...Object.keys(catalog).filter(id => id.startsWith('natal-'))
 ];
 
 function checkParcelGeometryAndWeight(result) {
@@ -114,10 +115,10 @@ function checkParcelGeometryAndWeight(result) {
   assert.equal(result.totalWeightGrams, totalWeight);
 }
 
-test('tabela cobre os 32 SKUs: 23 estimáveis, 8 incompletos e 1 sem caixa', () => {
+test('tabela cobre os 48 SKUs: 23 estimáveis, 24 incompletos e 1 sem caixa', () => {
   const coveredIds = [...singleUnits.map(([id]) => id), ...incompleteIds, 'jardim-encantado'];
   assert.equal(singleUnits.length, 23);
-  assert.equal(new Set(coveredIds).size, 32);
+  assert.equal(new Set(coveredIds).size, 48);
   assert.deepEqual(coveredIds.sort(), Object.keys(catalog).sort());
 });
 

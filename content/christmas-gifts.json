@@ -1,0 +1,135 @@
+[
+  {
+    "id": "encantos-da-vila",
+    "name": "Encantos da Vila",
+    "price": 119.90,
+    "sourcePhoto": "IMG_6126.jpg",
+    "image": "/assets/images/kits-natal/encantos-da-vila.webp",
+    "alt": "Pinheiros verdes, rena clara e cavalinho vermelho diante de uma casinha natalina",
+    "description": "Pinheiros em verde suave, uma rena em cera clara e um cavalinho vermelho compõem uma pequena cena de Natal. A casinha ilustrada completa uma composição que reúne a alegria da infância e a delicadeza das velas Liora.",
+    "detail": "Uma inspiração para acolher os encontros de fim de ano e presentear quem guarda um carinho especial pelas tradições natalinas."
+  },
+  {
+    "id": "quebra-nozes-na-casinha",
+    "name": "Quebra-Nozes na Casinha",
+    "price": 89.90,
+    "sourcePhoto": "IMG_9825.jpg",
+    "image": "/assets/images/kits-natal/quebra-nozes-na-casinha.webp",
+    "alt": "Vela Quebra-Nozes em tom marfim ao lado de uma embalagem alta em formato de casinha",
+    "description": "Em tom marfim, o Quebra-Nozes revela detalhes delicados no chapéu, no uniforme e na expressão. Ao lado da casinha ilustrada, a figura clássica ganha uma apresentação que lembra os contos de Natal e convida a presentear com encanto.",
+    "detail": "A suavidade da cera encontra as cores da embalagem em uma composição para quem aprecia personagens e histórias natalinas."
+  },
+  {
+    "id": "classicos-de-natal",
+    "name": "Clássicos de Natal",
+    "price": 129.90,
+    "sourcePhoto": "IMG_9763.jpg",
+    "image": "/assets/images/kits-natal/classicos-de-natal.webp",
+    "alt": "Trio com Quebra-Nozes marfim, cilindro vermelho em relevo e globo vermelho com rena, junto de caixa natalina",
+    "description": "O Quebra-Nozes em marfim se encontra com um cilindro vermelho em relevo e uma rena em formato de globo. Três desenhos marcantes, acompanhados por uma caixa ilustrada, celebram a riqueza dos detalhes e as cores tradicionais do Natal.",
+    "detail": "Uma composição de presença para transformar o gesto de presentear em uma pequena celebração."
+  },
+  {
+    "id": "duo-quebra-nozes",
+    "name": "Duo Quebra-Nozes",
+    "price": 119.90,
+    "sourcePhoto": "IMG_9764.jpg",
+    "image": "/assets/images/kits-natal/duo-quebra-nozes.webp",
+    "alt": "Quebra-Nozes escultural em marfim ao lado de vela cilíndrica vermelha com o mesmo personagem em relevo",
+    "description": "O vermelho festivo encontra a suavidade do marfim em duas interpretações do Quebra-Nozes. A figura escultural e o cilindro ornamentado formam um duo de texturas e volumes, feito para trazer o encanto desse personagem à decoração natalina.",
+    "detail": "As duas formas se complementam em uma composição que valoriza o relevo da cera e a beleza dos contrastes."
+  },
+  {
+    "id": "quebra-nozes-em-relevo",
+    "name": "Quebra-Nozes em Relevo",
+    "price": 59.90,
+    "sourcePhoto": "IMG_9765.jpg",
+    "image": "/assets/images/kits-natal/quebra-nozes-em-relevo.webp",
+    "alt": "Vela cilíndrica vermelha com Quebra-Nozes, sinos, flocos de neve e presentes em relevo",
+    "description": "O Quebra-Nozes ocupa o centro desta vela vermelha, cercado por sinos, flocos de neve e pequenos presentes. Os relevos desenham uma cena rica em detalhes, para oferecer como lembrança ou acrescentar um ponto de cor à mesa de Natal.",
+    "detail": "Uma peça que convida a olhar de perto e descobrir, em cada lado, um novo detalhe da celebração."
+  },
+  {
+    "id": "rena-escarlate",
+    "name": "Rena Escarlate",
+    "price": 59.90,
+    "sourcePhoto": "IMG_9766.jpg",
+    "image": "/assets/images/kits-natal/rena-escarlate.webp",
+    "alt": "Vela cilíndrica vermelha com rena, sino e flocos de neve em relevo",
+    "description": "Uma rena de contornos delicados se destaca entre sinos e flocos de neve nesta vela cilíndrica vermelha. O desenho em relevo dá profundidade à peça e traduz a atmosfera dos bosques de inverno em uma lembrança cheia de presença.",
+    "detail": "O vermelho aproxima a delicadeza do desenho das cores mais afetivas do Natal."
+  },
+  {
+    "id": "luz-de-inverno",
+    "name": "Luz de Inverno",
+    "price": 119.90,
+    "priceLabel": "Kit",
+    "unitPrice": 59.90,
+    "sourcePhoto": "IMG_9767.jpg",
+    "image": "/assets/images/kits-natal/luz-de-inverno.webp",
+    "alt": "Duo de velas cilíndricas, uma marfim com rena e outra caramelo com pinheiro e flocos de neve",
+    "description": "Entre o marfim e o caramelo, renas, pinheiros e flocos de neve se revelam em duas velas ornamentadas. Uma composição de tons suaves que traz aconchego à decoração e oferece uma maneira delicada de celebrar o Natal.",
+    "detail": "Os motivos se encontram em uma paleta acolhedora, fácil de imaginar sobre a mesa ou em um cantinho especial da casa."
+  },
+  {
+    "id": "sagrada-familia",
+    "name": "Sagrada Família",
+    "price": 49.90,
+    "sourcePhoto": "IMG_9916.jpg",
+    "image": "/assets/images/kits-natal/sagrada-familia.webp",
+    "alt": "Vela clara da Sagrada Família com Maria, José e o Menino Jesus, cercados por rosas em relevo",
+    "description": "Maria, José e o Menino Jesus se aproximam em uma escultura de gestos serenos, cercada por rosas em relevo. Em cera clara, a Sagrada Família convida a recordar o sentido do Natal e a presentear com fé, ternura e significado.",
+    "detail": "Uma presença delicada para acompanhar momentos de recolhimento e celebração em família."
+  },
+  {
+    "id": "bolas-de-natal",
+    "name": "Bolas de Natal",
+    "price": 119.90,
+    "priceLabel": "Kit",
+    "sourcePhoto": "IMG_9906.jpg",
+    "image": "/assets/images/kits-natal/bolas-de-natal.webp",
+    "alt": "Duas velas em formato de bolas natalinas, uma clara com detalhes dourados e outra verde, diante de uma casinha",
+    "description": "O formato das bolas natalinas ganha uma nova leitura em cera, com texturas delicadas, verde vivo e detalhes dourados sobre o tom claro. A casinha ilustrada completa uma apresentação alegre, inspirada nos enfeites que fazem parte das nossas memórias de Natal.",
+    "detail": "Duas formas arredondadas para trazer o encanto da árvore de Natal também às composições sobre a mesa."
+  },
+  {
+    "id": "bosque-encantado",
+    "name": "Bosque Encantado",
+    "price": 129.90,
+    "sourcePhoto": "IMG_9907.jpg",
+    "image": "/assets/images/kits-natal/bosque-encantado.webp",
+    "alt": "Caixa de presente Liora com duas velas em relevo, pinheiro verde suave e rena vermelha",
+    "description": "O pinheiro em verde suave e a rena vermelha se encontram em uma caixa com detalhes natalinos e a assinatura Liora. Uma composição que valoriza o contraste das cores e os relevos das velas, com a delicadeza de um presente escolhido com atenção.",
+    "detail": "A apresentação em caixa aproxima duas cenas de inverno e torna o momento de abrir o presente parte da experiência."
+  },
+  {
+    "id": "rena-na-sacola-natalina",
+    "name": "Rena na Sacola Natalina",
+    "price": 69.90,
+    "sourcePhoto": "IMG_9908.jpg",
+    "image": "/assets/images/kits-natal/rena-na-sacola-natalina.webp",
+    "alt": "Vela verde suave com rena e flocos claros ao lado de sacola natalina verde e vermelha com laço",
+    "description": "A rena e os flocos claros se destacam sobre o verde suave da vela, enquanto a sacola ilustrada recebe um laço vermelho. Uma apresentação delicada, em que o cuidado com a peça continua na embalagem e transforma a lembrança em um gesto de carinho.",
+    "detail": "O desenho da rena reaparece na sacola, criando uma ligação entre a vela e sua apresentação natalina."
+  },
+  {
+    "id": "dueto-da-vila",
+    "name": "Dueto da Vila",
+    "price": 129.90,
+    "sourcePhoto": "IMG_9909.jpg",
+    "image": "/assets/images/kits-natal/dueto-da-vila.webp",
+    "alt": "Vela com pinheiro em verde suave e vela com rena vermelha diante de embalagem em formato de casa natalina",
+    "description": "Uma árvore em verde suave e uma rena vermelha dão vida a este duo de velas em relevo. A embalagem em formato de casinha cria o cenário de uma pequena vila, reunindo símbolos que tornam o Natal tão familiar e acolhedor.",
+    "detail": "Uma composição para quem gosta de levar as cores e as histórias do Natal para dentro de casa."
+  },
+  {
+    "id": "estrelas-de-natal",
+    "name": "Estrelas de Natal",
+    "price": 59.90,
+    "sourcePhoto": "IMG_9915.jpg",
+    "image": "/assets/images/kits-natal/estrelas-de-natal.webp",
+    "alt": "Vela em copo de vidro com flocos dourados e pequenas estrelas, ao lado de caixa com rena e boneco de neve",
+    "description": "O vidro transparente revela a cera clara, acompanhada por flocos dourados e pequenas estrelas coloridas. Ao lado, a embalagem com rena e boneco de neve traz um toque lúdico à composição, pensada para iluminar o gesto de presentear.",
+    "detail": "A leveza do vidro e os detalhes festivos aproximam esta apresentação da delicadeza das velas Liora para a casa."
+  }
+]

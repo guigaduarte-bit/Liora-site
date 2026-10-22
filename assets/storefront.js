@@ -13,7 +13,7 @@ if(!document.getElementById('fav').getAttribute('href'))document.getElementById(
 
 /* ============ STORE DATA (lioraaromasdeluxo.lojavirtualnuvem.com.br) ============ */
 const AROMA_TAB='Catálogo de Aromas';
-const CATS=['Todas','Esculturas','Clássico','Boho Glass','Flora Linea',AROMA_TAB];
+const CATS=['Todas','Esculturas','Clássico','Boho Glass','Flora Linea','Natal',AROMA_TAB];
 const AROMA_FAMILIES=[
   {name:'Floral Frutal',className:'floral-frutal',profile:'Romântico · Fresco · Feminino',items:[
     {name:'Sim Arman',notes:'Figo · Damasco · Cedro · Musk'},
@@ -97,12 +97,13 @@ function toggleWish(id){
 /* ============ CART ============ */
 function addToCart(id,qty=1,frag=''){
   const p=prod(id);
-  if(!p||p.soldout||p.stock<1){toast(p?.availabilityPending?'Disponibilidade a confirmar':'Produto esgotado');return false}
+  if(!p||p.soldout||(!p.madeToOrder&&p.stock<1)){toast(p?.availabilityPending?'Disponibilidade a confirmar':'Produto esgotado');return false}
   qty=Math.max(1,Math.floor(Number(qty)||1));frag=String(frag).trim().slice(0,60);
   const key=keyFor(id,frag);
   const ex=cart.find(i=>i.key===key);
   const have=cart.filter(i=>i.id===id).reduce((n,i)=>n+i.qty,0);
-  if(p.stock&&have+qty>p.stock){toast(`Só ${p.stock} em estoque`);qty=Math.max(0,p.stock-have);if(!qty)return false}
+  if(!p.madeToOrder&&p.stock&&have+qty>p.stock){toast(`Só ${p.stock} em estoque`);qty=Math.max(0,p.stock-have);if(!qty)return false}
+  if(p.madeToOrder&&qty+(ex?.qty||0)>100){toast('Limite de 100 unidades por item no pedido');qty=Math.max(0,100-(ex?.qty||0));if(!qty)return false}
   if(ex)ex.qty+=qty;
   else cart.push({key,id,qty,frag,price:p.price,name:p.name,img:p.img});
   updateCounts();return true;
@@ -111,7 +112,8 @@ function quickAdd(id){openQuick(id)}
 function changeQty(key,d){
   const it=cart.find(i=>i.key===key);if(!it)return;
   const p=prod(it.id);
-  if(d>0&&cart.filter(i=>i.id===it.id).reduce((n,i)=>n+i.qty,0)+1>p.stock){toast(`Só ${p.stock} em estoque`);return}
+  if(d>0&&!p.madeToOrder&&cart.filter(i=>i.id===it.id).reduce((n,i)=>n+i.qty,0)+1>p.stock){toast(`Só ${p.stock} em estoque`);return}
+  if(d>0&&p.madeToOrder&&it.qty>=100){toast('Limite de 100 unidades por item no pedido');return}
   it.qty+=d;if(it.qty<1)cart=cart.filter(i=>i.key!==key);
   updateCounts();renderDrawer();
 }
@@ -132,10 +134,10 @@ function restoreCart(){
     if(Array.isArray(saved))for(const item of saved.slice(0,100)){
       if(!item||typeof item!=='object')continue;
       const p=prod(item.id);if(!p||p.soldout||!Number.isInteger(item.qty)||item.qty<1)continue;
-      const remaining=p.stock-cart.filter(i=>i.id===p.id).reduce((n,i)=>n+i.qty,0);
-      const qty=Math.min(item.qty,remaining);if(qty<1)continue;
       const frag=typeof item.frag==='string'?item.frag.slice(0,60):'';
       const key=keyFor(p.id,frag),existing=cart.find(i=>i.key===key);
+      const remaining=p.madeToOrder?100-(existing?.qty||0):p.stock-cart.filter(i=>i.id===p.id).reduce((n,i)=>n+i.qty,0);
+      const qty=Math.min(item.qty,remaining);if(qty<1)continue;
       if(existing)existing.qty+=qty;else cart.push({key,id:p.id,qty,frag,price:p.price,name:p.name,img:p.img});
     }
     const savedWish=JSON.parse(sessionStorage.getItem('liora_wish')||'[]');
@@ -247,7 +249,7 @@ function renderCheckout(){
     </div>
     <div class="field"><label for="fA">Endereço</label><input id="fA" placeholder="Rua, bairro — cidade/UF" value="${escapeAttr(checkoutForm.addr)}" oninput="checkoutForm.addr=this.value"></div>
     <p class="chk-step mt">2 · Meio de envio</p>
-    <p class="production-note"><strong>Produção: 10 dias úteis.</strong> A contagem começa quando pagamento e personalização estiverem confirmados. Some o prazo de transporte calculado pelo CEP.</p>
+    <p class="production-note"><strong>${cart.some(i=>prod(i.id)?.madeToOrder)?'Feito por encomenda · Envio em até 10 dias úteis.':'Produção: 10 dias úteis.'}</strong> A contagem começa quando pagamento e personalização estiverem confirmados. Some o prazo de transporte calculado pelo CEP.</p>
     ${shippingOptionsHTML(st)}
     ${packagingEstimateHTML()}
     ${paymentOptionsHTML()}
@@ -523,6 +525,7 @@ function openQuick(id){
 function stockNote(p){
   if(p.availabilityPending)return '<p class="stock-note">Disponibilidade a confirmar</p>';
   if(p.soldout)return '<p class="stock-note">Esgotado — avise-me quando voltar</p>';
+  if(p.madeToOrder)return '<p class="stock-note">Sob encomenda · Envio em até 10 dias úteis</p>';
   if(p.stock===1)return '<p class="stock-note">Atenção, última peça!</p>';
   if(p.stock&&p.stock<=5)return `<p class="stock-note">Só ${p.stock} em estoque</p>`;
   return p.stock?`<p class="stock-note" style="color:var(--ink-soft)">${p.stock} em estoque</p>`:'';
@@ -570,7 +573,8 @@ function renderQuick(){
 }
 function syncQty(){
   const p=prod(quick.id);
-  if(p.stock&&quick.qty>p.stock){quick.qty=p.stock;toast(`Só ${p.stock} em estoque`)}
+  if(!p.madeToOrder&&p.stock&&quick.qty>p.stock){quick.qty=p.stock;toast(`Só ${p.stock} em estoque`)}
+  if(p.madeToOrder&&quick.qty>100){quick.qty=100;toast('Limite de 100 unidades por item no pedido')}
   $('qQty').textContent=quick.qty;
   if(!p.soldout)$('qAdd').textContent=`Comprar · ${money(p.price*quick.qty)}`;
 }

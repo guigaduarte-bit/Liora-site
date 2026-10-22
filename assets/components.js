@@ -26,13 +26,23 @@ function lioraCardHTML(p,favorite=false){
  const name=lioraEscape(p.displayName||p.name),off=p.old?Math.round((1-p.price/p.old)*100):0;
  return `<article class="card${p.soldout&&!p.availabilityPending?' soldout':''}"><div class="card-media">
  <a class="card-image-link" href="/produtos/${p.id}/" aria-label="Ver ${name}">${lioraImage(p)}</a>
- ${p.soldout?`<span class="badge out">${p.availabilityPending?'A confirmar':'Esgotado'}</span>`:off?`<span class="badge">${off}% OFF</span>`:''}
+ ${p.soldout?`<span class="badge out">${p.availabilityPending?'A confirmar':'Esgotado'}</span>`:p.madeToOrder?'<span class="badge">Sob encomenda</span>':off?`<span class="badge">${off}% OFF</span>`:''}
  <button class="wish-btn${favorite?' on':''}" aria-label="Favoritar ${name}" aria-pressed="${favorite}" onclick="toggleWish('${p.id}')"><svg viewBox="0 0 24 24"><path d="M12 20.5s-7.5-4.7-9.3-9C1.2 8 3 4.5 6.6 4.5c2.2 0 3.9 1.3 5.4 3.4 1.5-2.1 3.2-3.4 5.4-3.4 3.6 0 5.4 3.5 3.9 7-1.8 4.3-9.3 9-9.3 9z"/></svg></button>
  ${p.availabilityPending?lioraAvailabilityLink(p,'quick-add'):`<button class="quick-add" ${p.soldout?'disabled':''} onclick="openQuick('${p.id}')">${p.soldout?'Esgotado':'Escolher e adicionar'}</button>`}</div>
- <div class="card-info"><h3><a href="/produtos/${p.id}/">${name}</a></h3><p class="card-price">${p.old?`<span class="old">${lioraMoney(p.old)}</span>`:''}${lioraMoney(p.price)}</p><p class="inst">${lioraInstallmentText(p.price)}</p><span class="tag-frete">Frete grátis em compras a partir de R$ 150</span></div></article>`;
+ <div class="card-info"><h3><a href="/produtos/${p.id}/">${name}</a></h3><p class="card-price">${p.old?`<span class="old">${lioraMoney(p.old)}</span>`:''}${lioraMoney(p.price)}</p>${p.showCardMeasures?`<p class="inst card-measures">Medidas: ${lioraEscape(p.specs?.find(s=>s.label==='Medidas')?.value||'')}</p>`:''}${p.madeToOrder?'<p class="inst card-dispatch">Envio em até 10 dias úteis</p>':''}<p class="inst">${lioraInstallmentText(p.price)}</p><span class="tag-frete">Frete grátis em compras a partir de R$ 150</span></div></article>`;
+}
+function lioraGiftPriceHTML(g,className='card-price'){
+ if(!Number.isFinite(g.price))return '';
+ const prices=[{label:g.priceLabel,value:g.price}];
+ if(Number.isFinite(g.unitPrice))prices.push({label:'Unidade',value:g.unitPrice});
+ return prices.map(p=>`<p class="${className}">${p.label?`${lioraEscape(p.label)}: `:''}${lioraMoney(p.value)}</p>`).join('');
+}
+function lioraGiftCardHTML(g){
+ const name=lioraEscape(g.name),url=`/kits-e-presentes-natal/${g.id}/`;
+ return `<article class="card gift-card"><div class="card-media"><a class="card-image-link" href="${url}" aria-label="Conhecer ${name}">${lioraImage({img:g.image,imageMeta:g.imageMeta,displayName:g.alt})}</a><a class="quick-add" href="${url}">Conhecer o presente</a></div><div class="card-info"><h3><a href="${url}">${name}</a></h3>${lioraGiftPriceHTML(g)}<p class="gift-description">${lioraEscape(g.description)}</p></div></article>`;
 }
 function lioraTabsHTML(categories,current='Todas'){
- return categories.map(c=>`<a class="tab${c.name===current?' active':''}" href="${c.path}" ${c.name===current?'aria-current="page"':''}>${lioraEscape(c.name)}</a>`).join('')+'<a class="tab" href="/catalogo-de-aromas/">Catálogo de Aromas</a>';
+ return categories.map(c=>`<a class="tab${c.name===current?' active':''}${c.festive||c.name==='Natal'?' tab-natal':''}" href="${c.path}" ${c.name===current?'aria-current="page"':''}>${lioraEscape(c.name)}${c.festive||c.name==='Natal'?'<img class="tab-holly" src="/assets/images/natal-azevinho.webp" alt="" aria-hidden="true" width="384" height="384">':''}</a>`).join('')+'<a class="tab" href="/catalogo-de-aromas/">Catálogo de Aromas</a>';
 }
 function lioraAromasHTML(families){return `<div class="aroma-family-grid">${families.map(f=>`<section class="aroma-family ${f.className}"><div class="aroma-family-head"><h2 class="aroma-family-name"><i class="aroma-symbol"></i>${lioraEscape(f.name)}</h2><p class="aroma-profile">${lioraEscape(f.profile)}</p></div><ul class="aroma-items">${f.items.map(i=>`<li class="aroma-item"><strong class="aroma-name">${lioraEscape(i.name)}</strong><span class="aroma-notes">${lioraEscape(i.notes)}</span>${i.archive?'<span class="aroma-status">Arquivo</span>':''}</li>`).join('')}</ul></section>`).join('')}</div>`;}
-if(typeof module!=='undefined')module.exports={lioraEscape,lioraMoney,lioraInstallmentText,lioraImage,lioraGallery,lioraAvailabilityLink,lioraCardHTML,lioraTabsHTML,lioraAromasHTML};
+if(typeof module!=='undefined')module.exports={lioraEscape,lioraMoney,lioraInstallmentText,lioraImage,lioraGallery,lioraAvailabilityLink,lioraCardHTML,lioraGiftPriceHTML,lioraGiftCardHTML,lioraTabsHTML,lioraAromasHTML};

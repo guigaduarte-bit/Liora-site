@@ -34,7 +34,7 @@ function validateCart(items) {
     const product = CATALOG[id];
     const quantity = Number(item && item.qty);
 
-    if (!product || product.soldout || product.stock < 1) {
+    if (!product || product.soldout || (!product.madeToOrder && product.stock < 1)) {
       throw new Error('Um produto do carrinho não está disponível');
     }
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) {
@@ -42,7 +42,7 @@ function validateCart(items) {
     }
 
     const accumulated = (quantitiesByProduct.get(id) || 0) + quantity;
-    if (accumulated > product.stock) {
+    if (!product.madeToOrder && accumulated > product.stock) {
       throw new Error(`Estoque insuficiente para ${product.name}`);
     }
     quantitiesByProduct.set(id, accumulated);

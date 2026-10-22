@@ -507,5 +507,421 @@
         "alt": "Caixa floral grande em formato de flor com velas coloridas"
       }
     ]
+  },
+  {
+    "id": "natal-cavalinho-de-balanco",
+    "name": "Cavalinho de balanço",
+    "price": 9.9,
+    "stock": null,
+    "soldout": false,
+    "availabilityPending": false,
+    "cats": [
+      "Natal"
+    ],
+    "desc": "O cavalinho de balanço revisita a delicadeza dos brinquedos de outros tempos, com curvas suaves e detalhes ornamentais na base. Uma vela que traz a ternura das lembranças de infância à decoração de Natal e aos presentes escolhidos com afeto.",
+    "dims": "Medidas: 10,6 × 8,6 cm",
+    "frag": false,
+    "showCardMeasures": true,
+    "images": [
+      {
+        "src": "/assets/images/natal-cavalinho-de-balanco.webp",
+        "alt": "Cavalinho de balanço — coleção Natal Liora"
+      },
+      {
+        "src": "/assets/images/natal-cavalinho-de-balanco-medidas.webp",
+        "alt": "Cavalinho de balanço — R$ 9,90 por unidade — 10,6 × 8,6 cm"
+      }
+    ],
+    "madeToOrder": true
+  },
+  {
+    "id": "natal-boneco-de-neve-com-coracao",
+    "name": "Boneco de neve com coração",
+    "price": 20.0,
+    "stock": null,
+    "soldout": false,
+    "availabilityPending": false,
+    "cats": [
+      "Natal"
+    ],
+    "desc": "Com gorro, pequenos presentes e um coração em relevo, este boneco de neve reúne detalhes que despertam um sorriso. Uma presença delicada para compor cantinhos natalinos ou oferecer como lembrança a quem torna a celebração mais especial.",
+    "dims": "Medidas: 11,2 × 10,2 cm",
+    "frag": false,
+    "showCardMeasures": true,
+    "images": [
+      {
+        "src": "/assets/images/natal-boneco-de-neve-com-coracao.webp",
+        "alt": "Boneco de neve com coração — coleção Natal Liora"
+      },
+      {
+        "src": "/assets/images/natal-boneco-de-neve-com-coracao-medidas.webp",
+        "alt": "Boneco de neve com coração — R$ 20,00 por unidade — 11,2 × 10,2 cm"
+      }
+    ],
+    "madeToOrder": true
+  },
+  {
+    "id": "natal-arvore-de-natal-com-enfeites",
+    "name": "Árvore de Natal com enfeites",
+    "price": 20.0,
+    "stock": null,
+    "soldout": false,
+    "availabilityPending": false,
+    "cats": [
+      "Natal"
+    ],
+    "desc": "Uma estrela coroa os ramos de contornos suaves, decorados com pequenas esferas em relevo. Esta árvore em forma de vela traduz o encanto do Natal em uma peça delicada, para acompanhar a mesa de celebração ou completar uma composição de presentes.",
+    "dims": "Medidas: 8,0 × 7,2 cm",
+    "frag": false,
+    "showCardMeasures": true,
+    "images": [
+      {
+        "src": "/assets/images/natal-arvore-de-natal-com-enfeites.webp",
+        "alt": "Árvore de Natal com enfeites — coleção Natal Liora"
+      },
+      {
+        "src": "/assets/images/natal-arvore-de-natal-com-enfeites-medidas.webp",
+        "alt": "Árvore de Natal com enfeites — R$ 20,00 por unidade — 8,0 × 7,2 cm"
+      }
+    ],
+    "madeToOrder": true
+  },
+  {
+    "id": "natal-arvore-de-natal-geometrica",
+    "name": "Árvore de Natal geométrica",
+    "price": 20.0,
+    "stock": null,
+    "soldout": false,
+    "availabilityPending": false,
+    "cats": [
+      "Natal"
+    ],
+    "desc": "Três camadas de linhas definidas se encontram sob uma estrela, formando uma árvore de desenho contemporâneo. A beleza da peça está na simplicidade dos contornos, que acrescentam um toque natalino elegante a mesas, aparadores e pequenos espaços.",
+    "dims": "Medidas: 8,0 × 6,8 cm",
+    "frag": false,
+    "showCardMeasures": true,
+    "images": [
+      {
+        "src": "/assets/images/natal-arvore-de-natal-geometrica.webp",
+        "alt": "Árvore de Natal geométrica — coleção Natal Liora"
+      },
+      {
+        "src": "/assets/images/natal-arvore-de-natal-geometrica-medidas.webp",
+        "alt": "Árvore de Natal geométrica — R$ 20,00 por unidade — 8,0 × 6,8 cm"
+      }
+    ],
+    "madeToOrder": true
+  },
+  {
+    "id": "natal-floco-de-neve",
+    "name": "Floco de neve",
+    "price": 10.0,
+    "stock": null,
+    "soldout": false,
+    "availabilityPending": false,
+    "cats": [
+      "Natal"
+    ],
+    "desc": "Seis pontas e delicados desenhos em baixo-relevo revelam a beleza geométrica de um floco de neve. Uma vela para acrescentar textura às composições natalinas, acompanhar outras peças da coleção ou surpreender como uma pequena lembrança.",
+    "dims": "Medidas: 6,8 × 5,8 cm",
+    "frag": false,
+    "showCardMeasures": true,
+    "images": [
+      {
+        "src": "/assets/images/natal-floco-de-neve.webp",
+        "alt": "Floco de neve — coleção Natal Liora"
+      },
+      {
+        "src": "/assets/images/natal-floco-de-neve-medidas.webp",
+        "alt": "Floco de neve — R$ 10,00 por unidade — 6,8 × 5,8 cm"
+      }
+    ],
+    "madeToOrder": true
+  },
+  {
+    "id": "natal-gnomo-natalino",
+    "name": "Gnomo natalino",
+    "price": 20.0,
+    "stock": null,
+    "soldout": false,
+    "availabilityPending": false,
+    "cats": [
+      "Natal"
+    ],
+    "desc": "O gorro alongado, as tranças e o pequeno trevo em relevo dão personalidade a este gnomo. Entre fantasia e delicadeza, a peça convida a criar uma decoração de Natal acolhedora, com detalhes que encantam de perto.",
+    "dims": "Medidas: 8,3 × 4,8 cm",
+    "frag": false,
+    "showCardMeasures": true,
+    "images": [
+      {
+        "src": "/assets/images/natal-gnomo-natalino.webp",
+        "alt": "Gnomo natalino — coleção Natal Liora"
+      },
+      {
+        "src": "/assets/images/natal-gnomo-natalino-medidas.webp",
+        "alt": "Gnomo natalino — R$ 20,00 por unidade — 8,3 × 4,8 cm"
+      }
+    ],
+    "madeToOrder": true
+  },
+  {
+    "id": "natal-anjo-com-coracao-em-relevo",
+    "name": "Anjo com coração em relevo",
+    "price": 20.0,
+    "stock": null,
+    "soldout": false,
+    "availabilityPending": false,
+    "cats": [
+      "Natal"
+    ],
+    "desc": "As asas abertas envolvem um coração, enquanto os desenhos do vestido revelam o cuidado com cada detalhe. Um anjo em forma de vela que expressa afeto e proteção, para presentear com significado ou acompanhar um lugar especial da casa.",
+    "dims": "Medidas: 9,7 × 9,1 cm",
+    "frag": false,
+    "showCardMeasures": true,
+    "images": [
+      {
+        "src": "/assets/images/natal-anjo-com-coracao-em-relevo.webp",
+        "alt": "Anjo com coração em relevo — coleção Natal Liora"
+      },
+      {
+        "src": "/assets/images/natal-anjo-com-coracao-em-relevo-medidas.webp",
+        "alt": "Anjo com coração em relevo — R$ 20,00 por unidade — 9,7 × 9,1 cm"
+      }
+    ],
+    "madeToOrder": true
+  },
+  {
+    "id": "natal-boneco-de-biscoito",
+    "name": "Boneco de biscoito",
+    "price": 19.9,
+    "stock": null,
+    "soldout": false,
+    "availabilityPending": false,
+    "cats": [
+      "Natal"
+    ],
+    "desc": "Inspirado nos tradicionais biscoitos natalinos, este pequeno personagem combina um sorriso delicado, botões e detalhes que lembram glacê. Uma vela de espírito alegre, para trazer leveza à decoração e carinho aos presentes de fim de ano.",
+    "dims": "Medidas: 7,2 × 6,2 cm",
+    "frag": false,
+    "showCardMeasures": true,
+    "images": [
+      {
+        "src": "/assets/images/natal-boneco-de-biscoito.webp",
+        "alt": "Boneco de biscoito — coleção Natal Liora"
+      },
+      {
+        "src": "/assets/images/natal-boneco-de-biscoito-medidas.webp",
+        "alt": "Boneco de biscoito — R$ 19,90 por unidade — 7,2 × 6,2 cm"
+      }
+    ],
+    "madeToOrder": true
+  },
+  {
+    "id": "natal-rena-natalina",
+    "name": "Rena natalina",
+    "price": 19.9,
+    "stock": null,
+    "soldout": false,
+    "availabilityPending": false,
+    "cats": [
+      "Natal"
+    ],
+    "desc": "De contornos suaves e galhadas marcantes, a rena ganha um toque especial com a fita vermelha e o delicado pingente. Uma peça que reúne a simplicidade do desenho e o encanto dos símbolos natalinos, para decorar ou presentear.",
+    "dims": "Medidas: 11 × 7 cm",
+    "frag": false,
+    "showCardMeasures": true,
+    "images": [
+      {
+        "src": "/assets/images/natal-rena-natalina.webp",
+        "alt": "Rena natalina — coleção Natal Liora"
+      },
+      {
+        "src": "/assets/images/natal-rena-natalina-medidas.webp",
+        "alt": "Rena natalina — R$ 19,90 por unidade — 11 × 7 cm"
+      }
+    ],
+    "madeToOrder": true
+  },
+  {
+    "id": "natal-sagrada-familia-em-relevo",
+    "name": "Sagrada Família em relevo",
+    "price": 30.0,
+    "stock": null,
+    "soldout": false,
+    "availabilityPending": false,
+    "cats": [
+      "Natal"
+    ],
+    "desc": "Maria, José e o menino Jesus aparecem em uma cena esculpida na superfície da vela, emoldurada por ramos e folhas. Uma composição que expressa fé, união e acolhimento, para acompanhar momentos de contemplação e celebrações em família.",
+    "dims": "Medidas: 7,5 × 5,5 cm",
+    "frag": false,
+    "showCardMeasures": true,
+    "images": [
+      {
+        "src": "/assets/images/natal-sagrada-familia-em-relevo.webp",
+        "alt": "Sagrada Família em relevo — coleção Natal Liora"
+      },
+      {
+        "src": "/assets/images/natal-sagrada-familia-em-relevo-medidas.webp",
+        "alt": "Sagrada Família em relevo — R$ 30,00 por unidade — 7,5 × 5,5 cm"
+      }
+    ],
+    "madeToOrder": true
+  },
+  {
+    "id": "natal-anjo-com-coracao-vazado",
+    "name": "Anjo com coração vazado",
+    "price": 20.0,
+    "stock": null,
+    "soldout": false,
+    "availabilityPending": false,
+    "cats": [
+      "Natal"
+    ],
+    "desc": "Linhas suaves desenham um anjo de asas abertas, com um coração vazado no centro da peça. A delicadeza da forma expressa afeto com simplicidade, tornando esta vela uma lembrança especial para celebrar vínculos e desejar um Natal de paz.",
+    "dims": "Medidas: 9,7 × 9,1 cm",
+    "frag": false,
+    "showCardMeasures": true,
+    "images": [
+      {
+        "src": "/assets/images/natal-anjo-com-coracao-vazado.webp",
+        "alt": "Anjo com coração vazado — coleção Natal Liora"
+      },
+      {
+        "src": "/assets/images/natal-anjo-com-coracao-vazado-medidas.webp",
+        "alt": "Anjo com coração vazado — R$ 20,00 por unidade — 9,7 × 9,1 cm"
+      }
+    ],
+    "madeToOrder": true
+  },
+  {
+    "id": "natal-pinheiro-de-tres-camadas",
+    "name": "Pinheiro de três camadas",
+    "price": 20.0,
+    "stock": null,
+    "soldout": false,
+    "availabilityPending": false,
+    "cats": [
+      "Natal"
+    ],
+    "desc": "Três camadas de contornos ondulados dão volume a este pequeno pinheiro, finalizado por uma estrela. Uma vela de presença delicada, para compor a mesa de Natal, combinar com outras peças ou oferecer como um gesto de carinho.",
+    "dims": "Medidas: 7 × 6,3 cm",
+    "frag": false,
+    "showCardMeasures": true,
+    "images": [
+      {
+        "src": "/assets/images/natal-pinheiro-de-tres-camadas.webp",
+        "alt": "Pinheiro de três camadas — coleção Natal Liora"
+      },
+      {
+        "src": "/assets/images/natal-pinheiro-de-tres-camadas-medidas.webp",
+        "alt": "Pinheiro de três camadas — R$ 20,00 por unidade — 7 × 6,3 cm"
+      }
+    ],
+    "madeToOrder": true
+  },
+  {
+    "id": "natal-livro-de-natal",
+    "name": "Livro de Natal",
+    "price": 39.9,
+    "stock": null,
+    "soldout": false,
+    "availabilityPending": false,
+    "cats": [
+      "Natal"
+    ],
+    "desc": "Um livro aberto revela uma pequena história natalina: o Papai Noel no trenó, as crianças e os flocos de neve ganham vida em relevo. Uma vela rica em detalhes, que convida a um olhar demorado e celebra a alegria de compartilhar histórias.",
+    "dims": "Medidas: 9,1 × 7,7 cm",
+    "frag": false,
+    "showCardMeasures": true,
+    "images": [
+      {
+        "src": "/assets/images/natal-livro-de-natal.webp",
+        "alt": "Livro de Natal — coleção Natal Liora"
+      },
+      {
+        "src": "/assets/images/natal-livro-de-natal-medidas.webp",
+        "alt": "Livro de Natal — R$ 39,90 por unidade — 9,1 × 7,7 cm"
+      }
+    ],
+    "madeToOrder": true
+  },
+  {
+    "id": "natal-boneco-de-neve-com-cachecol",
+    "name": "Boneco de neve com cachecol",
+    "price": 20.0,
+    "stock": null,
+    "soldout": false,
+    "availabilityPending": false,
+    "cats": [
+      "Natal"
+    ],
+    "desc": "O chapéu de abas largas, o cachecol texturizado e o floco de neve em relevo dão charme a este boneco de formas arredondadas. Uma peça acolhedora para acrescentar personalidade à decoração natalina ou encantar alguém querido.",
+    "dims": "Medidas: 6,5 × 4,2 cm",
+    "frag": false,
+    "showCardMeasures": true,
+    "images": [
+      {
+        "src": "/assets/images/natal-boneco-de-neve-com-cachecol.webp",
+        "alt": "Boneco de neve com cachecol — coleção Natal Liora"
+      },
+      {
+        "src": "/assets/images/natal-boneco-de-neve-com-cachecol-medidas.webp",
+        "alt": "Boneco de neve com cachecol — R$ 20,00 por unidade — 6,5 × 4,2 cm"
+      }
+    ],
+    "madeToOrder": true
+  },
+  {
+    "id": "natal-arvore-bubble-de-quatro-camadas",
+    "name": "Árvore Bubble de quatro camadas",
+    "price": 20.0,
+    "stock": null,
+    "soldout": false,
+    "availabilityPending": false,
+    "cats": [
+      "Natal"
+    ],
+    "desc": "Volumes arredondados se sobrepõem em quatro camadas, formando uma árvore coroada por uma estrela. Com desenho contemporâneo e curvas generosas, esta vela traz uma interpretação delicada do Natal para composições que valorizam forma e textura.",
+    "dims": "Medidas: 7 × 6 cm",
+    "frag": false,
+    "showCardMeasures": true,
+    "images": [
+      {
+        "src": "/assets/images/natal-arvore-bubble-de-quatro-camadas.webp",
+        "alt": "Árvore Bubble de quatro camadas — coleção Natal Liora"
+      },
+      {
+        "src": "/assets/images/natal-arvore-bubble-de-quatro-camadas-medidas.webp",
+        "alt": "Árvore Bubble de quatro camadas — R$ 20,00 por unidade — 7 × 6 cm"
+      }
+    ],
+    "madeToOrder": true
+  },
+  {
+    "id": "natal-casinha-de-natal",
+    "name": "Casinha de Natal",
+    "price": 30.0,
+    "stock": null,
+    "soldout": false,
+    "availabilityPending": false,
+    "cats": [
+      "Natal"
+    ],
+    "desc": "O telhado texturizado, a pequena porta e o floco de neve na fachada fazem desta casinha uma peça cheia de descobertas. Uma vela que evoca o aconchego de estar em casa e a beleza dos encontros que dão sentido ao Natal.",
+    "dims": "Medidas: 10 × 7 cm",
+    "frag": false,
+    "showCardMeasures": true,
+    "images": [
+      {
+        "src": "/assets/images/natal-casinha-de-natal.webp",
+        "alt": "Casinha de Natal — coleção Natal Liora"
+      },
+      {
+        "src": "/assets/images/natal-casinha-de-natal-medidas.webp",
+        "alt": "Casinha de Natal — R$ 30,00 por unidade — 10 × 7 cm"
+      }
+    ],
+    "madeToOrder": true
   }
 ]

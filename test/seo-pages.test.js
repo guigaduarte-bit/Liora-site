@@ -62,6 +62,12 @@ test('produtos têm preço, disponibilidade e identificador coerentes no HTML e 
   if(p.soldout&&!data.availabilityPending)assert.ok(html.includes('<button class="btn btn-ink" type="submit" disabled>Produto esgotado'));
  }
 });
+test('página do produto usa o mesmo arredondamento Pix do checkout em preços terminados em noventa centavos',()=>{
+ for(const [id,expected] of [['natal-cavalinho-de-balanco',9.40],['natal-boneco-de-biscoito',18.90]]){
+  const advertised=read(`/produtos/${id}/`).match(/<p class="product-pix">([^<]+)<\/p>/)[1];
+  assert.equal(advertised,`${expected.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})} no Pix · 5% de desconto`,id);
+ }
+});
 test('sitemap cobre os destinos canônicos e home expõe links de todos os produtos sem JavaScript',()=>{
  const sitemap=fs.readFileSync(path.join(root,'sitemap.xml'),'utf8');
  assert.equal([...sitemap.matchAll(/<loc>/g)].length,routes.length);

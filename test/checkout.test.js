@@ -94,9 +94,35 @@ test('catálogo do servidor corresponde ao catálogo exibido no site', () => {
       name: product.name,
       price: product.price,
       stock: product.stock,
+      ...(product.madeToOrder ? { madeToOrder: true } : {}),
       ...(product.soldout ? { soldout: true } : {})
     });
   }
+});
+
+test('Natal por encomenda aceita os 16 modelos e recalcula os preços no checkout', async () => {
+  process.env.MP_ACCESS_TOKEN = 'TEST-token';
+  process.env.SITE_URL = 'https://liora.example';
+  const natal = Object.entries(catalog).filter(([id]) => id.startsWith('natal-'));
+  assert.equal(natal.length, 16);
+  let preference;
+  global.fetch = async (url, options) => {
+    assert.equal(url, 'https://api.mercadopago.com/checkout/preferences');
+    preference = JSON.parse(options.body);
+    return { ok: true, status: 201, json: async () => ({ id: 'pref-natal-test', init_point: 'https://www.mercadopago.com.br/checkout' }) };
+  };
+  const response = await invoke(createPreference, validRequest({
+    items: natal.map(([id]) => ({ id, qty: 2, price: 0.01 })),
+    payMethod: 'card', shipping: { method: 'delivery', serviceId: 'curitiba-fixed' }
+  }));
+  assert.equal(response.statusCode, 200, JSON.stringify(response.body));
+  assert.equal(preference.items.length, 16);
+  for (const [id, product] of natal) {
+    const item = preference.items.find(item => item.id === id);
+    assert.equal(item.quantity, 2);
+    assert.equal(item.unit_price, product.price);
+  }
+  assert.equal(response.body.total, Math.round(natal.reduce((sum, [, p]) => sum + p.price * 2, 0) * 100) / 100);
 });
 
 test('função carrega e recusa métodos diferentes de POST antes das configurações', async () => {

@@ -17,12 +17,13 @@ function validateCart(items) {
     const id = String(item && item.id || '').slice(0, 100);
     const product = CATALOG[id];
     const quantity = Number(item && item.qty);
-    if (!product || product.soldout || !Number.isInteger(quantity) || quantity < 1) throw new Error('Produto indisponível');
+    if (!product || product.soldout || !Number.isInteger(quantity) || quantity < 1 || quantity > 100) throw new Error('Produto indisponível');
     const accumulated = (quantities.get(id) || 0) + quantity;
-    if (accumulated > product.stock) throw new Error('Estoque insuficiente');
+    if (!product.madeToOrder && accumulated > product.stock) throw new Error('Estoque insuficiente');
     quantities.set(id, accumulated);
     return { id, quantity, price: product.price };
   });
+  if (cart.reduce((sum, item) => sum + item.quantity, 0) > 200) throw new Error('Carrinho possui quantidade total inválida');
   return cart;
 }
 

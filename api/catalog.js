@@ -34,5 +34,21 @@ module.exports = Object.freeze({
   'vaso-floral-metal': { name: 'Vaso floral de metal', price: 89.9, stock: 10, soldout: true },
   'caixa-flor-solitaria': { name: 'Caixa flor solitária', price: 15.0, stock: 10, soldout: true },
   'caixa-quadrada-media': { name: 'Caixa quadrada média', price: 69.9, stock: 10, soldout: true },
-  'caixa-floral-grande': { name: 'Caixa floral grande', price: 129.9, stock: 10, soldout: true }
+  'caixa-floral-grande': { name: 'Caixa floral grande', price: 129.9, stock: 10, soldout: true },
+  "natal-cavalinho-de-balanco": { name: "Cavalinho de balanço", price: 9.9, stock: null, madeToOrder: true },
+  "natal-boneco-de-neve-com-coracao": { name: "Boneco de neve com coração", price: 20.0, stock: null, madeToOrder: true },
+  "natal-arvore-de-natal-com-enfeites": { name: "Árvore de Natal com enfeites", price: 20.0, stock: null, madeToOrder: true },
+  "natal-arvore-de-natal-geometrica": { name: "Árvore de Natal geométrica", price: 20.0, stock: null, madeToOrder: true },
+  "natal-floco-de-neve": { name: "Floco de neve", price: 10.0, stock: null, madeToOrder: true },
+  "natal-gnomo-natalino": { name: "Gnomo natalino", price: 20.0, stock: null, madeToOrder: true },
+  "natal-anjo-com-coracao-em-relevo": { name: "Anjo com coração em relevo", price: 20.0, stock: null, madeToOrder: true },
+  "natal-boneco-de-biscoito": { name: "Boneco de biscoito", price: 19.9, stock: null, madeToOrder: true },
+  "natal-rena-natalina": { name: "Rena natalina", price: 19.9, stock: null, madeToOrder: true },
+  "natal-sagrada-familia-em-relevo": { name: "Sagrada Família em relevo", price: 30.0, stock: null, madeToOrder: true },
+  "natal-anjo-com-coracao-vazado": { name: "Anjo com coração vazado", price: 20.0, stock: null, madeToOrder: true },
+  "natal-pinheiro-de-tres-camadas": { name: "Pinheiro de três camadas", price: 20.0, stock: null, madeToOrder: true },
+  "natal-livro-de-natal": { name: "Livro de Natal", price: 39.9, stock: null, madeToOrder: true },
+  "natal-boneco-de-neve-com-cachecol": { name: "Boneco de neve com cachecol", price: 20.0, stock: null, madeToOrder: true },
+  "natal-arvore-bubble-de-quatro-camadas": { name: "Árvore Bubble de quatro camadas", price: 20.0, stock: null, madeToOrder: true },
+  "natal-casinha-de-natal": { name: "Casinha de Natal", price: 30.0, stock: null, madeToOrder: true }
 });

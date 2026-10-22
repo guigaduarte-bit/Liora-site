@@ -107,6 +107,20 @@ test('adição e alteração de quantidade respeitam o estoque agregado das frag
   assert.equal(app.run('cart.length'), 2);
 });
 
+test('encomendas de Natal permitem comprar, alterar quantidade e restaurar o carrinho sem estoque físico', async () => {
+  const app = storefront();
+  await app.done;
+  assert.equal(app.run("addToCart('natal-cavalinho-de-balanco',3)"), true);
+  app.run('changeQty(cart[0].key,1)');
+  assert.equal(app.run('cartQty()'), 4);
+  assert.equal(app.run('subtotal()'), 39.6);
+  const restored = storefront({ saved: Object.fromEntries(app.storage) });
+  await restored.done;
+  assert.equal(restored.run('cartQty()'), 4);
+  assert.match(restored.run("stockNote(prod('natal-cavalinho-de-balanco'))"), /Sob encomenda.*10 dias úteis/);
+  assert.equal(restored.run("addToCart('caixa-flor-solitaria',1)"), false);
+});
+
 test('mudança de carrinho invalida serviço, preço e requisição de frete anterior', async () => {
   const app = storefront();
   await app.done;

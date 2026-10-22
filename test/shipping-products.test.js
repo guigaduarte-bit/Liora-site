@@ -141,7 +141,7 @@ test('todos os produtos à venda cotam sem dados logísticos em produção e pre
     return { ok: true, status: 200, json: async () => [{ id: 1, name: 'PAC', price: 26.4, delivery_time: 5 }] };
   };
   const handler = loadApi('shipping-quote.js', { shippingProducts: {} });
-  const available = Object.entries(catalog).filter(([, product]) => !product.soldout && product.stock > 0);
+  const available = Object.entries(catalog).filter(([, product]) => !product.soldout && (product.madeToOrder || product.stock > 0));
   for (const environment of ['production', 'preview']) {
     process.env.VERCEL_ENV = environment;
     for (const [id] of available) {

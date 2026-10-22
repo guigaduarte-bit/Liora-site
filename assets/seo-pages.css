@@ -16,6 +16,27 @@
 .collection-intro .collection-description{max-width:65ch;margin:0 auto;color:var(--ink-soft)}
 .collection-intro .collection-invitation{max-width:60ch;margin:20px auto 0;color:var(--ink)}
 .category-page{padding-bottom:80px}
+.category-page-natal{position:relative}
+.color-customization{display:flex;align-items:center;justify-content:center;gap:28px;max-width:900px;margin:0 auto 40px;padding:22px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.color-customization p{max-width:37ch;font-size:15px;line-height:1.6;color:var(--ink-soft)}
+.color-customization .btn{flex-shrink:0;text-align:center}
+.product-copy .color-customization{display:block;margin:24px 0}
+.product-copy .color-customization .btn{margin-top:16px}
+@media(max-width:768px){.color-customization{flex-direction:column;gap:16px;text-align:center}.color-customization .btn{max-width:100%;padding:16px 20px;letter-spacing:.14em}.product-copy .color-customization{text-align:left}}
+.natal-holly{position:absolute;top:32px;right:0;width:146px;height:auto;pointer-events:none}
+.tab-natal{position:relative}
+.tab-holly{position:absolute;top:-19px;right:-11px;width:38px;height:38px;object-fit:contain;pointer-events:none}
+.card-dispatch{color:var(--gold-deep)}
+.gift-card .card-media{background:var(--ivory)}
+.gift-card .card-media img{object-fit:contain}
+.gift-description{font-size:14px;line-height:1.7;color:var(--ink-soft);margin-top:12px}
+.gift-intro h1 span{display:block;font-style:italic;color:var(--gold-deep)}
+.gift-photo{margin:0}
+.gift-photo img{display:block;width:100%;height:auto}
+.gift-copy{padding-top:12px}
+.gift-copy .product-links{border-top:1px solid var(--line);padding-top:22px;margin-top:30px}
+@media(max-width:600px){.gift-grid{grid-template-columns:1fr;gap:38px}.gift-card .card-media{aspect-ratio:auto}.gift-card .card-media img{height:auto;display:block}.gift-card .card-info h3{font-size:27px}.gift-description{font-size:15px;max-width:42ch;margin:12px auto 0}.gift-card .quick-add{display:none}.gift-intro h1{font-size:42px}.tab{max-width:100%;text-align:center}}
+@media(max-width:768px){.natal-holly{top:25px;width:76px}.tab-holly{width:32px;height:32px;top:-15px;right:-7px}}
 .product-page{padding-bottom:80px}
 .product-layout{display:grid;grid-template-columns:1fr 1fr;gap:clamp(30px,6vw,84px);align-items:start;margin-bottom:70px}
 .product-photo{background:var(--ivory);aspect-ratio:1/1.12;overflow:hidden}

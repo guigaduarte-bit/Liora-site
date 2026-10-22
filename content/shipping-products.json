@@ -478,5 +478,197 @@
       "field": "dims",
       "text": "Peso total da peça: 480 g"
     }
+  },
+  "natal-cavalinho-de-balanco": {
+    "weightGrams": null,
+    "dimensionsCm": null,
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Medidas: 10,6 × 8,6 cm"
+    }
+  },
+  "natal-boneco-de-neve-com-coracao": {
+    "weightGrams": null,
+    "dimensionsCm": null,
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Medidas: 11,2 × 10,2 cm"
+    }
+  },
+  "natal-arvore-de-natal-com-enfeites": {
+    "weightGrams": null,
+    "dimensionsCm": null,
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Medidas: 8,0 × 7,2 cm"
+    }
+  },
+  "natal-arvore-de-natal-geometrica": {
+    "weightGrams": null,
+    "dimensionsCm": null,
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Medidas: 8,0 × 6,8 cm"
+    }
+  },
+  "natal-floco-de-neve": {
+    "weightGrams": null,
+    "dimensionsCm": null,
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Medidas: 6,8 × 5,8 cm"
+    }
+  },
+  "natal-gnomo-natalino": {
+    "weightGrams": null,
+    "dimensionsCm": null,
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Medidas: 8,3 × 4,8 cm"
+    }
+  },
+  "natal-anjo-com-coracao-em-relevo": {
+    "weightGrams": null,
+    "dimensionsCm": null,
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Medidas: 9,7 × 9,1 cm"
+    }
+  },
+  "natal-boneco-de-biscoito": {
+    "weightGrams": null,
+    "dimensionsCm": null,
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Medidas: 7,2 × 6,2 cm"
+    }
+  },
+  "natal-rena-natalina": {
+    "weightGrams": null,
+    "dimensionsCm": null,
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Medidas: 11 × 7 cm"
+    }
+  },
+  "natal-sagrada-familia-em-relevo": {
+    "weightGrams": null,
+    "dimensionsCm": null,
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Medidas: 7,5 × 5,5 cm"
+    }
+  },
+  "natal-anjo-com-coracao-vazado": {
+    "weightGrams": null,
+    "dimensionsCm": null,
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Medidas: 9,7 × 9,1 cm"
+    }
+  },
+  "natal-pinheiro-de-tres-camadas": {
+    "weightGrams": null,
+    "dimensionsCm": null,
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Medidas: 7 × 6,3 cm"
+    }
+  },
+  "natal-livro-de-natal": {
+    "weightGrams": null,
+    "dimensionsCm": null,
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Medidas: 9,1 × 7,7 cm"
+    }
+  },
+  "natal-boneco-de-neve-com-cachecol": {
+    "weightGrams": null,
+    "dimensionsCm": null,
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Medidas: 6,5 × 4,2 cm"
+    }
+  },
+  "natal-arvore-bubble-de-quatro-camadas": {
+    "weightGrams": null,
+    "dimensionsCm": null,
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Medidas: 7 × 6 cm"
+    }
+  },
+  "natal-casinha-de-natal": {
+    "weightGrams": null,
+    "dimensionsCm": null,
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": "Medidas: 10 × 7 cm"
+    }
   }
 }
