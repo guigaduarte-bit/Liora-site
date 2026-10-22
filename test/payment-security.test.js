@@ -74,7 +74,7 @@ test('Preview cannot use live mode or InfinitePay and Production cannot use test
   assert.equal((await invoke(createPreference, request())).body.code, 'PAYMENT_ENVIRONMENT_MISMATCH');
   process.env.PAYMENT_MODE = 'test';
   process.env.INFINITEPAY_HANDLE = 'synthetic-handle';
-  assert.equal((await invoke(createPreference, request({ payMethod: 'infinitepay' }))).body.code, 'PAYMENT_METHOD_UNAVAILABLE');
+  assert.equal((await invoke(createPreference, request({ payMethod: 'infinitepay' }))).body.code, 'INFINITEPAY_PREVIEW_UNAVAILABLE');
   assert.equal((await invoke(infinitePayStatus, { method: 'GET' })).body.code, 'INFINITEPAY_PREVIEW_UNAVAILABLE');
   process.env.VERCEL_ENV = 'production';
   assert.equal((await invoke(createPreference, request())).body.code, 'PAYMENT_ENVIRONMENT_MISMATCH');
@@ -140,7 +140,7 @@ for (const method of ['pix','card','boleto']) {
   });
 }
 
-test('retornos legados InfinitePay continuam conferindo principal sem permitir novas cobranças', async () => {
+test('retornos InfinitePay conferem principal, pagamento e juros cobrados pelo provedor', async () => {
   infiniteLive();
   for (const payment of [
     {success:true,paid:false,amount:9490},
@@ -300,18 +300,45 @@ test('checkout rejects HTTP, credential-bearing and lookalike provider URLs', as
   }
 });
 
-test('InfinitePay removida não cria cobrança mesmo com configuração e resposta válidas', async () => {
-  for (const environment of ['production','preview','development']) {
+test('InfinitePay só cria cobrança em produção live com conta configurada', async () => {
+  for (const environment of ['preview','development']) {
     process.env.VERCEL_ENV=environment;
-    process.env.PAYMENT_MODE=environment==='production'?'live':'test';
+    process.env.PAYMENT_MODE='test';
     process.env.INFINITEPAY_HANDLE='synthetic-handle';
-    global.fetch=async()=>assert.fail('Nenhum serviço deve ser consultado');
-    const result=await invoke(createPreference,request({payMethod:'infinitepay'}));
-    assert.equal(result.statusCode,400);
-    assert.equal(result.body.code,'PAYMENT_METHOD_UNAVAILABLE');
+    assert.equal((await invoke(createPreference,request({payMethod:'infinitepay'}))).body.code,'INFINITEPAY_PREVIEW_UNAVAILABLE');
+  }
+  infiniteLive();
+  delete process.env.INFINITEPAY_HANDLE;
+  assert.equal((await invoke(createPreference,request({payMethod:'infinitepay'}))).body.code,'PAYMENT_PROVIDER_NOT_CONFIGURED');
+  assert.equal(calls,0);
+  infiniteLive();
+  mockResponse({url:'https://checkout.infinitepay.com.br/synthetic-link'});
+  const result=await invoke(createPreference,request({payMethod:'infinitepay'}));
+  assert.equal(result.statusCode,200);
+  const signed=verifyProof({headers:{'x-checkout-proof':result.body.checkout_proof}},'infinitepay',configuration('infinitepay'));
+  assert.equal(signed.totalCents,9490);
+  assert.equal(result.body.provider,'infinitepay');
+});
+
+test('InfinitePay rejeita URL insegura, outro provedor e resposta sem URL', async () => {
+  infiniteLive();
+  for(const url of [null,'http://checkout.infinitepay.com.br/x','https://checkout.infinitepay.com.br.evil.example/x','https://secret@checkout.infinitepay.com.br/x','https://checkout.infinitepay.com.br:444/x','https://www.mercadopago.com.br/checkout/x','https://checkout.infinitepay.com.br/']){
+    mockResponse({url});
+    assert.equal((await invoke(createPreference,request({payMethod:'infinitepay'}))).statusCode,502);
   }
 });
 
+test('produção preparada aceita somente seu próprio domínio Vercel exato para o retorno', async () => {
+  infiniteLive();
+  process.env.VERCEL_URL='liora-staged.vercel.app';
+  const config=configuration('infinitepay');
+  assert.equal(siteOrigin(config,'https://liora-staged.vercel.app'),'https://liora-staged.vercel.app');
+  assert.equal(siteOrigin(config),'https://liora.example');
+  for(const returnOrigin of ['https://evil.example','https://liora-staged.vercel.app.evil.example','http://liora-staged.vercel.app','https://other.vercel.app']){
+    assert.equal((await invoke(createPreference,request({payMethod:'infinitepay',returnOrigin}))).body.code,'CHECKOUT_ORIGIN_MISMATCH');
+  }
+  assert.equal(calls,0);
+});
 
 test('provider errors and timeouts log no credential, proof, provider body or personal data', async () => {
   const logs = [];

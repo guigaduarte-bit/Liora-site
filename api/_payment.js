@@ -53,7 +53,7 @@ function configuration(provider) {
   return { mode, environment, secret, credential };
 }
 
-function siteOrigin(config) {
+function siteOrigin(config, requestedOrigin) {
   // Vercel's preview deployment URLs are the only return targets in Preview.
   // SITE_URL often points at the shop's production domain across environments.
   const previewUrls = [environmentUrl(process.env.VERCEL_BRANCH_URL), environmentUrl(process.env.VERCEL_URL)].filter(Boolean);
@@ -64,7 +64,11 @@ function siteOrigin(config) {
   const url = config.environment === 'preview'
     ? configured || previewUrls[0]
     : environmentUrl(process.env.SITE_URL) || (config.environment === 'production' ? environmentUrl(process.env.VERCEL_PROJECT_PRODUCTION_URL) : null);
-    if (!url) fail('PAYMENT_RETURN_URL_NOT_CONFIGURED');
+  if (!url) fail('PAYMENT_RETURN_URL_NOT_CONFIGURED');
+  // A staged production deployment may return to its own exact Vercel URL.
+  // Never trust an arbitrary client-supplied origin or a wildcard subdomain.
+  const deployment = environmentUrl(process.env.VERCEL_URL);
+  if (config.environment === 'production' && deployment?.hostname.endsWith('.vercel.app') && requestedOrigin === deployment.origin) return deployment.origin;
   return url.origin;
 }
 

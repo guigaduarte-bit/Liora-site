@@ -139,3 +139,21 @@ test('falha de rede da transportadora não aparece como recusa de pagamento', as
   assert.equal(result.statusCode, 503);
   assert.equal(result.body.code, 'SHIPPING_PROVIDER_UNAVAILABLE');
 });
+
+
+test('InfinitePay reutiliza o mesmo frete assinado e inclui centavos exatos no link', async () => {
+  Object.assign(process.env,{PAYMENT_MODE:'live',VERCEL_ENV:'production',INFINITEPAY_HANDLE:'synthetic-handle'});
+  const token=proof();
+  let calls=0;
+  global.fetch=async(url,options)=>{
+    calls++;
+    assert.equal(url,'https://api.checkout.infinitepay.io/links');
+    const sent=JSON.parse(options.body);
+    assert.deepEqual(sent.items.map(i=>[i.quantity,i.price]),[[1,2500],[1,2813]]);
+    return {ok:true,status:200,json:async()=>({url:'https://checkout.infinitepay.com.br/synthetic-link'})};
+  };
+  const result=await invoke(createPreference,{...request({quoteProof:token}),payMethod:'infinitepay'});
+  assert.equal(result.statusCode,200);
+  assert.equal(result.body.total,53.13);
+  assert.equal(calls,1);
+});

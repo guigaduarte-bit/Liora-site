@@ -280,21 +280,21 @@ test('falha na criação permite uma nova tentativa sem apagar o carrinho', asyn
   assert.equal(app.run('cartQty()'),1);
 });
 
-test('InfinitePay removida não aparece nem permite seleção em produção ou preview', async () => {
+test('InfinitePay é adicional em produção e permanece indisponível no preview', async () => {
   for(const environment of ['production','preview']) {
-    const app = storefront({environment});
-    await app.done;
+    const app=storefront({environment}); await app.done;
     app.run("addToCart('botanique',1); shippingState={status:'ready',quotes:[]}; renderCheckout();");
-    assert.doesNotMatch(app.nodes.get('drawerBody').innerHTML,/infinitepay/i);
     for(const method of ['pix','card','boleto']) assert.match(app.nodes.get('drawerBody').innerHTML,new RegExp('id="payment-'+method+'"'));
     app.run("selectPayment('infinitepay')");
-    assert.equal(app.run('payMethod'),'pix');
-    app.run("payMethod='infinitepay'");
-    await app.run('confirmOrder()');
-    assert.match(app.nodes.get('toastMsg').textContent,/Escolha Pix, cartão ou boleto/);
+    assert.equal(app.run('payMethod'),environment==='production'?'infinitepay':'pix');
+    if(environment==='production')assert.match(app.nodes.get('drawerBody').innerHTML,/id="payment-infinitepay"/);
+    else {
+      assert.doesNotMatch(app.nodes.get('drawerBody').innerHTML,/id="payment-infinitepay"/);
+      app.run("payMethod='infinitepay'"); await app.run('confirmOrder()');
+      assert.match(app.nodes.get('toastMsg').textContent,/formas de pagamento disponíveis/);
+    }
   }
 });
-
 
 test('aprovação de teste é identificada e pendência não promete e-mail inexistente', async () => {
   for (const status of ['approved', 'pending']) {
@@ -517,4 +517,62 @@ test('voltar pelo navegador após redirecionamento consulta o pedido existente s
   assert.equal(app.run('paymentView.status'),'not_found');
   assert.equal(app.run('cartQty()'),1);
   assert.match(app.nodes.get('drawerBody').innerHTML,/Retomar pagamento no Mercado Pago/);
+});
+
+
+test('InfinitePay guarda o link e volta sem pagamento sem nova cobrança ou falsa aprovação', async () => {
+  const orderId='LIORA-TESTE-12345678',checkoutUrl='https://checkout.infinitepay.com.br/synthetic-link';
+  let calls=0;
+  const app=storefront({fetch:async(url,options)=>{
+    calls++; assert.equal(url,'/api/create-preference');
+    assert.equal(JSON.parse(options.body).payMethod,'infinitepay');
+    return {ok:true,json:async()=>({provider:'infinitepay',init_point:checkoutUrl,order_id:orderId,checkout_proof:'signed-fixture'})};
+  }});
+  await app.done;
+  app.run("addToCart('botanique',1); payMethod='infinitepay'; shippingState={status:'ready',quotes:[{id:'curitiba-fixed',price:19.9}]}; selectedShippingService='curitiba-fixed'; $('fN').value='Cliente Fictício'; $('fE').value='cliente@example.com'; $('fC').value='80000000'; $('fA').value='Rua Fictícia';");
+  await app.run('confirmOrder()');
+  assert.equal(app.run('window.location.href'),checkoutUrl);
+  assert.equal(JSON.parse(app.storage.get('liora_checkout_return')).provider,'infinitepay');
+  await app.emit('pageshow',{persisted:true});
+  assert.equal(app.run('paymentView.status'),'unconfirmed');
+  assert.equal(app.run('cartQty()'),1);
+  assert.match(app.nodes.get('drawerBody').innerHTML,/Retomar pagamento na InfinitePay/);
+  assert.equal(calls,1);
+  const restored=storefront({saved:Object.fromEntries(app.storage),search:'?checkout=infinitepay-return&order_id='+orderId});
+  await restored.done;
+  assert.equal(restored.run('paymentView.status'),'unconfirmed');
+  assert.equal(restored.run('cartQty()'),1);
+  assert.match(restored.nodes.get('drawerBody').innerHTML,/synthetic-link/);
+});
+
+test('InfinitePay confirma no servidor antes de remover os produtos pagos', async () => {
+  const orderId='LIORA-TESTE-12345678';
+  const app=storefront({saved:{liora_cart:JSON.stringify([{id:'botanique',qty:1}]),['liora_checkout_proof:'+orderId]:'signed-fixture'},
+    search:'?checkout=infinitepay-return&order_id='+orderId+'&transaction_nsu=tx-123&slug=invoice-123&status=approved',
+    fetch:async(url,options)=>{
+      assert.match(url,/^\/api\/infinitepay-status\?/);
+      assert.match(url,/transaction_nsu=tx-123&slug=invoice-123/);
+      assert.equal(options.headers['X-Checkout-Proof'],'signed-fixture');
+      return {ok:true,json:async()=>({order_id:orderId,status:'pending',payment_mode:'live'})};
+    }});
+  await app.done;
+  assert.equal(app.run('paymentView.status'),'pending');
+  assert.equal(app.run('cartQty()'),1);
+});
+
+test('InfinitePay não aceita destino adulterado nem resposta de outro processador', async () => {
+  for(const [url,provider] of [
+    ['https://www.mercadopago.com.br/checkout/test','infinitepay'],
+    ['https://checkout.infinitepay.com.br/x','mercadopago'],
+    ['https://checkout.infinitepay.com.br.evil.example/x','infinitepay'],
+    ['https://secret@checkout.infinitepay.com.br/x','infinitepay'],
+    ['http://checkout.infinitepay.com.br/x','infinitepay']
+  ]){
+    const app=storefront({fetch:async()=>({ok:true,json:async()=>({provider,init_point:url,order_id:'LIORA-TESTE-12345678',checkout_proof:'signed-fixture'})})});
+    await app.done;
+    app.run("addToCart('botanique',1); payMethod='infinitepay'; shippingState={status:'ready',quotes:[{id:'curitiba-fixed',price:19.9}]}; selectedShippingService='curitiba-fixed'; $('fN').value='Cliente Fictício'; $('fE').value='cliente@example.com'; $('fC').value='80000000'; $('fA').value='Rua Fictícia';");
+    await app.run('confirmOrder()');
+    assert.equal(app.run('window.location.href'),'https://liora.example/');
+    assert.equal(app.storage.get('liora_checkout_order'),undefined);
+  }
 });

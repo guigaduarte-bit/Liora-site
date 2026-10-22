@@ -350,15 +350,24 @@ test('CEP válido sem modalidade é distinguido de CEP inválido', async () => {
   assert.doesNotMatch(res.body.error, /inválido|revise/i);
 });
 
-test('InfinitePay removida rejeita novos pagamentos antes de consultar serviços externos', async () => {
-  process.env.PAYMENT_MODE = 'live';
-  process.env.VERCEL_ENV = 'production';
-  global.fetch = async () => assert.fail('Não deve consultar nenhum provedor');
-  const res = await invoke(createPreference, validRequest({ payMethod: 'infinitepay' }));
-  assert.equal(res.statusCode, 400);
-  assert.equal(res.body.code, 'PAYMENT_METHOD_UNAVAILABLE');
+test('InfinitePay cria link com catálogo e frete em centavos sem alterar o Mercado Pago', async () => {
+  Object.assign(process.env,{PAYMENT_MODE:'live',VERCEL_ENV:'production',INFINITEPAY_HANDLE:'synthetic-handle',SITE_URL:'https://liora.example'});
+  let sent;
+  global.fetch=async(url,options)=>{
+    assert.equal(url,'https://api.checkout.infinitepay.io/links');
+    sent=JSON.parse(options.body);
+    return {ok:true,status:200,json:async()=>({url:'https://checkout.infinitepay.com.br/synthetic-link'})};
+  };
+  const res=await invoke(createPreference,validRequest({payMethod:'infinitepay',items:[{id:'botanique',qty:1}],shipping:{method:'delivery',serviceId:'curitiba-fixed'}}));
+  assert.equal(res.statusCode,200);
+  assert.equal(res.body.provider,'infinitepay');
+  assert.equal(sent.handle,'synthetic-handle');
+  assert.equal(sent.order_nsu,res.body.order_id);
+  assert.equal(sent.items.reduce((sum,item)=>sum+item.quantity*item.price,0),Math.round(res.body.total*100));
+  assert.ok(sent.items.every(item=>Number.isInteger(item.price)&&item.price>0));
+  assert.match(sent.redirect_url,/checkout=infinitepay-return/);
+  assert.doesNotMatch(sent.redirect_url,/proof|@/);
 });
-
 
 test('retorno InfinitePay é confirmado na API antes de aprovar o pedido', async () => {
   process.env.INFINITEPAY_HANDLE = 'liora-aromas';

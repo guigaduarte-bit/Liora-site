@@ -2,6 +2,7 @@
 
 const orders = require('./_orders');
 const { cpf, createPix } = require('./_pix');
+const { createInfinitePay } = require('./_infinitepay');
 const paymentPolicy = require('../content/payment-policy.json');
 const { randomUUID } = require('node:crypto');
 const CATALOG = require('./catalog');
@@ -10,7 +11,7 @@ const { verifyQuote } = require('./_shipping-proof');
 const { PaymentError, configuration, siteOrigin, signProof, pixSubtotal, httpsUrl, providerRequest, fail, respondError, responseHeaders } = require('./_payment');
 
 const PAYMENT_TYPES = ['credit_card', 'debit_card', 'ticket', 'bank_transfer'];
-const PAYMENT_METHODS = new Set(['pix', 'card', 'boleto']);
+const PAYMENT_METHODS = new Set(['pix', 'card', 'boleto', 'infinitepay']);
 const SHIPPING_METHODS = new Set(['delivery']);
 
 function cleanText(value, maxLength) {
@@ -130,20 +131,20 @@ module.exports = async function handler(req, res) {
     const selectedShipping = cleanText(shipping && shipping.method, 20);
 
     if (!PAYMENT_METHODS.has(selectedPayment)) {
-      return res.status(400).json({ code: 'PAYMENT_METHOD_UNAVAILABLE', error: 'Escolha Pix, cartão ou boleto para continuar.' });
+      return res.status(400).json({ code: 'PAYMENT_METHOD_UNAVAILABLE', error: 'Escolha uma das formas de pagamento disponíveis.' });
     }
     if (!SHIPPING_METHODS.has(selectedShipping)) {
       return res.status(400).json({ error: 'Meio de envio inválido' });
     }
 
-    const provider = 'mercadopago';
+    const provider = selectedPayment === 'infinitepay' ? 'infinitepay' : 'mercadopago';
     const config = configuration(provider);
     const durable = orders.enabled();
     if (durable) {
       orders.settings();
-      if (!process.env.MP_WEBHOOK_SECRET || process.env.MP_WEBHOOK_SECRET.length < 32) fail('PAYMENT_WEBHOOK_NOT_CONFIGURED');
+      if (provider === 'mercadopago' && (!process.env.MP_WEBHOOK_SECRET || process.env.MP_WEBHOOK_SECRET.length < 32)) fail('PAYMENT_WEBHOOK_NOT_CONFIGURED');
     }
-    const siteUrl = siteOrigin(config);
+    const siteUrl = siteOrigin(config, returnOrigin);
     if (returnOrigin !== undefined && returnOrigin !== siteUrl) {
       fail('CHECKOUT_ORIGIN_MISMATCH', 'Abra a loja pelo endereço configurado para este checkout antes de continuar.', 409);
     }
@@ -214,6 +215,12 @@ module.exports = async function handler(req, res) {
     if (durable && selectedPayment === 'pix') {
       const pix = await createPix({ orderId, total, payer: { name, email, cpf: payer.cpf }, config, notificationUrl: `${siteUrl}/api/payment-webhook?provider=mercadopago` });
       return await finish({ ...pix, order_id: orderId, provider, payment_mode: config.mode, total });
+    }
+
+    if (provider === 'infinitepay') {
+      const checkout = await createInfinitePay({ config, orderId, siteUrl, cart, shippingCost, selectedQuote,
+        customer: { name, email }, address: { cep: zipCode, number: streetNumber || 'S/N', complement: address }, durable });
+      return await finish({ ...checkout, order_id: orderId, provider, payment_mode: config.mode, total });
     }
 
     const preference = {

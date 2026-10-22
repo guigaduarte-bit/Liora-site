@@ -86,6 +86,7 @@ async function mockedFetch(url, options = {}) {
     return response(payment);
   }
   if (url === 'https://api.mercadopago.com/checkout/preferences') return response({ id: 'pref-123', init_point: 'https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=pref-123' });
+  if (url === 'https://api.checkout.infinitepay.io/links') return response({url:'https://checkout.infinitepay.com.br/synthetic-link'});
   if (url === 'https://api.checkout.infinitepay.io/payment_check') return response({ success: true, paid: true, amount: 9490, paid_amount: 9490, installments: 1, capture_method: 'credit_card' });
   assert.fail(`Unexpected network call: ${url}`);
 }
@@ -218,15 +219,19 @@ test('cartão limita parcelas e registra a condição sem prometer juros zero n�
   await invoke(createCheckout, request({ payMethod: 'card' }));
   assert.equal(calls.filter(c => c.url.endsWith('/checkout/preferences')).length, 1);
 });
-test('InfinitePay removida não registra pedido nem chama processadores', async () => {
-  Object.assign(process.env, { PAYMENT_MODE: 'live', VERCEL_ENV: 'production' });
-  const result = await invoke(createCheckout, request({ payMethod: 'infinitepay' }));
-  assert.equal(result.statusCode, 400);
-  assert.equal(result.body.code, 'PAYMENT_METHOD_UNAVAILABLE');
-  assert.equal(calls.length, 0);
-  assert.equal((await db.query('select * from liora_orders')).rows.length, 0);
+test('InfinitePay registra uma só criação e preserva o mesmo link em tentativas repetidas', async () => {
+  Object.assign(process.env,{PAYMENT_MODE:'live',VERCEL_ENV:'production',INFINITEPAY_HANDLE:'synthetic-handle'});
+  delete process.env.MP_WEBHOOK_SECRET;
+  const first=await invoke(createCheckout,request({payMethod:'infinitepay'}));
+  const second=await invoke(createCheckout,request({payMethod:'infinitepay'}));
+  assert.equal(first.statusCode,200);
+  assert.equal(second.body.init_point,first.body.init_point);
+  assert.equal(second.body.order_id,first.body.order_id);
+  const creations=calls.filter(c=>c.url==='https://api.checkout.infinitepay.io/links');
+  assert.equal(creations.length,1);
+  assert.equal(JSON.parse(creations[0].options.body).webhook_url,'https://liora.example/api/payment-webhook?provider=infinitepay');
+  assert.equal((await row(first.body.order_id)).provider,'infinitepay');
 });
-
 
 test('falha no registro da notificação retorna erro para permitir nova entrega', async () => {
   await invoke(createCheckout, request()); payments.get('123').status = 'approved';

@@ -60,6 +60,7 @@ let shippingRequestId=0;
 let paymentReturn=null, paymentView={status:'idle',test:false}, paymentCheckRunning=false;
 let checkoutSubmitting=false, paymentPollTimer=null, paymentPolls=0;
 const checkoutV2=window.LIORA_CHECKOUT_V2===true;
+const infinitePayAvailable=window.LIORA_PAYMENT_ENVIRONMENT==='production';
 const interestFree=window.LIORA_PAYMENT_POLICY?.interestFreeInstallments===3;
 
 const $=id=>document.getElementById(id);
@@ -257,13 +258,14 @@ function renderCheckout(){
     ${disc?`<div class="sum-row"><span>Desconto Pix (5%)</span><span style="color:var(--gold-deep)">− ${money(disc)}</span></div>`:''}
     <div class="sum-row total"><span>${previewOnly?'Total estimado':checkoutReady?'Total':'Total parcial'}</span><span>${money(total)}</span></div>
     <button class="btn btn-solid w-full" style="margin-top:14px" onclick="confirmOrder()" ${checkoutReady&&!checkoutSubmitting?'':'disabled'}>${checkoutSubmitting?'Gerando pagamento…':checkoutReady?`${payMethod==='pix'?'Pagar com Pix':payMethod==='boleto'?'Gerar boleto':'Confirmar pedido'} · ${money(total)}`:previewOnly?'Simulação · pagamento indisponível':'Calcule o frete para continuar'}</button>
-    <p style="text-align:center;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin-top:12px">${checkoutV2&&payMethod==='pix'?'O QR Code e o código Pix aparecerão aqui.':'Você será redirecionado ao ambiente seguro do Mercado Pago'}</p>`;
+    <p style="text-align:center;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin-top:12px">${checkoutV2&&payMethod==='pix'?'O QR Code e o código Pix aparecerão aqui.':payMethod==='infinitepay'?'Você será redirecionado ao ambiente seguro da InfinitePay':'Você será redirecionado ao ambiente seguro do Mercado Pago'}</p>`;
 }
 function paymentOptionsHTML(){
   const options=[
     {id:'pix',name:'Pix',detail:'5% de desconto extra'},
     {id:'card',name:'Cartão de crédito',detail:interestFree?'até 3x sem juros':'até 3x · condições no Mercado Pago'},
-    {id:'boleto',name:'Boleto bancário',detail:'aprovação após compensação'}
+    {id:'boleto',name:'Boleto bancário',detail:'aprovação após compensação'},
+    ...(infinitePayAvailable?[{id:'infinitepay',name:'InfinitePay',detail:'Pix e cartão · condições na InfinitePay'}]:[])
   ];
   return `<fieldset class="payment-options"><legend class="chk-step mt">3 · Pagamento</legend>${options.map(option=>{
     const disabled=checkoutSubmitting||option.disabled;
@@ -274,7 +276,7 @@ function paymentOptionsHTML(){
   }).join('')}</fieldset>`;
 }
 function selectPayment(method){
-  if(checkoutSubmitting||!['pix','card','boleto'].includes(method))return;
+  if(checkoutSubmitting||!['pix','card','boleto','infinitepay'].includes(method)||(method==='infinitepay'&&!infinitePayAvailable))return;
   payMethod=method;
   renderCheckout();
   $(`payment-${method}`)?.focus();
@@ -380,7 +382,7 @@ async function buscarCEP(cep){
 
 async function confirmOrder(){
   if(checkoutSubmitting)return;
-  if(!['pix','card','boleto'].includes(payMethod)){toast('Escolha Pix, cartão ou boleto para continuar.');return}
+  if(!['pix','card','boleto','infinitepay'].includes(payMethod)||(payMethod==='infinitepay'&&!infinitePayAvailable)){toast('Escolha uma das formas de pagamento disponíveis.');return}
   const selectedQuote=shippingState.quotes.find(q=>q.id===selectedShippingService);
   if(shipMethod==='delivery'&&selectedQuote?.preview){toast('Esta opção é uma simulação. O pagamento ficará disponível após a conferência do frete.');return}
   const name=$('fN').value.trim(),email=$('fE').value.trim(),cep=$('fC').value.trim(),num=$('fNum').value.trim(),addr=$('fA').value.trim();
@@ -424,15 +426,16 @@ async function confirmOrder(){
       toast(shippingState.status==='ready'?'O frete foi atualizado. Confira o total e confirme o pedido novamente.':shippingState.error);
       return;
     }
-    const checkoutUrl=mercadoPagoCheckoutUrl(data.init_point);
-    if(!resp.ok||(!checkoutUrl&&!data.pix)||!data.order_id||!data.checkout_proof||(data.provider&&data.provider!=='mercadopago')){
+    const provider=payload.payMethod==='infinitepay'?'infinitepay':'mercadopago';
+    const checkoutUrl=providerCheckoutUrl(data.init_point,provider);
+    if(!resp.ok||(!checkoutUrl&&!(provider==='mercadopago'&&data.pix))||!data.order_id||!data.checkout_proof||(data.provider&&data.provider!==provider)|| (provider==='infinitepay'&&(data.provider!==provider||data.pix))){
       toast(data.error||'Não foi possível iniciar o pagamento. Tente novamente.');
       return;
     }
     sessionStorage.setItem(`liora_checkout_proof:${data.order_id}`,data.checkout_proof);
     sessionStorage.setItem(`liora_checkout_cart:${data.order_id}`,JSON.stringify(payload.items));
     sessionStorage.setItem('liora_checkout_order',data.order_id);
-    paymentReturn={orderId:data.order_id,provider:'mercadopago',...(data.pix?{pix:data.pix,paymentId:data.payment_id,total:data.total}:{checkoutUrl})};
+    paymentReturn={orderId:data.order_id,provider,...(data.pix?{pix:data.pix,paymentId:data.payment_id,total:data.total}:{checkoutUrl})};
     savePaymentReturn();
     redirecting=true;
     if(data.pix){checkoutSubmitting=false;paymentPolls=0;await retryPaymentConfirmation()}
@@ -457,15 +460,24 @@ function mercadoPagoCheckoutUrl(value){
     return url.protocol==='https:'&&!url.username&&!url.password&&!url.port&&['www.mercadopago.com.br','mercadopago.com.br'].includes(url.hostname)&&/^\/checkout(?:\/|$)/.test(url.pathname)?url.href:'';
   }catch{return ''}
 }
+function providerCheckoutUrl(value,provider){
+  if(provider!=='infinitepay')return mercadoPagoCheckoutUrl(value);
+  try{
+    const url=new URL(value);
+    return url.protocol==='https:'&&!url.username&&!url.password&&!url.port&&url.hostname==='checkout.infinitepay.com.br'&&url.pathname!=='/'?url.href:'';
+  }catch{return ''}
+}
 function renderPaymentStatus(){
   const status=paymentView.status,approved=status==='approved';
-  const resumeUrl=status==='not_found'?mercadoPagoCheckoutUrl(paymentReturn?.checkoutUrl):'';
+  const resumeUrl=['not_found','unconfirmed'].includes(status)?providerCheckoutUrl(paymentReturn?.checkoutUrl,paymentReturn?.provider):'';
+  const providerLabel=paymentReturn?.provider==='infinitepay'?'na InfinitePay':'no Mercado Pago';
   const terminal=['rejected','cancelled','refunded','charged_back'].includes(status);
-  const headings={checking:'Confirmando pagamento…',not_found:'Pagamento ainda não localizado',approved:paymentView.test?'Pagamento de teste aprovado':'Pagamento confirmado',pending:'Aguardando confirmação',in_process:'Pagamento em análise',authorized:'Aguardando conclusão',rejected:'Pagamento não aprovado',cancelled:'Pagamento cancelado',refunded:'Pagamento devolvido',charged_back:'Pagamento contestado',in_mediation:'Pagamento em análise',review_required:'Pagamento recebido · pedido em conferência',error:'Confirmação em aberto'};
+  const headings={checking:'Confirmando pagamento…',not_found:'Pagamento ainda não localizado',unconfirmed:'Confirmação em aberto',approved:paymentView.test?'Pagamento de teste aprovado':'Pagamento confirmado',pending:'Aguardando confirmação',in_process:'Pagamento em análise',authorized:'Aguardando conclusão',rejected:'Pagamento não aprovado',cancelled:'Pagamento cancelado',refunded:'Pagamento devolvido',charged_back:'Pagamento contestado',in_mediation:'Pagamento em análise',review_required:'Pagamento recebido · pedido em conferência',error:'Confirmação em aberto'};
   const title=headings[status]||'Consultar pagamento';
   let message='Confira a situação no provedor antes de tentar pagar novamente. Use o botão abaixo para consultar este mesmo pagamento.';
   if(status==='checking')message='Consultando o pagamento já iniciado. Aguarde a resposta do provedor.';
   else if(status==='not_found')message='O Mercado Pago ainda não localizou um pagamento para este pedido. Se já pagou, aguarde e consulte novamente.'+(resumeUrl?' Se ainda não pagou, você pode retomar o checkout.':'');
+  else if(status==='unconfirmed')message='A confirmação da InfinitePay ainda não retornou para esta sessão. Se já pagou, confira a situação na InfinitePay antes de tentar novamente. Se ainda não pagou, retome o mesmo checkout.';
   else if(approved)message=paymentView.test?'Nenhum pedido será produzido. Este pagamento pertence ao ambiente de testes.':'Obrigada pelo seu pedido. O prazo de produção é de 10 dias úteis após a confirmação do pagamento e da personalização.';
   else if(['pending','in_process','authorized','in_mediation'].includes(status))message='O provedor ainda não confirmou a conclusão. Você pode consultar novamente sem fazer outro pagamento.';
   else if(status==='review_required')message='O pagamento foi recebido, mas as condições precisam ser conferidas pela Liora. Não pague novamente. Entre em contato informando o número do pedido.';
@@ -476,7 +488,7 @@ function renderPaymentStatus(){
     <h3>${title}</h3><p>${message}</p>
     ${pixPaymentHTML(status)}
     ${paymentReturn?`<p class="order">Pedido ${escapeAttr(paymentReturn.orderId)}</p>`:''}
-    ${resumeUrl?`<a class="btn btn-solid w-full" href="${escapeAttr(resumeUrl)}">Retomar pagamento no Mercado Pago</a>`:''}
+    ${resumeUrl?`<a class="btn btn-solid w-full" href="${escapeAttr(resumeUrl)}">Retomar pagamento ${providerLabel}</a>`:''}
     ${!approved&&!terminal?`<button class="btn btn-ink w-full" onclick="retryPaymentConfirmation()" ${paymentCheckRunning?'disabled':''}>${paymentCheckRunning?'Consultando…':'Verificar pagamento novamente'}</button>`:''}
     <button class="btn btn-outline w-full payment-close" onclick="closeAll()">Continuar no site</button></div>`;
   $('drawerFoot').innerHTML='';
@@ -550,7 +562,7 @@ function renderQuick(){
         <div><svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M2.5 10h19"/></svg>${interestFree?'Até 3x sem juros':'Cartão em até 3x'}</div>
       </div>
       <div style="margin-top:26px">
-        <details><summary>Pagamento</summary><p>Mercado Pago com Pix (5% de desconto), cartão em até 3x ou boleto.</p></details>
+        <details><summary>Pagamento</summary><p>Mercado Pago com Pix (5% de desconto), cartão em até 3x ou boleto. InfinitePay com Pix e cartão, conforme as condições exibidas no checkout.</p></details>
         <details><summary>Envio</summary><p>Comparamos opções da SuperFrete pelo CEP, incluindo Correios e outras transportadoras disponíveis. Em Curitiba, a entrega Liora custa R$ 19,90 abaixo de R$ 150. A partir desse valor, aplica-se a gratuidade geral.</p></details>
         <details><summary>Cuidados com a vela</summary><p>Consulte as orientações que acompanham a peça. Os cuidados variam conforme o formato e o recipiente.</p></details>
       </div>
@@ -633,7 +645,7 @@ async function retryPaymentConfirmation(){
     const query=new URLSearchParams({order_id:orderId});
     let endpoint='/api/payment-status';
     if(context.provider==='infinitepay'){
-      if(!context.transactionNsu||!context.slug)throw new Error('Retorno incompleto');
+      if(!context.transactionNsu||!context.slug){paymentView={status:'unconfirmed',test:false};savePaymentReturn();return}
       query.set('transaction_nsu',context.transactionNsu);query.set('slug',context.slug);endpoint='/api/infinitepay-status';
     }else if(context.paymentId)query.set('payment_id',context.paymentId);
     const resp=await fetch(`${endpoint}?${query}`,{headers:{'X-Checkout-Proof':checkoutProof},cache:'no-store'});
@@ -682,7 +694,8 @@ async function retryPaymentConfirmation(){
     if(!isReturn&&!sessionStorage.getItem(`liora_checkout_proof:${orderId}`))return;
     paymentReturn=isReturn?{...(stored?.orderId===orderId?stored:{}),orderId,provider:isInfinitePay?'infinitepay':'mercadopago',
       ...(paymentId&&/^\d{1,30}$/.test(paymentId)?{paymentId}:{}),
-      ...(isInfinitePay?{transactionNsu:params.get('transaction_nsu'),slug:params.get('slug')||params.get('invoice_slug')}:{}),
+      ...(isInfinitePay&&params.get('transaction_nsu')?{transactionNsu:params.get('transaction_nsu')}:{}),
+      ...(isInfinitePay&&(params.get('slug')||params.get('invoice_slug'))?{slug:params.get('slug')||params.get('invoice_slug')}:{}),
     }:stored?.orderId===orderId?stored:{orderId,provider:'mercadopago'};
     // Migrate sessions created before cart snapshots existed. Preserve the
     // snapshot before querying so additions during a retry are never removed.
