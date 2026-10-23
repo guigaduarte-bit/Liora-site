@@ -670,5 +670,29 @@
       "field": "dims",
       "text": "Medidas: 10 × 7 cm"
     }
+  },
+  "natal-gingerbread": {
+    "weightGrams": null,
+    "dimensionsCm": null,
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": ""
+    }
+  },
+  "natal-gnomos-de-natal": {
+    "weightGrams": null,
+    "dimensionsCm": null,
+    "packingWeightGrams": null,
+    "shippingDimensionsCm": null,
+    "confirmedForShipping": false,
+    "source": {
+      "file": "content/products.json",
+      "field": "dims",
+      "text": ""
+    }
   }
 }

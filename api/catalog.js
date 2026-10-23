@@ -35,6 +35,8 @@ module.exports = Object.freeze({
   'caixa-flor-solitaria': { name: 'Caixa flor solitária', price: 15.0, stock: 10, soldout: true },
   'caixa-quadrada-media': { name: 'Caixa quadrada média', price: 69.9, stock: 10, soldout: true },
   'caixa-floral-grande': { name: 'Caixa floral grande', price: 129.9, stock: 10, soldout: true },
+  "natal-gingerbread": { name: "Gingerbread", price: 25, stock: null, madeToOrder: true },
+  "natal-gnomos-de-natal": { name: "Gnomos de Natal", price: 25, stock: null, madeToOrder: true },
   "natal-cavalinho-de-balanco": { name: "Cavalinho de balanço", price: 9.9, stock: null, madeToOrder: true },
   "natal-boneco-de-neve-com-coracao": { name: "Boneco de neve com coração", price: 20.0, stock: null, madeToOrder: true },
   "natal-arvore-de-natal-com-enfeites": { name: "Árvore de Natal com enfeites", price: 20.0, stock: null, madeToOrder: true },

@@ -841,5 +841,67 @@
         "value": "R$ 30,00"
       }
     ]
+  },
+  {
+    "id": "natal-gingerbread",
+    "displayName": "Gingerbread",
+    "description": "O encanto dos tradicionais biscoitos de Natal ganha vida em ilustrações de bonequinhos, xícaras e pequenos detalhes festivos. Em potes de vidro com tampa de madeira, as velas da linha Gingerbread trazem a doçura das lembranças natalinas para a decoração — uma delicada escolha para acolher os encontros e presentear com carinho.",
+    "specs": [
+      {
+        "label": "Coleção",
+        "value": "Natal"
+      },
+      {
+        "label": "Recipiente",
+        "value": "Vidro"
+      },
+      {
+        "label": "Tampa",
+        "value": "Madeira"
+      },
+      {
+        "label": "Decoração",
+        "value": "Bonequinhos de biscoito e motivos natalinos"
+      },
+      {
+        "label": "Conteúdo da compra",
+        "value": "1 vela da linha"
+      },
+      {
+        "label": "Valor por unidade",
+        "value": "R$ 25,00"
+      }
+    ]
+  },
+  {
+    "id": "natal-gnomos-de-natal",
+    "displayName": "Gnomos de Natal",
+    "description": "Pequenos gnomos, casinhas e ramos natalinos compõem cenas que parecem saídas de um conto de inverno. Em potes de vidro com tampa de cortiça, as velas da linha Gnomos de Natal acrescentam um toque lúdico e acolhedor à casa, transformando um pequeno presente em uma lembrança cheia de afeto.",
+    "specs": [
+      {
+        "label": "Coleção",
+        "value": "Natal"
+      },
+      {
+        "label": "Recipiente",
+        "value": "Vidro"
+      },
+      {
+        "label": "Tampa",
+        "value": "Cortiça"
+      },
+      {
+        "label": "Decoração",
+        "value": "Gnomos, casinhas e ramos natalinos"
+      },
+      {
+        "label": "Conteúdo da compra",
+        "value": "1 vela da linha"
+      },
+      {
+        "label": "Valor por unidade",
+        "value": "R$ 25,00"
+      }
+    ]
   }
 ]

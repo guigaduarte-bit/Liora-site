@@ -509,6 +509,54 @@
     ]
   },
   {
+    "id": "natal-gingerbread",
+    "name": "Gingerbread",
+    "price": 25,
+    "stock": null,
+    "soldout": false,
+    "availabilityPending": false,
+    "cats": [
+      "Natal"
+    ],
+    "desc": "O encanto dos tradicionais biscoitos de Natal ganha vida em ilustrações de bonequinhos, xícaras e pequenos detalhes festivos. Em potes de vidro com tampa de madeira, as velas da linha Gingerbread trazem a doçura das lembranças natalinas para a decoração — uma delicada escolha para acolher os encontros e presentear com carinho.",
+    "dims": "",
+    "frag": false,
+    "linePresentation": true,
+    "unitLabel": "por unidade",
+    "unitNote": "Valor referente a 1 vela. A foto apresenta diferentes estampas da linha.",
+    "images": [
+      {
+        "src": "/assets/images/natal-gingerbread.jpg",
+        "alt": "Seis estampas da linha Gingerbread em potes de vidro com tampa de madeira"
+      }
+    ],
+    "madeToOrder": true
+  },
+  {
+    "id": "natal-gnomos-de-natal",
+    "name": "Gnomos de Natal",
+    "price": 25,
+    "stock": null,
+    "soldout": false,
+    "availabilityPending": false,
+    "cats": [
+      "Natal"
+    ],
+    "desc": "Pequenos gnomos, casinhas e ramos natalinos compõem cenas que parecem saídas de um conto de inverno. Em potes de vidro com tampa de cortiça, as velas da linha Gnomos de Natal acrescentam um toque lúdico e acolhedor à casa, transformando um pequeno presente em uma lembrança cheia de afeto.",
+    "dims": "",
+    "frag": false,
+    "linePresentation": true,
+    "unitLabel": "por unidade",
+    "unitNote": "Valor referente a 1 vela. A foto apresenta diferentes estampas da linha.",
+    "images": [
+      {
+        "src": "/assets/images/natal-gnomos-de-natal.jpg",
+        "alt": "Três estampas da linha Gnomos de Natal em potes de vidro com tampa de cortiça"
+      }
+    ],
+    "madeToOrder": true
+  },
+  {
     "id": "natal-cavalinho-de-balanco",
     "name": "Cavalinho de balanço",
     "price": 9.9,

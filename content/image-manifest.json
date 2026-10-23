@@ -1414,5 +1414,17 @@
       }
     ],
     "bytes": 68336
+  },
+  "/assets/images/natal-gingerbread.jpg": {
+    "width": 960,
+    "height": 334,
+    "bytes": 110508,
+    "variants": []
+  },
+  "/assets/images/natal-gnomos-de-natal.jpg": {
+    "width": 960,
+    "height": 630,
+    "bytes": 221901,
+    "variants": []
   }
 }

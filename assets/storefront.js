@@ -535,15 +535,16 @@ function renderQuick(){
   const off=offPct(p);
   $('modalCard').innerHTML=`
     <button class="modal-close" aria-label="Fechar" onclick="closeAll()"><svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--ink);fill:none;stroke-width:1.4"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
-    <div class="modal-media"><img src="${p.img}" alt="${escapeAttr(p.displayName||p.name)}"></div>
+    <div class="modal-media${p.linePresentation?' modal-media-full':''}"><img src="${p.img}" alt="${escapeAttr(p.displayName||p.name)}"></div>
     <div class="modal-body">
       <p class="eyebrow">${p.availabilityPending?'Disponibilidade a confirmar':p.soldout?'Esgotado':(off?off+'% OFF · Frete grátis*':'Coleção Liora')}</p>
       <h3>${escapeAttr(p.displayName||p.name)}</h3>
       <p class="m-variant">${p.cats.join(' · ')||'Liora Aromas de Luxo'}</p>
-      <p class="m-price">${p.old?`<span class="old">${money(p.old)}</span>`:''}${money(p.price)}</p>
+      <p class="m-price">${p.old?`<span class="old">${money(p.old)}</span>`:''}${money(p.price)}${p.unitLabel?` <span class="price-unit">${escapeAttr(p.unitLabel)}</span>`:''}</p>
       <p class="m-inst">${instTxt(p)} · Pix com 5% de desconto extra</p>
       ${stockNote(p)}
       <p class="m-desc">${p.desc}</p>
+      ${p.unitNote?`<p class="unit-note">${escapeAttr(p.unitNote)}</p>`:''}
       ${p.gallery?.length>1?`<p class="product-help"><a href="/produtos/${p.id}/">Ver todas as fotos deste modelo</a></p>`:''}
       <div class="pyramid">
         ${p.dims?`<div class="pyr-row"><span>Dimensões</span><div>${p.dims}</div></div>`:''}

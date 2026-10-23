@@ -115,10 +115,10 @@ function checkParcelGeometryAndWeight(result) {
   assert.equal(result.totalWeightGrams, totalWeight);
 }
 
-test('tabela cobre os 48 SKUs: 23 estimáveis, 24 incompletos e 1 sem caixa', () => {
+test('tabela cobre os 50 SKUs: 23 estimáveis, 26 incompletos e 1 sem caixa', () => {
   const coveredIds = [...singleUnits.map(([id]) => id), ...incompleteIds, 'jardim-encantado'];
   assert.equal(singleUnits.length, 23);
-  assert.equal(new Set(coveredIds).size, 48);
+  assert.equal(new Set(coveredIds).size, 50);
   assert.deepEqual(coveredIds.sort(), Object.keys(catalog).sort());
 });
 
