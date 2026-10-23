@@ -1426,5 +1426,43 @@
     "height": 630,
     "bytes": 221901,
     "variants": []
+  },
+  "/assets/images/natal-gingerbread-ambientada.webp": {
+    "width": 1122,
+    "height": 1402,
+    "bytes": 464822,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/natal-gingerbread-ambientada-360.webp",
+        "width": 360,
+        "height": 450,
+        "bytes": 62954
+      },
+      {
+        "src": "/assets/images/responsive/natal-gingerbread-ambientada-720.webp",
+        "width": 720,
+        "height": 900,
+        "bytes": 192756
+      }
+    ]
+  },
+  "/assets/images/natal-gnomos-de-natal-ambientada.webp": {
+    "width": 1122,
+    "height": 1402,
+    "bytes": 385974,
+    "variants": [
+      {
+        "src": "/assets/images/responsive/natal-gnomos-de-natal-ambientada-360.webp",
+        "width": 360,
+        "height": 450,
+        "bytes": 55320
+      },
+      {
+        "src": "/assets/images/responsive/natal-gnomos-de-natal-ambientada-720.webp",
+        "width": 720,
+        "height": 900,
+        "bytes": 157816
+      }
+    ]
   }
 }

@@ -38,8 +38,8 @@ function lioraGiftPriceHTML(g,className='card-price'){
  return prices.map(p=>`<p class="${className}">${p.label?`${lioraEscape(p.label)}: `:''}${lioraMoney(p.value)}</p>`).join('');
 }
 function lioraGiftCardHTML(g){
- const name=lioraEscape(g.name),url=`/kits-e-presentes-natal/${g.id}/`;
- return `<article class="card gift-card"><div class="card-media"><a class="card-image-link" href="${url}" aria-label="Conhecer ${name}">${lioraImage({img:g.image,imageMeta:g.imageMeta,displayName:g.alt})}</a><a class="quick-add" href="${url}">Conhecer o presente</a></div><div class="card-info"><h3><a href="${url}">${name}</a></h3>${lioraGiftPriceHTML(g)}<p class="gift-description">${lioraEscape(g.description)}</p></div></article>`;
+ const name=lioraEscape(g.name),url=g.productId?`/produtos/${g.productId}/`:`/kits-e-presentes-natal/${g.id}/`;
+ return `<article class="card gift-card"><div class="card-media"><a class="card-image-link" href="${url}" aria-label="Conhecer ${name}">${lioraImage({img:g.image,imageMeta:g.imageMeta,displayName:g.alt})}</a><a class="quick-add" href="${url}">${g.productId?'Conhecer a linha':'Conhecer o presente'}</a></div><div class="card-info"><h3><a href="${url}">${name}</a></h3>${lioraGiftPriceHTML(g)}<p class="gift-description">${lioraEscape(g.description)}</p>${g.productId?`<p class="unit-note">${lioraEscape(g.detail)}</p>`:''}</div></article>`;
 }
 function lioraTabsHTML(categories,current='Todas'){
  return categories.map(c=>`<a class="tab${c.name===current?' active':''}${c.festive||c.name==='Natal'?' tab-natal':''}" href="${c.path}" ${c.name===current?'aria-current="page"':''}>${lioraEscape(c.name)}${c.festive||c.name==='Natal'?'<img class="tab-holly" src="/assets/images/natal-azevinho.webp" alt="" aria-hidden="true" width="384" height="384">':''}</a>`).join('')+'<a class="tab" href="/catalogo-de-aromas/">Catálogo de Aromas</a>';

@@ -526,8 +526,12 @@
     "unitNote": "Valor referente a 1 vela. A foto apresenta diferentes estampas da linha.",
     "images": [
       {
+        "src": "/assets/images/natal-gingerbread-ambientada.webp",
+        "alt": "Seis estampas da linha Gingerbread em potes de vidro com tampa de madeira em cenário natalino dourado"
+      },
+      {
         "src": "/assets/images/natal-gingerbread.jpg",
-        "alt": "Seis estampas da linha Gingerbread em potes de vidro com tampa de madeira"
+        "alt": "Seis estampas da linha Gingerbread em potes de vidro com tampa de madeira — foto original"
       }
     ],
     "madeToOrder": true
@@ -550,8 +554,12 @@
     "unitNote": "Valor referente a 1 vela. A foto apresenta diferentes estampas da linha.",
     "images": [
       {
+        "src": "/assets/images/natal-gnomos-de-natal-ambientada.webp",
+        "alt": "Três estampas da linha Gnomos de Natal em potes de vidro com tampa de cortiça em cenário natalino dourado"
+      },
+      {
         "src": "/assets/images/natal-gnomos-de-natal.jpg",
-        "alt": "Três estampas da linha Gnomos de Natal em potes de vidro com tampa de cortiça"
+        "alt": "Três estampas da linha Gnomos de Natal em potes de vidro com tampa de cortiça — foto original"
       }
     ],
     "madeToOrder": true

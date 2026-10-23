@@ -33,13 +33,18 @@ for(const [src,meta] of Object.entries(imageManifest)){
 }
 const editorial=json('content/product-editorial.json');
 const collectionEditorial=json('content/collection-editorial.json');
+const original=json('content/products.json');
 const gifts=json('content/christmas-gifts.json').map(g=>{
+ if(g.productId){
+  const p=original.find(p=>p.id===g.productId),copy=editorial.find(p=>p.id===g.productId),commercial=catalog[g.productId];
+  if(!p||!copy||!commercial)throw Error(`Unknown Christmas gift product ${g.productId}`);
+  g={...g,name:copy.displayName,description:copy.description,detail:p.unitNote,price:commercial.price,priceLabel:'Unidade',image:p.images[0].src,alt:p.images[0].alt};
+ }
  const imageMeta=imageManifest[g.image];
  if(!imageMeta||!g.name||!g.description||!g.alt)throw Error(`Incomplete Christmas gift ${g.id}`);
  return {...g,imageMeta};
 });
 if(new Set(gifts.map(g=>g.id)).size!==gifts.length)throw Error('Christmas gift IDs must be unique');
-const original=json('content/products.json');
 const productIds=original.map(p=>p.id);
 if(new Set(productIds).size!==original.length||editorial.length!==original.length||Object.keys(catalog).length!==original.length||new Set(editorial.map(p=>p.id)).size!==original.length)throw Error('Product catalogue IDs must be unique and synchronized');
 const products=original.map(p=>{
@@ -102,6 +107,7 @@ for(const c of categories){
 const giftCategory=categories.find(c=>c.editorial),giftCopy=collectionEditorial[giftCategory.name];
 page({url:giftCategory.path,title:`${giftCategory.title} | Liora`,description:giftCategory.description,img:gifts[0].image,schemas:[crumbSchema([{name:giftCategory.name,path:giftCategory.path}])]},`<section class="wrap category-page category-page-natal">${crumbs([{name:giftCategory.name}])}<img class="natal-holly" src="/assets/images/natal-azevinho.webp" alt="" aria-hidden="true" width="384" height="384"><div class="page-intro collection-intro gift-intro"><p class="eyebrow">Coleções Liora</p><h1 class="display">Kits e presentes <span>Natal Liora</span></h1><p class="collection-tagline">${e(giftCopy.tagline)}</p><p class="collection-description">${e(giftCopy.description)}</p><p class="collection-invitation">${e(giftCopy.invitation)}</p></div>${colorCustomization(giftCategory.name,giftCategory.path)}<nav class="tabs" id="tabsBar" aria-label="Coleções">${lioraTabsHTML(categories,giftCategory.name)}</nav><div class="grid gift-grid" id="gifts-grid">${gifts.map(g=>lioraGiftCardHTML(g)).join('')}</div></section>`,giftCategory.name);
 for(const g of gifts){
+ if(g.productId)continue;
  const url=`${giftCategory.path}${g.id}/`;
  const trail=[{name:giftCategory.name,path:giftCategory.path},{name:g.name,path:url}];
  const related=gifts.filter(r=>r.id!==g.id).slice(0,4);

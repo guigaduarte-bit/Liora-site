@@ -1,5 +1,13 @@
 [
   {
+    "id": "gingerbread",
+    "productId": "natal-gingerbread"
+  },
+  {
+    "id": "gnomos-de-natal",
+    "productId": "natal-gnomos-de-natal"
+  },
+  {
     "id": "encantos-da-vila",
     "name": "Encantos da Vila",
     "price": 119.90,
