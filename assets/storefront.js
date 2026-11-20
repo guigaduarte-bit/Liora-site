@@ -54,12 +54,16 @@ const SHIP_FREE=150;
 let cart=[], wish=new Set(), drawerView='cart', currentTab=document.body.dataset.category||'Todas';
 let quick={id:null,qty:1};
 let payMethod='pix', shipMethod='delivery', selectedShippingService='';
-let checkoutForm={name:'',email:'',cep:'',num:'',addr:''};
+let checkoutForm={name:'',email:'',cep:'',num:'',addr:'',cpf:''};
 let shippingState={status:'idle',quotes:[],preview:false,packaging:null,notice:'',error:'',code:'',sandbox:false,cep:''};
 let shippingRequestId=0;
 let paymentReturn=null, paymentView={status:'idle',test:false}, paymentCheckRunning=false;
 let checkoutSubmitting=false, paymentPollTimer=null, paymentPolls=0;
 const checkoutV2=window.LIORA_CHECKOUT_V2===true;
+const couponsEnabled=window.LIORA_COUPONS_ENABLED===true;
+const orderTrackingEnabled=window.LIORA_ORDER_TRACKING_ENABLED===true;
+let couponState={code:'',applied:null,status:'idle',error:'',errorField:'',notice:'',open:false};
+let couponRequestId=0;
 const infinitePayAvailable=window.LIORA_PAYMENT_ENVIRONMENT==='production';
 const interestFree=window.LIORA_PAYMENT_POLICY?.interestFreeInstallments===3;
 
@@ -149,6 +153,7 @@ function updateCounts(){
   if(next!==cartFingerprint){
     shippingState={status:'idle',quotes:[],preview:false,packaging:null,notice:'',error:'',code:'',sandbox:false,cep:''};
     selectedShippingService='';shippingRequestId++;cartFingerprint=next;
+    invalidateCoupon('O carrinho mudou. Aplique o cupom novamente para atualizar o desconto.');
   }
   saveCart();
   const c=$('cartCount'),w=$('wishCount');
@@ -212,6 +217,93 @@ function renderDrawer(){
 }
 
 /* ============ CHECKOUT ============ */
+function couponContext(code=couponState.code){
+  return JSON.stringify({items:cart.map(({id,qty,frag})=>({id,qty,frag})),payMethod,
+    cpf:String(code).trim().toUpperCase()==='PRIMEIRACOMPRA'?String(checkoutForm.cpf||'').replace(/\D/g,''):''});
+}
+function announceCoupon(message){
+  const live=$('couponLive');
+  if(live)live.textContent=message;
+}
+function invalidateCoupon(message=''){
+  const hadCoupon=Boolean(couponState.applied||couponState.status==='checking');
+  couponRequestId++;
+  couponState={...couponState,applied:null,status:'idle',error:'',errorField:'',notice:hadCoupon?message:'',open:couponState.open||hadCoupon};
+  if(hadCoupon&&message)announceCoupon(message);
+}
+function couponHTML(){
+  if(!couponsEnabled)return '';
+  const applied=couponState.applied?.coupon;
+  const busy=checkoutSubmitting||couponState.status==='checking';
+  const error=couponState.error;
+  return `<details id="checkoutCoupon" class="checkout-coupon" ${couponState.open?'open':''} ontoggle="couponState.open=this.open">
+    <summary><span>Cupom de desconto${applied?' · aplicado':''}</span></summary>
+    <div class="coupon-content">
+      <div class="field coupon-field"><label for="couponCode">Código do cupom</label>
+        <div class="coupon-entry"><input id="couponCode" name="coupon-code" type="text" placeholder="Ex.: PRIMEIRACOMPRA" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="40" value="${escapeAttr(couponState.code)}" ${applied?'readonly':''} ${busy?'disabled':''} ${error&&couponState.errorField!=='cpf'?'aria-invalid="true"':''} aria-describedby="couponHelp couponError" oninput="couponState.code=this.value;couponState.error='';couponState.errorField=''" onkeydown="if(event.key==='Enter'){event.preventDefault();applyCoupon()}">
+        ${applied?`<button type="button" class="btn btn-outline coupon-action" onclick="removeCoupon()" ${checkoutSubmitting?'disabled':''}>Remover</button>`:`<button type="button" id="couponApply" class="btn btn-ink coupon-action" onclick="applyCoupon()" ${busy?'disabled':''}>${couponState.status==='checking'?'Aplicando…':'Aplicar'}</button>`}</div>
+      </div>
+      <p id="couponHelp" class="coupon-help">Use um cupom por pedido. O desconto vale para os produtos; o frete permanece igual.</p>
+      <p id="couponError" class="coupon-error" ${error?'':'hidden'}>${escapeAttr(error)}</p>
+      ${error&&couponState.code?`<button type="button" class="coupon-clear" onclick="removeCoupon()" ${checkoutSubmitting?'disabled':''}>Remover cupom</button>`:''}
+      <p class="coupon-feedback" ${applied||couponState.notice?'':'hidden'}>${escapeAttr(applied?`${applied.code} aplicado: ${applied.percent}% de desconto nos produtos.`:couponState.notice)}</p>
+      ${applied&&payMethod==='pix'?'<p class="coupon-help">Os 5% extras do Pix são calculados após o cupom.</p>':''}
+    </div>
+  </details>`;
+}
+function couponFailure(message,field='coupon'){
+  couponState={...couponState,applied:null,status:'error',error:message,errorField:field,notice:'',open:true};
+  renderCheckout();
+  announceCoupon(message);
+  $(field==='cpf'?'fCPF':'couponCode')?.focus();
+}
+async function applyCoupon(){
+  if(!couponsEnabled||checkoutSubmitting||couponState.status==='checking'||couponState.applied)return;
+  const code=String(couponState.code).trim().toUpperCase();
+  if(!code){couponFailure('Digite o código do cupom para aplicar.');return}
+  const requestId=++couponRequestId;
+  const context=couponContext(code);
+  couponState={...couponState,code,applied:null,status:'checking',error:'',errorField:'',notice:'',open:true};
+  renderCheckout();
+  announceCoupon('Conferindo cupom de desconto.');
+  try{
+    const response=await fetch('/api/validate-coupon',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({items:cart.map(({id,qty,frag})=>({id,qty,frag})),payMethod,couponCode:code,payer:{cpf:String(checkoutForm.cpf||'').replace(/\D/g,'')}})});
+    const data=await response.json();
+    if(requestId!==couponRequestId||context!==couponContext(code))return;
+    if(!response.ok){couponFailure(data.error||'Não foi possível aplicar o cupom. Confira o código e tente novamente.',/CPF/.test(data.code||'')?'cpf':'coupon');return}
+    const cents=['subtotalCents','couponDiscountCents','paymentDiscountCents','productTotalCents'];
+    if(!data.coupon||data.coupon.code!==code||!Number.isInteger(data.coupon.percent)||data.coupon.percent<1||data.coupon.percent>100
+      ||!cents.every(key=>Number.isSafeInteger(data[key])&&data[key]>=0)||data.subtotalCents!==Math.round(subtotal()*100)
+      ||data.couponDiscountCents<=0||data.productTotalCents!==data.subtotalCents-data.couponDiscountCents-data.paymentDiscountCents){
+      throw new Error('invalid coupon response');
+    }
+    couponState={...couponState,status:'applied',applied:{...data,context},error:'',errorField:'',notice:''};
+    renderCheckout();
+    announceCoupon(`${code} aplicado. Desconto de ${money(data.couponDiscountCents/100)} nos produtos.`);
+    $('couponCode')?.focus();
+  }catch{
+    if(requestId!==couponRequestId)return;
+    couponFailure('Não foi possível conferir o cupom. Verifique sua conexão e tente novamente.');
+  }
+}
+function removeCoupon(){
+  if(checkoutSubmitting)return;
+  couponRequestId++;
+  couponState={code:'',applied:null,status:'idle',error:'',errorField:'',notice:'Cupom removido.',open:true};
+  renderCheckout();announceCoupon('Cupom removido. O total foi atualizado.');$('couponCode')?.focus();
+}
+function updateCheckoutCPF(input){
+  const previous=String(checkoutForm.cpf||'').replace(/\D/g,'');
+  checkoutForm.cpf=input.value;
+  if(previous!==input.value.replace(/\D/g,'')&&couponState.code.trim().toUpperCase()==='PRIMEIRACOMPRA'&&(couponState.applied||couponState.status==='checking')){
+    const cursor=input.selectionStart;
+    invalidateCoupon('O CPF mudou. Aplique o cupom novamente para conferir a primeira compra.');
+    renderCheckout();
+    const replacement=$('fCPF');replacement?.focus();
+    if(typeof replacement?.setSelectionRange==='function'&&Number.isInteger(cursor))replacement.setSelectionRange(cursor,cursor);
+  }
+}
 function checkoutCepStatus(){
   if(shippingState.status==='loading')return 'Calculando entrega…';
   if(shippingState.status==='ready'){
@@ -236,8 +328,11 @@ function renderCheckout(){
   const previewOnly=shipMethod==='delivery'&&Boolean(selectedQuote?.preview);
   const checkoutReady=(shipMethod!=='delivery'||Boolean(selectedQuote&&!previewOnly));
   const ship=shipMethod==='delivery'&&selectedQuote?selectedQuote.price:0;
-  const disc=payMethod==='pix'?Math.round(Math.round(st*100)*5/100)/100:0;
-  const total=roundCurrency(st+ship-disc);
+  if(couponState.applied&&couponState.applied.context!==couponContext(couponState.applied.coupon.code))invalidateCoupon('Os dados do pedido mudaram. Aplique o cupom novamente.');
+  const appliedCoupon=couponState.applied;
+  const couponDiscount=appliedCoupon?appliedCoupon.couponDiscountCents/100:0;
+  const disc=appliedCoupon?appliedCoupon.paymentDiscountCents/100:payMethod==='pix'?Math.round(Math.round(st*100)*5/100)/100:0;
+  const total=roundCurrency(st+ship-couponDiscount-disc);
   $('drawerBody').innerHTML=`
     <button class="back-link" onclick="drawerView='cart';renderDrawer()">← Voltar ao carrinho</button>
     <p class="chk-step">1 · Entrega</p>
@@ -253,13 +348,15 @@ function renderCheckout(){
     ${shippingOptionsHTML(st)}
     ${packagingEstimateHTML()}
     ${paymentOptionsHTML()}
-    ${checkoutV2&&payMethod==='pix'?`<div class="field"><label for="fCPF">CPF do pagador</label><input id="fCPF" inputmode="numeric" autocomplete="off" maxlength="14" value="${escapeAttr(checkoutForm.cpf)}" oninput="checkoutForm.cpf=this.value" aria-describedby="cpfHelp"><small id="cpfHelp">Necessário para gerar o Pix no Mercado Pago.</small></div>`:''}`;
+    ${couponsEnabled||checkoutV2&&payMethod==='pix'?`<div class="field"><label for="fCPF">CPF do pagador</label><input id="fCPF" name="payer-cpf" inputmode="numeric" autocomplete="off" maxlength="14" value="${escapeAttr(checkoutForm.cpf)}" oninput="updateCheckoutCPF(this)" ${checkoutSubmitting?'disabled':''} ${couponState.errorField==='cpf'?'aria-invalid="true"':''} aria-describedby="cpfHelp${couponState.errorField==='cpf'?' couponError':''}"><small id="cpfHelp">${couponsEnabled?'Usado para identificar o pedido e conferir o cupom de primeira compra.':'Necessário para gerar o Pix no Mercado Pago.'}</small></div>`:''}
+    ${couponHTML()}`;
   $('drawerFoot').innerHTML=`
     <div class="sum-row"><span>Subtotal</span><span>${money(st)}</span></div>
     <div class="sum-row"><span>Frete</span><span>${shipMethod==='delivery'&&!selectedQuote?'A calcular':ship?money(ship):'<span class="free">Grátis</span>'}</span></div>
+    ${appliedCoupon?`<div class="sum-row coupon-summary"><span>Cupom ${escapeAttr(appliedCoupon.coupon.code)} (${appliedCoupon.coupon.percent}%)</span><span>− ${money(couponDiscount)}</span></div>`:''}
     ${disc?`<div class="sum-row"><span>Desconto Pix (5%)</span><span style="color:var(--gold-deep)">− ${money(disc)}</span></div>`:''}
     <div class="sum-row total"><span>${previewOnly?'Total estimado':checkoutReady?'Total':'Total parcial'}</span><span>${money(total)}</span></div>
-    <button class="btn btn-solid w-full" style="margin-top:14px" onclick="confirmOrder()" ${checkoutReady&&!checkoutSubmitting?'':'disabled'}>${checkoutSubmitting?'Gerando pagamento…':checkoutReady?`${payMethod==='pix'?'Pagar com Pix':payMethod==='boleto'?'Gerar boleto':'Confirmar pedido'} · ${money(total)}`:previewOnly?'Simulação · pagamento indisponível':'Calcule o frete para continuar'}</button>
+    <button class="btn btn-solid w-full" style="margin-top:14px" onclick="confirmOrder()" ${checkoutReady&&!checkoutSubmitting&&couponState.status!=='checking'?'':'disabled'}>${checkoutSubmitting?'Gerando pagamento…':couponState.status==='checking'?'Conferindo cupom…':checkoutReady?`${payMethod==='pix'?'Pagar com Pix':payMethod==='boleto'?'Gerar boleto':'Confirmar pedido'} · ${money(total)}`:previewOnly?'Simulação · pagamento indisponível':'Calcule o frete para continuar'}</button>
     <p style="text-align:center;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);margin-top:12px">${checkoutV2&&payMethod==='pix'?'O QR Code e o código Pix aparecerão aqui.':payMethod==='infinitepay'?'Você será redirecionado ao ambiente seguro da InfinitePay':'Você será redirecionado ao ambiente seguro do Mercado Pago'}</p>`;
 }
 function paymentOptionsHTML(){
@@ -279,6 +376,7 @@ function paymentOptionsHTML(){
 }
 function selectPayment(method){
   if(checkoutSubmitting||!['pix','card','boleto','infinitepay'].includes(method)||(method==='infinitepay'&&!infinitePayAvailable))return;
+  if(payMethod!==method)invalidateCoupon('A forma de pagamento mudou. Aplique o cupom novamente para atualizar o total.');
   payMethod=method;
   renderCheckout();
   $(`payment-${method}`)?.focus();
@@ -383,14 +481,20 @@ async function buscarCEP(cep){
 }
 
 async function confirmOrder(){
-  if(checkoutSubmitting)return;
+  if(checkoutSubmitting||couponState.status==='checking')return;
+  if(couponsEnabled&&couponState.code.trim()&&!couponState.applied){couponFailure('Aplique o cupom ou remova o código para continuar.');return}
   if(!['pix','card','boleto','infinitepay'].includes(payMethod)||(payMethod==='infinitepay'&&!infinitePayAvailable)){toast('Escolha uma das formas de pagamento disponíveis.');return}
   const selectedQuote=shippingState.quotes.find(q=>q.id===selectedShippingService);
   if(shipMethod==='delivery'&&selectedQuote?.preview){toast('Esta opção é uma simulação. O pagamento ficará disponível após a conferência do frete.');return}
   const name=$('fN').value.trim(),email=$('fE').value.trim(),cep=$('fC').value.trim(),num=$('fNum').value.trim(),addr=$('fA').value.trim();
-  const cpf=checkoutV2&&payMethod==='pix'?$('fCPF').value.replace(/\D/g,''):'';
+  const cpf=couponsEnabled||checkoutV2&&payMethod==='pix'?$('fCPF').value.replace(/\D/g,''):'';
   checkoutForm={name,email,cep,num,addr,cpf};
-  if(checkoutV2&&payMethod==='pix'&&!/^\d{11}$/.test(cpf)){toast('Informe o CPF do pagador para gerar o Pix');return}
+  if(couponState.applied&&couponState.applied.context!==couponContext(couponState.applied.coupon.code)){couponFailure('O CPF ou os itens mudaram. Aplique o cupom novamente.');return}
+  if((couponsEnabled||checkoutV2&&payMethod==='pix')&&!/^\d{11}$/.test(cpf)){
+    if(couponsEnabled)couponFailure('Informe um CPF válido para continuar.','cpf');
+    else toast('Informe o CPF do pagador para gerar o Pix');
+    return;
+  }
   if(!name||!email||!$('fE').checkValidity()){toast('Preencha nome e e-mail válidos para continuar');return}
   if(shipMethod==='delivery'&&(!cep||!addr)){toast('Preencha o endereço de entrega');return}
   if(shipMethod==='delivery'&&!selectedQuote){toast('Selecione uma opção de entrega');return}
@@ -406,9 +510,10 @@ async function confirmOrder(){
       payMethod,
       shipping:{method:shipMethod,serviceId:selectedShippingService,...(selectedQuote?.quoteProof?{quoteProof:selectedQuote.quoteProof}:{})},
       payer:{name,email,cep,num,addr,...(cpf?{cpf}:{})},
+      ...(couponState.applied?{couponCode:couponState.applied.coupon.code}:{}),
       returnOrigin:window.location.origin
     };
-    if(checkoutV2){
+    if(checkoutV2||couponsEnabled||orderTrackingEnabled){
       const fingerprintPayload={...payload,shipping:{method:payload.shipping.method,serviceId:payload.shipping.serviceId}};
       const bytes=await window.crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(fingerprintPayload)));
       const fingerprint=Array.from(new Uint8Array(bytes),b=>b.toString(16).padStart(2,'0')).join('');
@@ -422,6 +527,11 @@ async function confirmOrder(){
       body:JSON.stringify(payload)
     });
     const data=await resp.json().catch(()=>({}));
+    if(!resp.ok&&(/^COUPONS?_/.test(data.code||'')||/CPF/.test(data.code||''))){
+      couponState={...couponState,applied:null,status:'error',error:data.error||'Confira o cupom antes de continuar.',errorField:/CPF/.test(data.code)?'cpf':'coupon',notice:'',open:true};
+      announceCoupon(couponState.error);
+      return;
+    }
     if(!resp.ok&&['SHIPPING_QUOTE_INVALID','SHIPPING_QUOTE_EXPIRED','SHIPPING_QUOTE_CHANGED'].includes(data.code)){
       await buscarCEP(cep.replace(/\D/g,''));
       checkoutForm.addr=addr;
@@ -445,7 +555,10 @@ async function confirmOrder(){
   }catch(err){
     toast('Erro de conexão. Tente novamente.');
   }finally{
-    if(!redirecting){checkoutSubmitting=false;renderCheckout()}
+    if(!redirecting){
+      checkoutSubmitting=false;renderCheckout();
+      if(couponState.status==='error')$(couponState.errorField==='cpf'?'fCPF':'couponCode')?.focus();
+    }
   }
 }
 window.addEventListener('pageshow',async event=>{

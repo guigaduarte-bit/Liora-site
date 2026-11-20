@@ -1,6 +1,8 @@
 'use strict';
 
 const orders = require('./_orders');
+const { cleanText, validateCart } = require('./_cart');
+const { normalizeCode, validateCoupon, priceProducts, cpfHash, allocateProductCents } = require('./_coupons');
 const { cpf, createPix } = require('./_pix');
 const { createInfinitePay } = require('./_infinitepay');
 const paymentPolicy = require('../content/payment-policy.json');
@@ -14,51 +16,10 @@ const PAYMENT_TYPES = ['credit_card', 'debit_card', 'ticket', 'bank_transfer'];
 const PAYMENT_METHODS = new Set(['pix', 'card', 'boleto', 'infinitepay']);
 const SHIPPING_METHODS = new Set(['delivery']);
 
-function cleanText(value, maxLength) {
-  return String(value || '').replace(/[\u0000-\u001f\u007f]/g, ' ').trim().slice(0, maxLength);
-}
-
 function parseBody(req) {
   if (req.body && typeof req.body === 'object' && !Buffer.isBuffer(req.body)) return req.body;
   if (typeof req.body === 'string' || Buffer.isBuffer(req.body)) return JSON.parse(req.body.toString());
   return {};
-}
-
-function validateCart(items) {
-  if (!Array.isArray(items) || items.length === 0) throw new Error('Carrinho vazio');
-  if (items.length > 50) throw new Error('Carrinho possui itens demais');
-
-  const quantitiesByProduct = new Map();
-  const validated = items.map((item) => {
-    const id = cleanText(item && item.id, 100);
-    const product = CATALOG[id];
-    const quantity = Number(item && item.qty);
-
-    if (!product || product.soldout || (!product.madeToOrder && product.stock < 1)) {
-      throw new Error('Um produto do carrinho não está disponível');
-    }
-    if (!Number.isInteger(quantity) || quantity < 1 || quantity > 100) {
-      throw new Error('Quantidade inválida no carrinho');
-    }
-
-    const accumulated = (quantitiesByProduct.get(id) || 0) + quantity;
-    if (!product.madeToOrder && accumulated > product.stock) {
-      throw new Error(`Estoque insuficiente para ${product.name}`);
-    }
-    quantitiesByProduct.set(id, accumulated);
-
-    return {
-      id,
-      name: product.name,
-      price: product.price,
-      quantity,
-      fragrance: cleanText(item.frag, 60)
-    };
-  });
-
-  const totalQuantity = validated.reduce((sum, item) => sum + item.quantity, 0);
-  if (totalQuantity > 200) throw new Error('Quantidade total inválida');
-  return validated;
 }
 
 function titleFor(item) {
@@ -66,7 +27,13 @@ function titleFor(item) {
   return `${item.name}${fragrance}`.slice(0, 250);
 }
 
-function buildPaymentItems(cart, payMethod, subtotal) {
+function buildPaymentItems(cart, payMethod, subtotal, pricing) {
+  if (pricing?.coupon) {
+    const amounts = allocateProductCents(cart, pricing.productTotalCents);
+    return cart.map((item, index) => ({ id: item.id,
+      title: `${item.quantity}× ${titleFor(item)}`.slice(0, 250),
+      quantity: 1, unit_price: amounts[index] / 100, currency_id: 'BRL' }));
+  }
   if (payMethod !== 'pix') {
     return cart.map((item) => ({
       id: item.id,
@@ -126,7 +93,10 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const { items, payMethod, shipping, payer, returnOrigin, checkoutKey } = parseBody(req);
+    const { items, payMethod, shipping, payer, returnOrigin, checkoutKey, couponCode: rawCouponCode, coupons } = parseBody(req);
+    if (coupons !== undefined) fail('COUPON_ONE_AT_A_TIME', 'Use apenas um cupom por pedido.', 400);
+    const couponCode = normalizeCode(rawCouponCode);
+    if (couponCode && !orders.couponsEnabled()) fail('COUPONS_UNAVAILABLE', 'Os cupons estão temporariamente indisponíveis. Remova o cupom para continuar.');
     const selectedPayment = cleanText(payMethod, 20);
     const selectedShipping = cleanText(shipping && shipping.method, 20);
 
@@ -139,7 +109,8 @@ module.exports = async function handler(req, res) {
 
     const provider = selectedPayment === 'infinitepay' ? 'infinitepay' : 'mercadopago';
     const config = configuration(provider);
-    const durable = orders.enabled();
+    const durable = orders.trackingEnabled();
+    const directPix = orders.enabled();
     if (durable) {
       orders.settings();
       if (provider === 'mercadopago' && (!process.env.MP_WEBHOOK_SECRET || process.env.MP_WEBHOOK_SECRET.length < 32)) fail('PAYMENT_WEBHOOK_NOT_CONFIGURED');
@@ -162,18 +133,35 @@ module.exports = async function handler(req, res) {
       return res.status(400).json({ error: 'Endereço de entrega incompleto' });
     }
 
-    const cart = validateCart(items);
-    if (durable && selectedPayment === 'pix' && !cpf(payer?.cpf)) fail('PIX_CPF_INVALID', 'Informe um CPF válido para gerar o Pix.', 400);
-    const subtotal = roundCurrency(cart.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0
-    ));
+    const cart = validateCart(items, CATALOG);
+    if (directPix && selectedPayment === 'pix' && !cpf(payer?.cpf)) fail('PIX_CPF_INVALID', 'Informe um CPF válido para gerar o Pix.', 400);
+    const customerCpfHash = orders.couponsEnabled() ? cpfHash(payer?.cpf, config.environment) : null;
+    const orderId = durable ? orders.identity(checkoutKey, config) : `LIORA-${Date.now().toString(36).toUpperCase()}-${randomUUID().slice(0, 8).toUpperCase()}`;
+    const existingCouponOrder = durable && couponCode ? await orders.getOrder(orderId, config.environment) : null;
+    // An identical retry must recover the original payment even after a
+    // campaign ends. The database timestamp is trusted; the subsequent atomic
+    // registration still rejects any changed cart, CPF, method or coupon.
+    const couponTime = existingCouponOrder && Number.isFinite(Date.parse(existingCouponOrder.created_at))
+      ? Date.parse(existingCouponOrder.created_at) : undefined;
+    const pricing = couponCode
+      // The atomic registration below is authoritative for first-purchase
+      // eligibility and exact retries; the quote endpoint only previews it.
+      ? await validateCoupon({ code: couponCode, cart, paymentMethod: selectedPayment, payerCpf: payer?.cpf, environment: config.environment, orderId, now: couponTime, checkEligibility: false })
+      : priceProducts(cart, selectedPayment);
+    const subtotal = pricing.subtotalCents / 100;
     let selectedQuote = null;
     let shippingCost = 0;
     if (selectedShipping === 'delivery') {
       const serviceId = cleanText(shipping && shipping.serviceId, 80);
       if (shipping.quoteProof !== undefined) {
-        selectedQuote = verifyQuote(shipping.quoteProof, { zipCode, cart, serviceId }, config);
+        try {
+          selectedQuote = verifyQuote(shipping.quoteProof, { zipCode, cart, serviceId }, config);
+        } catch (error) {
+          if (!existingCouponOrder || couponTime === undefined || error.code !== 'SHIPPING_QUOTE_EXPIRED') throw error;
+          // Recover only a quote that was valid when this order was created.
+          // Atomic registration below requires the original full fingerprint.
+          selectedQuote = verifyQuote(shipping.quoteProof, { zipCode, cart, serviceId }, config, couponTime);
+        }
       } else {
         // Compatibilidade com páginas abertas antes da atualização.
         const quoteResult = await quoteShipping({ zipCode, cart, subtotal });
@@ -190,11 +178,8 @@ module.exports = async function handler(req, res) {
       }
       shippingCost = subtotal >= SHIP_FREE ? 0 : selectedQuote.price;
     }
-    const productTotal = selectedPayment === 'pix'
-      ? pixSubtotal(subtotal)
-      : subtotal;
+    const productTotal = pricing.productTotalCents / 100;
     const total = roundCurrency(productTotal + shippingCost);
-    const orderId = durable ? orders.identity(checkoutKey, config) : `LIORA-${Date.now().toString(36).toUpperCase()}-${randomUUID().slice(0, 8).toUpperCase()}`;
     const checkoutProof = signProof({ orderId, provider, totalCents: Math.round(total * 100), method: selectedPayment, registered: durable }, config);
     const returnUrl = `${siteUrl}/?checkout=return&order_id=${encodeURIComponent(orderId)}`;
 
@@ -202,32 +187,36 @@ module.exports = async function handler(req, res) {
       const snapshot = { id: orderId, provider, environment: config.environment, mode: config.mode, method: selectedPayment,
         total_cents: Math.round(total * 100), subtotal_cents: Math.round(subtotal * 100), discount_cents: Math.round((subtotal - productTotal) * 100),
         shipping_cents: Math.round(shippingCost * 100), interest_free_installments: paymentPolicy.interestFreeInstallments,
+        ...(customerCpfHash ? { customer_cpf_hash: customerCpfHash, coupon_code: pricing.coupon?.code || null,
+          coupon_discount_cents: pricing.couponDiscountCents, payment_discount_cents: pricing.paymentDiscountCents } : {}),
         customer: { name, email, cep: zipCode, number: streetNumber || 'S/N', address }, items: cart,
         shipping: { id: selectedQuote.id, name: selectedQuote.name, carrier: selectedQuote.carrier, deliveryDays: selectedQuote.deliveryDays || 0 } };
-      const registered = await orders.register(snapshot, { snapshot, cpf: selectedPayment === 'pix' ? cpf(payer.cpf) : null });
+      const registered = await orders.register(snapshot, { snapshot, cpf: !customerCpfHash && directPix && selectedPayment === 'pix' ? cpf(payer.cpf) : null });
       if (registered.order.checkout_response) return res.status(200).json({ ...registered.order.checkout_response, checkout_proof: checkoutProof });
-      if (!registered.created && selectedPayment !== 'pix') fail('ORDER_ALREADY_STARTED', 'Este pedido já está sendo processado. Consulte o pagamento antes de tentar novamente.', 409);
+      if (!registered.created && !(directPix && selectedPayment === 'pix')) fail('ORDER_ALREADY_STARTED', 'Este pedido já está sendo processado. Consulte o pagamento antes de tentar novamente.', 409);
     }
     const finish = async (data) => {
       if (durable) await orders.saveCheckout(orderId, config.environment, data);
       return res.status(200).json({ ...data, checkout_proof: checkoutProof });
     };
-    if (durable && selectedPayment === 'pix') {
+    if (directPix && selectedPayment === 'pix') {
       const pix = await createPix({ orderId, total, payer: { name, email, cpf: payer.cpf }, config, notificationUrl: `${siteUrl}/api/payment-webhook?provider=mercadopago` });
       return await finish({ ...pix, order_id: orderId, provider, payment_mode: config.mode, total });
     }
 
     if (provider === 'infinitepay') {
       const checkout = await createInfinitePay({ config, orderId, siteUrl, cart, shippingCost, selectedQuote,
-        customer: { name, email }, address: { cep: zipCode, number: streetNumber || 'S/N', complement: address }, durable });
+        customer: { name, email }, address: { cep: zipCode, number: streetNumber || 'S/N', complement: address }, durable,
+        discountedProductCents: pricing.coupon ? pricing.productTotalCents : undefined });
       return await finish({ ...checkout, order_id: orderId, provider, payment_mode: config.mode, total });
     }
 
     const preference = {
-      items: buildPaymentItems(cart, selectedPayment, subtotal),
+      items: buildPaymentItems(cart, selectedPayment, subtotal, pricing),
       payer: {
         name,
         email,
+        ...(customerCpfHash ? { identification: { type: 'CPF', number: cpf(payer.cpf) } } : {}),
         ...(selectedShipping === 'delivery' ? {
           address: {
             zip_code: zipCode,
@@ -255,7 +244,9 @@ module.exports = async function handler(req, res) {
         shipping_carrier: selectedQuote.carrier,
         shipping_delivery_days: selectedQuote.deliveryDays || 0,
         subtotal,
-        total
+        total,
+        ...(pricing.coupon ? { coupon_code: pricing.coupon.code, coupon_discount: pricing.couponDiscountCents / 100,
+          payment_discount: pricing.paymentDiscountCents / 100 } : {})
       }
     };
 

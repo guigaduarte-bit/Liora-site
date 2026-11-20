@@ -270,6 +270,27 @@ footer li a:hover{color:#E4C98F}
 .field label{display:block;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:7px}
 .field input{width:100%;border:1px solid var(--line);background:transparent;padding:13px 14px;font-family:var(--ui);font-size:13.5px;color:var(--ink)}
 .field input:focus{outline:none;border-color:var(--gold)}
+.checkout-coupon{margin-top:20px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.checkout-coupon summary{min-height:48px;gap:12px;font-size:12px;letter-spacing:.1em}
+.checkout-coupon .coupon-content{padding:0 0 16px}
+.checkout-coupon .coupon-field{margin-bottom:8px}
+.coupon-entry{display:flex;align-items:stretch;gap:8px;min-width:0}
+.coupon-entry input{flex:1;min-width:0;font-size:16px;letter-spacing:.035em}
+.coupon-entry input[readonly]{background:var(--ivory);font-weight:400}
+.coupon-entry .coupon-action{flex:none;min-height:44px;padding:10px 14px;font-size:10px;letter-spacing:.12em}
+.coupon-entry button[disabled]{cursor:wait;opacity:.7}
+.checkout-coupon .coupon-help,.checkout-coupon .coupon-feedback,.checkout-coupon .coupon-error{padding:0;font-size:12px;line-height:1.55;letter-spacing:0}
+.checkout-coupon .coupon-feedback,.checkout-coupon .coupon-error{margin-top:10px}
+.checkout-coupon .coupon-feedback{font-weight:400;color:var(--ink)}
+.checkout-coupon .coupon-error{color:#8C302C;font-weight:400}
+.checkout-coupon .coupon-clear{min-height:44px;text-decoration:underline;text-underline-offset:3px;font-size:12px;color:var(--ink);padding:8px 0}
+.checkout-coupon .coupon-feedback+.coupon-help{margin-top:6px}
+.coupon-summary{gap:12px;color:var(--ink)}
+.coupon-summary>span:last-child{white-space:nowrap}
+.checkout-coupon :focus-visible,.field #fCPF:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.coupon-live{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+@media(prefers-reduced-motion:reduce){.checkout-coupon summary::after{transition:none}}
+@media(forced-colors:active){.checkout-coupon :focus-visible,.field #fCPF:focus-visible{outline-color:Highlight}}
 .f-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .pay-opt{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);padding:15px 16px;margin-bottom:10px;cursor:pointer;transition:border-color .25s;font-size:13px;gap:10px}
 .pay-opt:hover{border-color:var(--gold)}

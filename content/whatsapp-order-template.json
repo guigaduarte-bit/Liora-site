@@ -1,0 +1,8 @@
+{
+  "name": "liora_pedido_confirmado",
+  "language": "pt_BR",
+  "category": "UTILITY",
+  "body": "Novo pedido confirmado na Liora.\nReferência: {{1}}\nTotal: {{2}}\nItens: {{3}}\nPagamento confirmado.",
+  "parameters": ["Referência do pedido", "Total pago em reais", "Produtos e quantidades"],
+  "approvalRequired": true
+}

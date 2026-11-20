@@ -1,0 +1,19 @@
+{
+  "timezone": "America/Sao_Paulo",
+  "maxCouponsPerOrder": 1,
+  "pixExtraPercent": 5,
+  "coupons": [
+    {
+      "code": "BF20",
+      "percent": 20,
+      "startsAt": "2026-11-27T00:00:00-03:00",
+      "endsAt": "2026-11-30T00:00:00-03:00",
+      "firstPurchaseOnly": false
+    },
+    {
+      "code": "PRIMEIRACOMPRA",
+      "percent": 10,
+      "firstPurchaseOnly": true
+    }
+  ]
+}
