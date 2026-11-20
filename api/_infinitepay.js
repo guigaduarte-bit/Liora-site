@@ -1,9 +1,12 @@
 'use strict';
 const { providerRequest, httpsUrl, fail } = require('./_payment');
+const { allocateProductCents } = require('./_coupons');
 
-async function createInfinitePay({ config, orderId, siteUrl, cart, shippingCost, selectedQuote, customer, address, durable }) {
-  const items = cart.map(item => ({ quantity: item.quantity, price: Math.round(item.price * 100),
-    description: `${item.name}${item.fragrance ? ` — ${item.fragrance}` : ''}`.slice(0, 120) }));
+async function createInfinitePay({ config, orderId, siteUrl, cart, shippingCost, selectedQuote, customer, address, durable, discountedProductCents }) {
+  const amounts = discountedProductCents === undefined ? null : allocateProductCents(cart, discountedProductCents);
+  const items = cart.map((item, index) => ({ quantity: amounts ? 1 : item.quantity,
+    price: amounts ? amounts[index] : Math.round(item.price * 100),
+    description: `${amounts ? `${item.quantity}× ` : ''}${item.name}${item.fragrance ? ` — ${item.fragrance}` : ''}`.slice(0, 120) }));
   if (shippingCost > 0) items.push({ quantity: 1, price: Math.round(shippingCost * 100), description: `Frete — ${selectedQuote.name}`.slice(0, 120) });
   const payload = { handle: config.credential, order_nsu: orderId,
     redirect_url: `${siteUrl}/?checkout=infinitepay-return&order_id=${encodeURIComponent(orderId)}`,
