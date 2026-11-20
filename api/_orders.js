@@ -6,7 +6,7 @@ const { fail } = require('./_payment');
 function enabled() { return process.env.LIORA_CHECKOUT_V2 === 'true'; }
 function couponsEnabled() { return process.env.LIORA_COUPONS_ENABLED === 'true'; }
 // Coupon history must not silently switch the existing Checkout Pro Pix flow.
-function trackingEnabled() { return enabled() || couponsEnabled(); }
+function trackingEnabled() { return enabled() || couponsEnabled() || process.env.LIORA_ORDER_TRACKING_ENABLED === 'true'; }
 function settings() {
   const url = process.env.ORDERS_SUPABASE_URL;
   const key = process.env.ORDERS_SUPABASE_SECRET_KEY;
@@ -88,7 +88,18 @@ async function saveCheckout(id, environment, data) {
   if (!Array.isArray(rows) || rows.length !== 1) fail('ORDER_STORAGE_UNAVAILABLE');
 }
 async function recordPayment(order, payment) {
-  return request('rpc/liora_record_payment', { method: 'POST', body: { p_order_id: order.id, p_environment: order.environment, p_payment: payment } });
+  const recorded = await request('rpc/liora_record_payment', { method: 'POST', body: { p_order_id: order.id, p_environment: order.environment, p_payment: payment } });
+  if (recorded?.recorded === true && recorded.status === 'approved' && order.environment === 'production'
+    && order.mode === 'live' && process.env.WHATSAPP_ENABLED === 'true') {
+    try {
+      // The database already committed the payment and queued one event. An
+      // unavailable messaging provider must never undo a confirmed payment.
+      await require('./_order-alerts').dispatchOrderAlert({ orderId: order.id });
+    } catch {
+      console.warn('ORDER_ALERT_DISPATCH_DEFERRED');
+    }
+  }
+  return recorded;
 }
 function proofFor(order) {
   return { orderId: order.id, provider: order.provider, totalCents: order.total_cents, method: order.method, mode: order.mode, environment: order.environment, currency: 'BRL' };
@@ -105,4 +116,4 @@ async function reconcile(proof, payment) {
   return recordPayment(order, payment);
 }
 
-module.exports = { enabled, couponsEnabled, trackingEnabled, settings, identity, getOrder, register, saveCheckout, recordPayment, proofFor, reconcile, couponEligibility, couponFailure };
+module.exports = { enabled, couponsEnabled, trackingEnabled, settings, identity, getOrder, register, saveCheckout, recordPayment, proofFor, reconcile, couponEligibility, couponFailure, storageRequest: request };

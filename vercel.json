@@ -3,6 +3,12 @@
   "framework": null,
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
+  "functions": {
+    "api/payment-webhook.js": { "maxDuration": 60 },
+    "api/payment-status.js": { "maxDuration": 60 },
+    "api/infinitepay-status.js": { "maxDuration": 60 },
+    "api/order-alerts.js": { "maxDuration": 60 }
+  },
   "redirects": [
     { "source": "/trocas-e-devolucoes", "destination": "/trocas-e-devolucoes.html", "permanent": true },
     { "source": "/termos-de-uso", "destination": "/termos-de-uso.html", "permanent": true },

@@ -7,7 +7,7 @@ const vm = require('node:vm');
 const { test } = require('node:test');
 const products = require('../content/products.json');
 
-function storefront({ saved = {}, blockedStorage = false, search = '', fetch, environment = 'production', checkoutV2 = false, couponsEnabled = false } = {}) {
+function storefront({ saved = {}, blockedStorage = false, search = '', fetch, environment = 'production', checkoutV2 = false, couponsEnabled = false, orderTrackingEnabled = false } = {}) {
   const storage = new Map(Object.entries(saved));
   const nodes = new Map();
   const windowEvents = new Map();
@@ -26,6 +26,7 @@ function storefront({ saved = {}, blockedStorage = false, search = '', fetch, en
     LIORA_PAYMENT_ENVIRONMENT: environment,
     LIORA_CHECKOUT_V2: checkoutV2,
     LIORA_COUPONS_ENABLED: couponsEnabled,
+    LIORA_ORDER_TRACKING_ENABLED: orderTrackingEnabled,
     LIORA_PAYMENT_POLICY: { maxInstallments: 3, interestFreeInstallments: 0 },
     crypto: require('node:crypto').webcrypto,
     location: { search, pathname: '/', href: 'https://liora.example/', origin: 'https://liora.example' },
@@ -717,5 +718,33 @@ test('erro de CPF fica associado ao campo e resposta inconsistente não aplica d
     assert.equal(app.run('couponState.applied'),null);
     if(data.code){assert.equal(app.run('couponState.errorField'),'cpf');assert.match(app.nodes.get('drawerBody').innerHTML,/id="fCPF"[^>]*aria-invalid="true"[^>]*aria-describedby="cpfHelp couponError"/)}
     else assert.match(app.nodes.get('drawerBody').innerHTML,/Não foi possível conferir o cupom/);
+  }
+});
+
+test('registro independente usa chave estável sem liberar CPF, cupom ou Pix direto; legado segue sem chave',async()=>{
+  for(const orderTrackingEnabled of [false,true]){
+    const payloads=[];
+    const app=storefront({orderTrackingEnabled,checkoutV2:false,couponsEnabled:false,fetch:async(url,options)=>{
+      assert.equal(url,'/api/create-preference');payloads.push(JSON.parse(options.body));throw Error('synthetic network failure');
+    }});await app.done;
+    app.run("addToCart('botanique',1);drawerView='checkout';shippingState={status:'ready',quotes:[{id:'curitiba-fixed',price:19.9}]};selectedShippingService='curitiba-fixed';renderCheckout();");
+    assert.doesNotMatch(app.nodes.get('drawerBody').innerHTML,/id="fCPF"|id="checkoutCoupon"|id="couponCode"/);
+    assert.doesNotMatch(app.nodes.get('drawerFoot').innerHTML,/O QR Code e o código Pix aparecerão aqui/);
+    assert.match(app.nodes.get('drawerFoot').innerHTML,/ambiente seguro do Mercado Pago/);
+    app.run("$('fN').value='Pessoa Fictícia';$('fE').value='fixture@example.com';$('fC').value='80000000';$('fNum').value='1';$('fA').value='Rua Fictícia';");
+    await app.run('confirmOrder()');await app.run('confirmOrder()');
+    app.run("$('fN').value='Outra Pessoa Fictícia'");await app.run('confirmOrder()');
+    assert.equal(payloads.length,3);
+    assert.equal(payloads[0].payMethod,'pix');assert.equal(payloads[0].payer.cpf,undefined);assert.equal(payloads[0].couponCode,undefined);
+    if(orderTrackingEnabled){
+      assert.match(payloads[0].checkoutKey,/^[a-f0-9-]{36}$/);
+      assert.equal(payloads[0].checkoutKey,payloads[1].checkoutKey);
+      assert.notEqual(payloads[1].checkoutKey,payloads[2].checkoutKey);
+      assert.equal(JSON.parse(app.storage.get('liora_checkout_attempt')).key,payloads[2].checkoutKey);
+    }else{
+      assert.ok(payloads.every(payload=>payload.checkoutKey===undefined));
+      assert.equal(app.storage.get('liora_checkout_attempt'),undefined);
+    }
+    assert.doesNotMatch(JSON.stringify([...app.storage]),/fixture@example.com|Pessoa Fictícia|Rua Fictícia|80000000/);
   }
 });

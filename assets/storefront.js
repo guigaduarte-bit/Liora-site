@@ -61,6 +61,7 @@ let paymentReturn=null, paymentView={status:'idle',test:false}, paymentCheckRunn
 let checkoutSubmitting=false, paymentPollTimer=null, paymentPolls=0;
 const checkoutV2=window.LIORA_CHECKOUT_V2===true;
 const couponsEnabled=window.LIORA_COUPONS_ENABLED===true;
+const orderTrackingEnabled=window.LIORA_ORDER_TRACKING_ENABLED===true;
 let couponState={code:'',applied:null,status:'idle',error:'',errorField:'',notice:'',open:false};
 let couponRequestId=0;
 const infinitePayAvailable=window.LIORA_PAYMENT_ENVIRONMENT==='production';
@@ -512,7 +513,7 @@ async function confirmOrder(){
       ...(couponState.applied?{couponCode:couponState.applied.coupon.code}:{}),
       returnOrigin:window.location.origin
     };
-    if(checkoutV2||couponsEnabled){
+    if(checkoutV2||couponsEnabled||orderTrackingEnabled){
       const fingerprintPayload={...payload,shipping:{method:payload.shipping.method,serviceId:payload.shipping.serviceId}};
       const bytes=await window.crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(fingerprintPayload)));
       const fingerprint=Array.from(new Uint8Array(bytes),b=>b.toString(16).padStart(2,'0')).join('');
