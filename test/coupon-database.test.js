@@ -121,8 +121,8 @@ test('histórico importado bloqueia compradores antigos e ambientes permanecem s
   assert.equal((await register(snapshot('LIORA-PREVIEW-1234567890', { environment: 'preview' }))).created, true);
 });
 
-test('BF20% não exige primeira compra, mas mantém totais e registro por CPF', async () => {
-  const order = snapshot('LIORA-BF-1234567890', { coupon_code: 'BF20%', coupon_discount_cents: 2000, discount_cents: 2000, total_cents: 9990 });
+test('BF20 não exige primeira compra, mas mantém totais e registro por CPF', async () => {
+  const order = snapshot('LIORA-BF-1234567890', { coupon_code: 'BF20', coupon_discount_cents: 2000, discount_cents: 2000, total_cents: 9990 });
   const result = await register(order);
   assert.equal(result.created, true);
   assert.equal(result.order.subtotal_cents, 10000);

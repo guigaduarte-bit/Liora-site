@@ -21,10 +21,10 @@ function resolveCoupon(value, now = Date.now()) {
   const coupon = policy.coupons.find(item => item.code === code);
   if (!coupon) fail('COUPON_INVALID', 'Cupom não encontrado. Confira o código e tente novamente.', 400);
   if (coupon.startsAt && now < Date.parse(coupon.startsAt)) {
-    fail('COUPON_NOT_STARTED', 'O cupom BF20% vale de 27 a 29/11/2026, pelo horário de Brasília.', 400);
+    fail('COUPON_NOT_STARTED', 'O cupom BF20 vale de 27 a 29/11/2026, pelo horário de Brasília.', 400);
   }
   if (coupon.endsAt && now >= Date.parse(coupon.endsAt)) {
-    fail('COUPON_EXPIRED', 'O prazo do cupom BF20% terminou em 29/11/2026, pelo horário de Brasília.', 400);
+    fail('COUPON_EXPIRED', 'O prazo do cupom BF20 terminou em 29/11/2026, pelo horário de Brasília.', 400);
   }
   return coupon;
 }

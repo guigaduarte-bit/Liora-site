@@ -42,7 +42,7 @@ async function invoke(handler, body) {
   return res;
 }
 function request(overrides = {}) {
-  return { checkoutKey: randomUUID(), returnOrigin: 'https://liora.example', couponCode: 'BF20%',
+  return { checkoutKey: randomUUID(), returnOrigin: 'https://liora.example', couponCode: 'BF20',
     items: [{ id: 'botanique', qty: 1, frag: 'Lavanda', price: 0.01 }], payMethod: 'card',
     shipping: { method: 'delivery', serviceId: 'curitiba-fixed', price: 0 },
     payer: { name: 'Pessoa Teste', email: 'teste@example.com', cep: '80010000', addr: 'Endereço de teste', num: '1', cpf: '191.191.191-00' },
@@ -61,26 +61,26 @@ function mockOrders(t) {
   t.mock.method(orders, 'saveCheckout', async (id, environment, response) => { saved.get(id).checkout_response = response; });
 }
 
-test('BF20% respects inclusive Brazilian start and exclusive midnight after November 29', () => {
-  assert.throws(() => resolveCoupon('BF20%', Date.parse('2026-11-27T02:59:59.999Z')), { code: 'COUPON_NOT_STARTED' });
-  assert.equal(resolveCoupon(' bf20% ', Date.parse('2026-11-27T03:00:00Z')).percent, 20);
-  assert.equal(resolveCoupon('BF20%', Date.parse('2026-11-30T02:59:59.999Z')).percent, 20);
-  assert.throws(() => resolveCoupon('BF20%', Date.parse('2026-11-30T03:00:00Z')), { code: 'COUPON_EXPIRED' });
+test('BF20 respects inclusive Brazilian start and exclusive midnight after November 29', () => {
+  assert.throws(() => resolveCoupon('BF20', Date.parse('2026-11-27T02:59:59.999Z')), { code: 'COUPON_NOT_STARTED' });
+  assert.equal(resolveCoupon(' bf20 ', Date.parse('2026-11-27T03:00:00Z')).percent, 20);
+  assert.equal(resolveCoupon('BF20', Date.parse('2026-11-30T02:59:59.999Z')).percent, 20);
+  assert.throws(() => resolveCoupon('BF20', Date.parse('2026-11-30T03:00:00Z')), { code: 'COUPON_EXPIRED' });
 });
 test('one literal coupon at a time; no aliases, arrays, objects or composite codes', () => {
-  for (const code of [['BF20%', 'PRIMEIRACOMPRA'], {}, 'BF20% PRIMEIRACOMPRA', 'BF20%+PRIMEIRACOMPRA', 'BF20%,PRIMEIRACOMPRA']) {
+  for (const code of [['BF20', 'PRIMEIRACOMPRA'], {}, 'BF20 PRIMEIRACOMPRA', 'BF20+PRIMEIRACOMPRA', 'BF20,PRIMEIRACOMPRA']) {
     assert.throws(() => normalizeCode(code), { code: 'COUPON_ONE_AT_A_TIME' });
   }
-  assert.throws(() => resolveCoupon('BF20'), { code: 'COUPON_INVALID' });
+  assert.throws(() => resolveCoupon('BF20%'), { code: 'COUPON_INVALID' });
   assert.equal(normalizeCode(undefined), null);
   assert.equal(resolveCoupon('primeiracompra').percent, 10);
 });
 test('catalogue value stays 129.90; coupon then existing Pix extra preserve exact cents', () => {
   const cart = [{ price: 129.9, quantity: 1 }];
-  const bf = resolveCoupon('BF20%', Date.parse('2026-11-28T12:00:00-03:00'));
+  const bf = resolveCoupon('BF20', Date.parse('2026-11-28T12:00:00-03:00'));
   const first = resolveCoupon('PRIMEIRACOMPRA');
   assert.deepEqual(priceProducts(cart, 'card', bf), { subtotalCents: 12990, couponDiscountCents: 2598, paymentDiscountCents: 0, productTotalCents: 10392,
-    coupon: { code: 'BF20%', percent: 20, discountCents: 2598 } });
+    coupon: { code: 'BF20', percent: 20, discountCents: 2598 } });
   assert.equal(priceProducts(cart, 'pix', bf).productTotalCents, 9872);
   assert.equal(priceProducts(cart, 'card', first).productTotalCents, 11691);
   assert.equal(priceProducts(cart, 'pix', first).productTotalCents, 11106);
@@ -135,7 +135,7 @@ test('payment creation revalidates date, prevents spoofing, preserves fixed frei
     const order = snapshots.at(-1);
     assert.equal(order.items[0].price, 75);
     assert.equal(order.shipping_cents, 1990);
-    assert.equal(order.coupon_code, 'BF20%');
+    assert.equal(order.coupon_code, 'BF20');
     assert.doesNotMatch(JSON.stringify(order), /19119119100/);
   }
   t.mock.method(Date, 'now', () => Date.parse('2026-11-30T03:00:00Z'));
@@ -189,7 +189,7 @@ test('missing/invalid CPF and multiple coupons fail before provider; no-coupon o
     const req = request(); req.payer.cpf = cpf;
     assert.equal((await invoke(createCheckout, req)).body.code, 'CHECKOUT_CPF_INVALID');
   }
-  assert.equal((await invoke(createCheckout, request({ coupons: ['BF20%', 'PRIMEIRACOMPRA'] }))).body.code, 'COUPON_ONE_AT_A_TIME');
+  assert.equal((await invoke(createCheckout, request({ coupons: ['BF20', 'PRIMEIRACOMPRA'] }))).body.code, 'COUPON_ONE_AT_A_TIME');
   assert.equal(calls.length, 0);
   const res = await invoke(createCheckout, request({ couponCode: undefined }));
   assert.equal(res.statusCode, 200);

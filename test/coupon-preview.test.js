@@ -20,7 +20,7 @@ function request(window,url,body){return window.fetch(url,{body:JSON.stringify(b
 
 test('prévia usa catálogo real e mantém BF, primeira compra e Pix com totais de demonstração coerentes',async()=>{
  const window=preview('bf_active');
- const result=await(await request(window,'/api/validate-coupon',{items,payMethod:'pix',couponCode:'BF20%'})).json();
+ const result=await(await request(window,'/api/validate-coupon',{items,payMethod:'pix',couponCode:'BF20'})).json();
  assert.equal(result.subtotalCents,10000);assert.equal(result.couponDiscountCents,2000);assert.equal(result.paymentDiscountCents,400);assert.equal(result.productTotalCents,7600);
  const first=await(await request(window,'/api/validate-coupon',{items,payMethod:'card',couponCode:'PRIMEIRACOMPRA',payer:{cpf:'19119119100'}})).json();
  assert.equal(first.productTotalCents,9000);
@@ -30,7 +30,7 @@ test('prévia usa catálogo real e mantém BF, primeira compra e Pix com totais 
 });
 
 test('prévia cobre período anterior, expirado e CPF com pedido sem API externa',async()=>{
- for(const [scenario,couponCode,code] of [['bf_early','BF20%','COUPON_NOT_STARTED'],['bf_expired','BF20%','COUPON_EXPIRED'],['first_used','PRIMEIRACOMPRA','COUPON_NOT_ELIGIBLE']]){
+ for(const [scenario,couponCode,code] of [['bf_early','BF20','COUPON_NOT_STARTED'],['bf_expired','BF20','COUPON_EXPIRED'],['first_used','PRIMEIRACOMPRA','COUPON_NOT_ELIGIBLE']]){
   const window=preview(scenario),res=await request(window,'/api/validate-coupon',{items,payMethod:'pix',couponCode,payer:{cpf:'19119119100'}});
   assert.equal(res.ok,false);assert.equal((await res.json()).code,code);
  }

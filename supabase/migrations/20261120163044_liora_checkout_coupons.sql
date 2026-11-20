@@ -2,7 +2,7 @@
 -- Keep existing Checkout Pro behavior independent from LIORA_CHECKOUT_V2.
 alter table public.liora_orders
   add column customer_cpf_hash text check (customer_cpf_hash ~ '^[a-f0-9]{64}$'),
-  add column coupon_code text check (coupon_code in ('BF20%', 'PRIMEIRACOMPRA')),
+  add column coupon_code text check (coupon_code in ('BF20', 'PRIMEIRACOMPRA')),
   add column coupon_discount_cents integer not null default 0 check (coupon_discount_cents >= 0),
   add column payment_discount_cents integer not null default 0 check (payment_discount_cents >= 0),
   add column checkout_closed_at timestamptz,

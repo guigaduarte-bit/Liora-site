@@ -13,8 +13,8 @@
 <section class="preview-copy" aria-labelledby="previewTitle">
 <p class="eyebrow">Checkout · novembro de 2026</p><h1 id="previewTitle">Um cuidado a mais no seu pedido.</h1>
 <p class="intro">Confira os cupons na finalização da compra. Esta demonstração usa produtos do catálogo e dados fictícios; nenhuma cobrança ou consulta a clientes é realizada.</p>
-<div class="preview-control"><label for="scenario">Escolha o cenário</label><select id="scenario"><option value="bf_active">BF20% · válido de 27 a 29/11</option><option value="bf_early">BF20% · antes de 27/11</option><option value="bf_expired">BF20% · após 29/11</option><option value="first_eligible">PRIMEIRACOMPRA · CPF sem pedidos</option><option value="first_used">PRIMEIRACOMPRA · CPF com pedido</option></select><button id="restart" type="button">Reiniciar demonstração</button></div>
-<div class="policy"><div><strong>BF20% · 20% nos produtos</strong><p>De 27/11, às 00h, até 29/11/2026, às 23h59, no horário de Brasília.</p></div><div><strong>PRIMEIRACOMPRA · 10% nos produtos</strong><p>Para o primeiro pedido do CPF. Apenas um cupom por pedido.</p></div><div><strong>Catálogo e frete preservados</strong><p>O desconto aparece em uma linha própria. Os 5% extras do Pix são calculados após o cupom.</p></div></div>
+<div class="preview-control"><label for="scenario">Escolha o cenário</label><select id="scenario"><option value="bf_active">BF20 · válido de 27 a 29/11</option><option value="bf_early">BF20 · antes de 27/11</option><option value="bf_expired">BF20 · após 29/11</option><option value="first_eligible">PRIMEIRACOMPRA · CPF sem pedidos</option><option value="first_used">PRIMEIRACOMPRA · CPF com pedido</option></select><button id="restart" type="button">Reiniciar demonstração</button></div>
+<div class="policy"><div><strong>BF20 · 20% nos produtos</strong><p>De 27/11, às 00h, até 29/11/2026, às 23h59, no horário de Brasília.</p></div><div><strong>PRIMEIRACOMPRA · 10% nos produtos</strong><p>Para o primeiro pedido do CPF. Apenas um cupom por pedido.</p></div><div><strong>Catálogo e frete preservados</strong><p>O desconto aparece em uma linha própria. Os 5% extras do Pix são calculados após o cupom.</p></div></div>
 <div class="preview-products"><img src="/assets/images/botanique.webp" alt="Vela Botanique"><img src="/assets/images/natal-gingerbread.jpg" alt="Vela Gingerbread"></div><p class="fixture-note">Exemplo: Botanique (R$ 75) + Gingerbread (R$ 25), com frete de R$ 19,90 para Curitiba.</p>
 </section>
 <section aria-label="Checkout em demonstração"><iframe class="preview-frame" id="site" title="Checkout Liora: demonstração de cupons sem cobrança" sandbox="allow-scripts allow-same-origin"></iframe><output id="previewResult" aria-live="polite">Carregando demonstração…</output></section>
@@ -38,14 +38,14 @@ function fixture(scenario){
     if(path==='/api/validate-coupon'){
       window.__couponPreview.validations++;
       const code=String(body.couponCode||'').trim().toUpperCase();
-      if(!['BF20%','PRIMEIRACOMPRA'].includes(code))return invalid('COUPON_INVALID','Cupom não encontrado. Confira o código e tente novamente.');
-      if(code==='BF20%'&&scenario==='bf_early')return invalid('COUPON_NOT_STARTED','O cupom BF20% estará disponível de 27 a 29/11/2026, no horário de Brasília.');
-      if(code==='BF20%'&&scenario==='bf_expired')return invalid('COUPON_EXPIRED','O prazo do cupom BF20% terminou em 29/11/2026.');
+      if(!['BF20','PRIMEIRACOMPRA'].includes(code))return invalid('COUPON_INVALID','Cupom não encontrado. Confira o código e tente novamente.');
+      if(code==='BF20'&&scenario==='bf_early')return invalid('COUPON_NOT_STARTED','O cupom BF20 estará disponível de 27 a 29/11/2026, no horário de Brasília.');
+      if(code==='BF20'&&scenario==='bf_expired')return invalid('COUPON_EXPIRED','O prazo do cupom BF20 terminou em 29/11/2026.');
       if(code==='PRIMEIRACOMPRA'){
         if(String(body.payer?.cpf||'').replace(/\D/g,'')!=='19119119100')return invalid('CHECKOUT_CPF_INVALID','Nesta demonstração, use o CPF fictício 191.191.191-00.');
         if(scenario==='first_used')return invalid('COUPON_NOT_ELIGIBLE','Este cupom é válido somente no primeiro pedido do CPF.');
       }
-      const subtotalCents=sum(body.items),percent=code==='BF20%'?20:10;
+      const subtotalCents=sum(body.items),percent=code==='BF20'?20:10;
       const couponDiscountCents=Math.round(subtotalCents*percent/100),remaining=subtotalCents-couponDiscountCents;
       const paymentDiscountCents=body.payMethod==='pix'?Math.round(remaining*5/100):0;
       return response({coupon:{code,percent,discountCents:couponDiscountCents},subtotalCents,couponDiscountCents,paymentDiscountCents,productTotalCents:remaining-paymentDiscountCents});
@@ -70,7 +70,7 @@ function fixture(scenario){
     checkoutForm={name:'Cliente de demonstração',email:'demonstracao@example.com',cep:'80010-000',num:'100',addr:'Rua de demonstração, Centro — Curitiba/PR',cpf:'191.191.191-00'};
     shippingState={status:'ready',quotes:[{id:'curitiba-fixed',name:'Entrega em Curitiba',carrier:'Entrega local',price:19.9,deliveryDays:0}],preview:false,packaging:null,notice:'',error:'',code:'',sandbox:false,cep:'80010000'};
     selectedShippingService='curitiba-fixed';
-    couponState.code=scenario.startsWith('first_')?'PRIMEIRACOMPRA':'BF20%';couponState.open=true;
+    couponState.code=scenario.startsWith('first_')?'PRIMEIRACOMPRA':'BF20';couponState.open=true;
     openDrawer('checkout');
     await applyCoupon();
     document.getElementById('drawerBody').scrollTop=document.getElementById('drawerBody').scrollHeight;
