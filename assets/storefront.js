@@ -244,6 +244,7 @@ function couponHTML(){
       </div>
       <p id="couponHelp" class="coupon-help">Use um cupom por pedido. O desconto vale para os produtos; o frete permanece igual.</p>
       <p id="couponError" class="coupon-error" ${error?'':'hidden'}>${escapeAttr(error)}</p>
+      ${error&&couponState.code?`<button type="button" class="coupon-clear" onclick="removeCoupon()" ${checkoutSubmitting?'disabled':''}>Remover cupom</button>`:''}
       <p class="coupon-feedback" ${applied||couponState.notice?'':'hidden'}>${escapeAttr(applied?`${applied.code} aplicado: ${applied.percent}% de desconto nos produtos.`:couponState.notice)}</p>
       ${applied&&payMethod==='pix'?'<p class="coupon-help">Os 5% extras do Pix são calculados após o cupom.</p>':''}
     </div>
@@ -525,7 +526,7 @@ async function confirmOrder(){
       body:JSON.stringify(payload)
     });
     const data=await resp.json().catch(()=>({}));
-    if(!resp.ok&&(/^(COUPON_)/.test(data.code||'')||/CPF/.test(data.code||''))){
+    if(!resp.ok&&(/^COUPONS?_/.test(data.code||'')||/CPF/.test(data.code||''))){
       couponState={...couponState,applied:null,status:'error',error:data.error||'Confira o cupom antes de continuar.',errorField:/CPF/.test(data.code)?'cpf':'coupon',notice:'',open:true};
       announceCoupon(couponState.error);
       return;

@@ -703,6 +703,7 @@ test('cupom recusado na cobrança exige nova conferência, recalcula total e nun
   await app.run('confirmOrder()');
   assert.equal(checkouts,1);assert.equal(app.run('couponState.applied'),null);
   assert.match(app.nodes.get('drawerBody').innerHTML,/O prazo deste cupom terminou/);
+  assert.match(app.nodes.get('drawerBody').innerHTML,/>Remover cupom<\/button>/);
   assert.match(app.nodes.get('drawerFoot').innerHTML,/91,15/);
   await app.run('confirmOrder()');assert.equal(checkouts,1);
   assert.equal(app.run('window.location.href'),'https://liora.example/');

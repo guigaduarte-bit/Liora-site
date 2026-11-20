@@ -283,6 +283,7 @@ footer li a:hover{color:#E4C98F}
 .checkout-coupon .coupon-feedback,.checkout-coupon .coupon-error{margin-top:10px}
 .checkout-coupon .coupon-feedback{font-weight:400;color:var(--ink)}
 .checkout-coupon .coupon-error{color:#8C302C;font-weight:400}
+.checkout-coupon .coupon-clear{min-height:44px;text-decoration:underline;text-underline-offset:3px;font-size:12px;color:var(--ink);padding:8px 0}
 .checkout-coupon .coupon-feedback+.coupon-help{margin-top:6px}
 .coupon-summary{gap:12px;color:var(--ink)}
 .coupon-summary>span:last-child{white-space:nowrap}
