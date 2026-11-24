@@ -22,11 +22,23 @@ test('prévia usa catálogo real e mantém BF, primeira compra e Pix com totais 
  const window=preview('bf_active');
  const result=await(await request(window,'/api/validate-coupon',{items,payMethod:'pix',couponCode:'BF20'})).json();
  assert.equal(result.subtotalCents,10000);assert.equal(result.couponDiscountCents,2000);assert.equal(result.paymentDiscountCents,400);assert.equal(result.productTotalCents,7600);
- const first=await(await request(window,'/api/validate-coupon',{items,payMethod:'card',couponCode:'PRIMEIRACOMPRA',payer:{cpf:'19119119100'}})).json();
+ const firstWindow=preview('first_eligible');
+ const first=await(await request(firstWindow,'/api/validate-coupon',{items,payMethod:'card',couponCode:'PRIMEIRACOMPRA',payer:{cpf:'19119119100'}})).json();
  assert.equal(first.productTotalCents,9000);
  const shipping=await(await request(window,'/api/shipping-quote',{items})).json();assert.equal(shipping.quotes[0].price,19.9);
- assert.equal(window.LIORA_COUPONS_ENABLED,true);assert.equal(window.LIORA_CHECKOUT_V2,false);assert.equal(window.LIORA_PAYMENT_ENVIRONMENT,'preview');
- window.LIORA_COUPONS_ENABLED=false;assert.equal(window.LIORA_COUPONS_ENABLED,true);
+ assert.equal(window.LIORA_COUPONS_ENABLED,false);assert.equal(window.LIORA_CAMPAIGN_COUPONS_ENABLED,true);assert.equal(window.LIORA_ORDER_TRACKING_ENABLED,false);assert.equal(window.LIORA_CHECKOUT_V2,false);assert.equal(window.LIORA_PAYMENT_ENVIRONMENT,'preview');
+ window.LIORA_COUPONS_ENABLED=true;assert.equal(window.LIORA_COUPONS_ENABLED,false);
+ assert.equal(firstWindow.LIORA_COUPONS_ENABLED,true);assert.equal(firstWindow.LIORA_CAMPAIGN_COUPONS_ENABLED,false);
+});
+
+test('cenários BF recusam primeira compra antes de pedir CPF e mantêm o modo campanha isolado',async()=>{
+ for(const scenario of ['bf_active','bf_early','bf_expired']){
+  const window=preview(scenario);
+  const res=await request(window,'/api/validate-coupon',{items,payMethod:'pix',couponCode:'PRIMEIRACOMPRA'});
+  assert.equal(res.ok,false);assert.equal((await res.json()).code,'COUPONS_UNAVAILABLE');
+  assert.equal(window.LIORA_COUPONS_ENABLED,false);assert.equal(window.LIORA_CAMPAIGN_COUPONS_ENABLED,true);
+  window.LIORA_ORDER_TRACKING_ENABLED=true;assert.equal(window.LIORA_ORDER_TRACKING_ENABLED,false);
+ }
 });
 
 test('prévia cobre período anterior, expirado e CPF com pedido sem API externa',async()=>{

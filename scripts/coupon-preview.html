@@ -24,9 +24,12 @@ const frame=document.getElementById('site'),result=document.getElementById('prev
 function fixture(scenario){
   // This fixture is injected only into the isolated demonstration document.
   // It never falls through to a real API and cannot issue a provider redirect.
+  const fullCoupons=scenario.startsWith('first_');
   const memory=new Map([['liora_cart',JSON.stringify([{id:'botanique',qty:1,frag:'Lavanda Sofisticada'},{id:'natal-gingerbread',qty:1,frag:''}])]]);
   Object.defineProperty(window,'sessionStorage',{value:{getItem:key=>memory.get(key)||null,setItem:(key,value)=>memory.set(key,String(value)),removeItem:key=>memory.delete(key)}});
-  Object.defineProperty(window,'LIORA_COUPONS_ENABLED',{get:()=>true,set(){}});
+  Object.defineProperty(window,'LIORA_COUPONS_ENABLED',{get:()=>fullCoupons,set(){}});
+  Object.defineProperty(window,'LIORA_CAMPAIGN_COUPONS_ENABLED',{get:()=>!fullCoupons,set(){}});
+  Object.defineProperty(window,'LIORA_ORDER_TRACKING_ENABLED',{get:()=>false,set(){}});
   Object.defineProperty(window,'LIORA_CHECKOUT_V2',{get:()=>false,set(){}});
   Object.defineProperty(window,'LIORA_PAYMENT_ENVIRONMENT',{get:()=> 'preview',set(){}});
   window.__couponPreview={scenario,validations:0,paymentAttempts:0,blocked:0};
@@ -42,6 +45,7 @@ function fixture(scenario){
       if(code==='BF20'&&scenario==='bf_early')return invalid('COUPON_NOT_STARTED','O cupom BF20 estará disponível de 27 a 29/11/2026, no horário de Brasília.');
       if(code==='BF20'&&scenario==='bf_expired')return invalid('COUPON_EXPIRED','O prazo do cupom BF20 terminou em 29/11/2026.');
       if(code==='PRIMEIRACOMPRA'){
+        if(!fullCoupons)return invalid('COUPONS_UNAVAILABLE','Este cupom está temporariamente indisponível. Remova-o para continuar.');
         if(String(body.payer?.cpf||'').replace(/\D/g,'')!=='19119119100')return invalid('CHECKOUT_CPF_INVALID','Nesta demonstração, use o CPF fictício 191.191.191-00.');
         if(scenario==='first_used')return invalid('COUPON_NOT_ELIGIBLE','Este cupom é válido somente no primeiro pedido do CPF.');
       }
@@ -67,7 +71,7 @@ function fixture(scenario){
   document.addEventListener('DOMContentLoaded',async()=>{
     const live=document.createElement('div');live.id='couponLive';live.className='coupon-live';live.setAttribute('role','status');live.setAttribute('aria-live','polite');live.setAttribute('aria-atomic','true');
     if(!document.getElementById('couponLive'))document.getElementById('drawer').append(live);
-    checkoutForm={name:'Cliente de demonstração',email:'demonstracao@example.com',cep:'80010-000',num:'100',addr:'Rua de demonstração, Centro — Curitiba/PR',cpf:'191.191.191-00'};
+    checkoutForm={name:'Cliente de demonstração',email:'demonstracao@example.com',cep:'80010-000',num:'100',addr:'Rua de demonstração, Centro — Curitiba/PR',cpf:fullCoupons?'191.191.191-00':''};
     shippingState={status:'ready',quotes:[{id:'curitiba-fixed',name:'Entrega em Curitiba',carrier:'Entrega local',price:19.9,deliveryDays:0}],preview:false,packaging:null,notice:'',error:'',code:'',sandbox:false,cep:'80010000'};
     selectedShippingService='curitiba-fixed';
     couponState.code=scenario.startsWith('first_')?'PRIMEIRACOMPRA':'BF20';couponState.open=true;

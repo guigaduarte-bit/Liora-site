@@ -7,7 +7,7 @@ const vm = require('node:vm');
 const { test } = require('node:test');
 const products = require('../content/products.json');
 
-function storefront({ saved = {}, blockedStorage = false, search = '', fetch, environment = 'production', checkoutV2 = false, couponsEnabled = false, orderTrackingEnabled = false } = {}) {
+function storefront({ saved = {}, blockedStorage = false, search = '', fetch, environment = 'production', checkoutV2 = false, couponsEnabled = false, campaignCouponsEnabled = false, orderTrackingEnabled = false } = {}) {
   const storage = new Map(Object.entries(saved));
   const nodes = new Map();
   const windowEvents = new Map();
@@ -26,6 +26,7 @@ function storefront({ saved = {}, blockedStorage = false, search = '', fetch, en
     LIORA_PAYMENT_ENVIRONMENT: environment,
     LIORA_CHECKOUT_V2: checkoutV2,
     LIORA_COUPONS_ENABLED: couponsEnabled,
+    LIORA_CAMPAIGN_COUPONS_ENABLED: campaignCouponsEnabled,
     LIORA_ORDER_TRACKING_ENABLED: orderTrackingEnabled,
     LIORA_PAYMENT_POLICY: { maxInstallments: 3, interestFreeInstallments: 0 },
     crypto: require('node:crypto').webcrypto,
@@ -747,4 +748,80 @@ test('registro independente usa chave estável sem liberar CPF, cupom ou Pix dir
     }
     assert.doesNotMatch(JSON.stringify([...app.storage]),/fixture@example.com|Pessoa Fictícia|Rua Fictícia|80000000/);
   }
+});
+
+test('campanha BF20 usa Checkout Pro legado sem CPF ou chave e preserva Pix, cartão, boleto e frete',async()=>{
+  for(const method of ['pix','card','boleto']){
+    const requests=[];
+    const quote=method==='pix'?bfPixQuote:{...bfPixQuote,paymentDiscountCents:0,productTotalCents:6000};
+    const app=storefront({campaignCouponsEnabled:true,fetch:async(url,options)=>{
+      const body=JSON.parse(options.body);requests.push({url,body});
+      if(url==='/api/validate-coupon')return {ok:true,json:async()=>quote};
+      assert.equal(url,'/api/create-preference');
+      return {ok:true,json:async()=>({provider:'mercadopago',init_point:'https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=campaign-fixture',order_id:'LIORA-CAMPAIGN-12345678',checkout_proof:'synthetic-campaign-proof'})};
+    }});await app.done;
+    app.run("addToCart('botanique',1);drawerView='checkout';shippingState={status:'ready',quotes:[{id:'curitiba-fixed',price:19.9}]};selectedShippingService='curitiba-fixed';checkoutForm.cpf='19119119100';couponState.code='BF20';payMethod="+JSON.stringify(method)+";renderCheckout();");
+    assert.match(app.nodes.get('drawerBody').innerHTML,/id="checkoutCoupon"/);
+    assert.match(app.nodes.get('drawerBody').innerHTML,/placeholder="Ex\.: BF20"/);
+    assert.doesNotMatch(app.nodes.get('drawerBody').innerHTML,/id="fCPF"|placeholder="Ex\.: PRIMEIRACOMPRA"/);
+    await app.run('applyCoupon()');
+    assert.equal(requests[0].body.payer,undefined);
+    assert.equal(requests[0].body.couponCode,'BF20');
+    assert.match(app.nodes.get('drawerFoot').innerHTML,method==='pix'?/76,90/:/79,90/);
+    assert.equal(app.run('cart[0].price'),75);assert.equal(app.run('shippingState.quotes[0].price'),19.9);
+    assert.doesNotMatch(app.nodes.get('drawerFoot').innerHTML,/O QR Code e o código Pix aparecerão aqui/);
+    app.run("$('fN').value='Pessoa Fictícia';$('fE').value='fixture@example.com';$('fC').value='80000000';$('fA').value='Rua Fictícia';");
+    await app.run('confirmOrder()');
+    const payload=requests[1].body;
+    assert.equal(payload.payMethod,method);assert.equal(payload.couponCode,'BF20');assert.equal(payload.payer.cpf,undefined);assert.equal(payload.checkoutKey,undefined);
+    assert.equal(app.storage.get('liora_checkout_attempt'),undefined);
+    assert.equal(app.run('window.location.href'),'https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=campaign-fixture');
+  }
+});
+
+test('primeira compra indisponível no modo campanha mostra remoção sem pedir CPF ou cobrar',async()=>{
+  let checkouts=0;
+  const app=storefront({campaignCouponsEnabled:true,fetch:async(url,options)=>{
+    if(url==='/api/validate-coupon'){
+      assert.equal(JSON.parse(options.body).payer,undefined);
+      return {ok:false,json:async()=>({code:'COUPONS_UNAVAILABLE',error:'Este cupom está temporariamente indisponível. Remova-o para continuar.'})};
+    }
+    checkouts++;assert.equal(JSON.parse(options.body).couponCode,undefined);assert.equal(JSON.parse(options.body).payer.cpf,undefined);
+    return {ok:false,json:async()=>({error:'Resposta fictícia sem cobrança.'})};
+  }});await app.done;
+  app.run("addToCart('botanique',1);drawerView='checkout';shippingState={status:'ready',quotes:[{id:'curitiba-fixed',price:19.9}]};selectedShippingService='curitiba-fixed';couponState.code='PRIMEIRACOMPRA';");
+  await app.run('applyCoupon()');
+  assert.equal(app.run('couponState.applied'),null);
+  assert.match(app.nodes.get('drawerBody').innerHTML,/Este cupom está temporariamente indisponível/);
+  assert.match(app.nodes.get('drawerBody').innerHTML,/>Remover cupom<\/button>/);
+  assert.doesNotMatch(app.nodes.get('drawerBody').innerHTML,/id="fCPF"/);
+  await app.run('confirmOrder()');assert.equal(checkouts,0);
+  app.run("removeCoupon();$('fN').value='Pessoa Fictícia';$('fE').value='fixture@example.com';$('fC').value='80000000';$('fA').value='Rua Fictícia';");
+  await app.run('confirmOrder()');assert.equal(checkouts,1);
+});
+
+test('campanha com registro independente mantém chave estável sem exigir CPF',async()=>{
+  const payloads=[];
+  const app=storefront({campaignCouponsEnabled:true,orderTrackingEnabled:true,fetch:async(url,options)=>{
+    if(url==='/api/validate-coupon')return {ok:true,json:async()=>bfPixQuote};
+    payloads.push(JSON.parse(options.body));throw Error('synthetic network failure');
+  }});await app.done;
+  app.run("addToCart('botanique',1);drawerView='checkout';shippingState={status:'ready',quotes:[{id:'curitiba-fixed',price:19.9}]};selectedShippingService='curitiba-fixed';couponState.code='BF20';");
+  await app.run('applyCoupon()');
+  assert.doesNotMatch(app.nodes.get('drawerBody').innerHTML,/id="fCPF"/);
+  app.run("$('fN').value='Pessoa Fictícia';$('fE').value='fixture@example.com';$('fC').value='80000000';$('fA').value='Rua Fictícia';");
+  await app.run('confirmOrder()');await app.run('confirmOrder()');
+  assert.equal(payloads.length,2);assert.match(payloads[0].checkoutKey,/^[a-f0-9-]{36}$/);assert.equal(payloads[0].checkoutKey,payloads[1].checkoutKey);
+  assert.equal(payloads[0].payer.cpf,undefined);assert.equal(payloads[0].couponCode,'BF20');
+});
+
+test('modo campanha mantém bloqueio durante validação e descarta resposta após trocar pagamento',async()=>{
+  let resolve;let calls=0;
+  const app=storefront({campaignCouponsEnabled:true,fetch:()=>{calls++;return new Promise(r=>{resolve=r})}});await app.done;
+  app.run("addToCart('botanique',1);drawerView='checkout';shippingState={status:'ready',quotes:[{id:'curitiba-fixed',price:19.9}]};selectedShippingService='curitiba-fixed';couponState.code='BF20';");
+  const pending=app.run('applyCoupon()');await app.run('confirmOrder()');assert.equal(calls,1);
+  assert.match(app.nodes.get('drawerFoot').innerHTML,/disabled>Conferindo cupom/);
+  app.run("selectPayment('card')");resolve({ok:true,json:async()=>bfPixQuote});await pending;
+  assert.equal(app.run('couponState.applied'),null);assert.equal(app.run('couponState.status'),'idle');
+  assert.match(app.nodes.get('drawerFoot').innerHTML,/94,90/);
 });

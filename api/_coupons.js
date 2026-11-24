@@ -66,9 +66,16 @@ function eligibilityError(code) {
 }
 
 async function validateCoupon({ code, cart, paymentMethod, payerCpf, environment, orderId, now, checkEligibility = true }) {
-  if (!orders.couponsEnabled()) fail('COUPONS_UNAVAILABLE', 'Os cupons estão temporariamente indisponíveis. Continue sem cupom ou tente mais tarde.');
+  const fullCoupons = orders.couponsEnabled();
+  const campaignCoupons = orders.campaignCouponsEnabled();
+  if (!fullCoupons && !campaignCoupons) fail('COUPONS_UNAVAILABLE', 'Os cupons estão temporariamente indisponíveis. Continue sem cupom ou tente mais tarde.');
   const coupon = resolveCoupon(code, now);
   if (!coupon) fail('COUPON_REQUIRED', 'Digite um cupom para aplicar o desconto.', 400);
+  // Always authorize the selected code, including creation's atomic-check path.
+  // A campaign flag must never admit first-purchase or future coupon definitions.
+  if (!fullCoupons && !(campaignCoupons && coupon.code === 'BF20' && coupon.firstPurchaseOnly === false)) {
+    fail('COUPONS_UNAVAILABLE', 'Este cupom está temporariamente indisponível. Remova-o para continuar.');
+  }
   if (coupon.firstPurchaseOnly && checkEligibility) {
     const identity = cpfHash(payerCpf, environment);
     const eligibility = await orders.couponEligibility(identity, environment, orderId);
