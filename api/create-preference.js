@@ -96,7 +96,7 @@ module.exports = async function handler(req, res) {
     const { items, payMethod, shipping, payer, returnOrigin, checkoutKey, couponCode: rawCouponCode, coupons } = parseBody(req);
     if (coupons !== undefined) fail('COUPON_ONE_AT_A_TIME', 'Use apenas um cupom por pedido.', 400);
     const couponCode = normalizeCode(rawCouponCode);
-    if (couponCode && !orders.couponsEnabled()) fail('COUPONS_UNAVAILABLE', 'Os cupons estão temporariamente indisponíveis. Remova o cupom para continuar.');
+    if (couponCode && !orders.couponsEnabled() && !orders.campaignCouponsEnabled()) fail('COUPONS_UNAVAILABLE', 'Os cupons estão temporariamente indisponíveis. Remova o cupom para continuar.');
     const selectedPayment = cleanText(payMethod, 20);
     const selectedShipping = cleanText(shipping && shipping.method, 20);
 

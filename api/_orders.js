@@ -5,7 +5,9 @@ const { fail } = require('./_payment');
 
 function enabled() { return process.env.LIORA_CHECKOUT_V2 === 'true'; }
 function couponsEnabled() { return process.env.LIORA_COUPONS_ENABLED === 'true'; }
+function campaignCouponsEnabled() { return process.env.LIORA_CAMPAIGN_COUPONS_ENABLED === 'true'; }
 // Coupon history must not silently switch the existing Checkout Pro Pix flow.
+// General campaigns do not activate the CPF ledger or durable checkout.
 function trackingEnabled() { return enabled() || couponsEnabled() || process.env.LIORA_ORDER_TRACKING_ENABLED === 'true'; }
 function settings() {
   const url = process.env.ORDERS_SUPABASE_URL;
@@ -116,4 +118,4 @@ async function reconcile(proof, payment) {
   return recordPayment(order, payment);
 }
 
-module.exports = { enabled, couponsEnabled, trackingEnabled, settings, identity, getOrder, register, saveCheckout, recordPayment, proofFor, reconcile, couponEligibility, couponFailure, storageRequest: request };
+module.exports = { enabled, couponsEnabled, campaignCouponsEnabled, trackingEnabled, settings, identity, getOrder, register, saveCheckout, recordPayment, proofFor, reconcile, couponEligibility, couponFailure, storageRequest: request };
