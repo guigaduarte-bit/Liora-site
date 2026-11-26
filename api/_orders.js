@@ -92,11 +92,12 @@ async function saveCheckout(id, environment, data) {
 async function recordPayment(order, payment) {
   const recorded = await request('rpc/liora_record_payment', { method: 'POST', body: { p_order_id: order.id, p_environment: order.environment, p_payment: payment } });
   if (recorded?.recorded === true && recorded.status === 'approved' && order.environment === 'production'
-    && order.mode === 'live' && process.env.WHATSAPP_ENABLED === 'true') {
+    && order.mode === 'live' && (process.env.WHATSAPP_ENABLED === 'true' || process.env.EMAIL_ALERTS_ENABLED === 'true')) {
     try {
       // The database already committed the payment and queued one event. An
       // unavailable messaging provider must never undo a confirmed payment.
-      await require('./_order-alerts').dispatchOrderAlert({ orderId: order.id });
+      const notification = await require('./_notifications').dispatchOrderNotifications({ orderId: order.id });
+      if (notification.status === 'unavailable') console.warn('ORDER_ALERT_DISPATCH_DEFERRED');
     } catch {
       console.warn('ORDER_ALERT_DISPATCH_DEFERRED');
     }

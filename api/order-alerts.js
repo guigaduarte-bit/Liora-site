@@ -10,7 +10,7 @@ function authorized(req, secret) {
   return expected.length === received.length && timingSafeEqual(expected, received);
 }
 
-function createHandler({ env = process.env, dispatch = () => require('./_order-alerts').dispatchOrderAlert() } = {}) {
+function createHandler({ env = process.env, dispatch = () => require('./_notifications').dispatchOrderNotifications() } = {}) {
   return async function handler(req, res) {
     res.setHeader('Cache-Control', 'no-store');
     res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -21,8 +21,8 @@ function createHandler({ env = process.env, dispatch = () => require('./_order-a
     if (!authorized(req, env.CRON_SECRET)) return res.status(401).json({ code: 'UNAUTHORIZED' });
     if (env.VERCEL_ENV !== 'production' || env.PAYMENT_MODE !== 'live') return res.status(503).json({ code: 'ORDER_ALERT_ENVIRONMENT_MISMATCH' });
     try {
-      // One queue item per call bounds execution and makes concurrent workers
-      // safe through the database lease. Query/body cannot select another order.
+      // One item per enabled channel bounds execution. Independent database
+      // leases protect parallel workers; the request cannot select an order.
       const result = await dispatch();
       if (!result || typeof result.status !== 'string') throw new Error('invalid');
       return res.status(result.status === 'unavailable' ? 503 : 200).json({ status: result.status });

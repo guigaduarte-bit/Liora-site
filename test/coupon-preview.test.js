@@ -42,10 +42,52 @@ test('cenários BF recusam primeira compra antes de pedir CPF e mantêm o modo c
 });
 
 test('prévia cobre período anterior, expirado e CPF com pedido sem API externa',async()=>{
- for(const [scenario,couponCode,code] of [['bf_early','BF20','COUPON_NOT_STARTED'],['bf_expired','BF20','COUPON_EXPIRED'],['first_used','PRIMEIRACOMPRA','COUPON_NOT_ELIGIBLE']]){
+ for(const [scenario,couponCode,code] of [['bf_early','BF20','COUPON_NOT_STARTED'],['bf_expired','BF20','COUPON_EXPIRED'],['first_used','PRIMEIRACOMPRA','COUPON_FIRST_ORDER_ONLY']]){
   const window=preview(scenario),res=await request(window,'/api/validate-coupon',{items,payMethod:'pix',couponCode,payer:{cpf:'19119119100'}});
   assert.equal(res.ok,false);assert.equal((await res.json()).code,code);
  }
+});
+
+test('histórico indisponível não aplica PRIMEIRACOMPRA nem expõe consultas reais na prévia',async()=>{
+ const window=preview('first_unavailable');
+ const res=await request(window,'/api/validate-coupon',{items,payMethod:'pix',couponCode:'PRIMEIRACOMPRA',payer:{cpf:'19119119100'}});
+ assert.equal(res.ok,false);assert.equal(res.status,503);
+ const body=await res.json();assert.equal(body.code,'COUPON_HISTORY_UNAVAILABLE');assert.equal(body.coupon,undefined);
+ assert.match(body.error,/Tente mais tarde ou continue sem cupom/);
+ await assert.rejects(window.fetch('/api/orders'),/não acessa serviços reais/);
+ assert.equal(window.__couponPreview.blocked,1);
+});
+
+test('exemplo de e-mail abre sem rede, fecha o checkout e não revela destinatário pessoal',async()=>{
+ let requests=0;
+ const frame={hidden:false,srcdoc:'checkout em demonstração'},emailPreview={hidden:true},result={textContent:''};
+ const context=vm.createContext({frame,emailPreview,result,document:{getElementById(){return {value:'email_preview'}}},fetch(){requests++;throw Error('network must not be called')}});
+ const startSource=script.slice(script.indexOf('let template;'),script.indexOf("\nwindow.addEventListener('message'"));
+ await vm.runInContext(startSource+'\nstart()',context);
+ assert.equal(requests,0);assert.equal(frame.hidden,true);assert.equal(frame.srcdoc,'');assert.equal(emailPreview.hidden,false);
+ assert.equal(result.textContent,'Exemplo de e-mail pronto. Nenhuma mensagem foi enviada.');
+ const sample=source.match(/<article class="email-preview"[\s\S]*?<\/article>/)[0];
+ assert.match(sample,/Exemplo de e-mail · nenhuma mensagem enviada/);
+ assert.match(sample,/E-mail pessoal configurado/);
+ assert.match(sample,/Venda confirmada na Liora — LIORA-PREVIA-0001/);
+ assert.match(sample,/R\$ 95,90/);assert.match(sample,/1 × Botanique/);assert.match(sample,/1 × Gingerbread/);
+ assert.match(sample,/Esta prévia não confirma uma venda nem a ativação do envio de e-mails/);
+ assert.doesNotMatch(sample,/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i);
+ assert.doesNotMatch(sample,/<(?:form|script|input)|mailto:|https?:\/\//i);
+});
+
+test('carregamento atrasado do checkout não substitui o exemplo de e-mail selecionado',async()=>{
+ let resolveTemplate;
+ const frame={hidden:false,srcdoc:''},emailPreview={hidden:true},result={textContent:''},scenario={value:'bf_active'};
+ const context=vm.createContext({frame,emailPreview,result,document:{getElementById(){return scenario}},fetch:async()=>({text:()=>new Promise(resolve=>{resolveTemplate=resolve})}),fixture(){}});
+ const startSource=script.slice(script.indexOf('let template;'),script.indexOf("\nwindow.addEventListener('message'"));
+ vm.runInContext(startSource,context);
+ const pending=vm.runInContext('start()',context);
+ await Promise.resolve();
+ scenario.value='email_preview';await vm.runInContext('start()',context);
+ resolveTemplate('<head></head><body>Checkout fictício</body>');await pending;
+ assert.equal(frame.hidden,true);assert.equal(frame.srcdoc,'');assert.equal(emailPreview.hidden,false);
+ assert.equal(result.textContent,'Exemplo de e-mail pronto. Nenhuma mensagem foi enviada.');
 });
 
 test('prévia nunca redireciona para cobrança e recusa qualquer chamada não declarada',async()=>{
