@@ -10,7 +10,7 @@ O código envia um aviso ao responsável pela loja depois que o provedor de paga
 4. Confirmar o número do responsável que receberá os avisos. Ele deve ser diferente do remetente da API.
 5. Cadastrar as variáveis privadas na hospedagem, somente no ambiente Production. Não colocar credenciais no repositório, no navegador ou em mensagens de atendimento.
 6. Configurar o callback HTTPS `/api/whatsapp-webhook`, verificar o desafio e assinar os eventos `messages` na conta WhatsApp Business. Validar os callbacks antes de ativar novos envios.
-7. Configurar um agendador autenticado para chamar `/api/order-alerts` com `Authorization: Bearer <CRON_SECRET>`. Uma chamada processa no máximo um aviso; a frequência deve ser compatível com o plano de hospedagem e o volume de pedidos. O repositório não cria automaticamente um cron nem contrata um plano.
+7. Configurar um agendador autenticado para chamar `/api/order-alerts` com `Authorization: Bearer <CRON_SECRET>`. Uma chamada processa no máximo um aviso por canal ativo (WhatsApp e/ou e-mail), com filas independentes; a frequência deve ser compatível com o plano de hospedagem e o volume de pedidos. O repositório não cria automaticamente um cron nem contrata um plano.
 8. Definir `WHATSAPP_ALERTS_START_AT` para o instante efetivo de ativação, com fuso horário explícito. Isso impede o disparo de uma fila histórica. Ativar `WHATSAPP_ENABLED=true` somente com canal, modelo, destinatário e agendamento conferidos.
 9. Publicar novamente depois de alterar os controles do checkout e verificar um fluxo de pagamento autorizado. A aceitação da Meta deve ser seguida de um callback `delivered` ou `read` antes de considerar a entrega validada.
 
