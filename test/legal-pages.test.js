@@ -31,12 +31,16 @@ test('páginas legais existem, têm estrutura acessível e seguem a identidade L
   }
 });
 
-test('preview omite dados pessoais e sinaliza a proteção aplicada', () => {
+test('cadastro público mostra somente a cidade autorizada e o WhatsApp comercial', () => {
+  const {whatsapp} = JSON.parse(read('content/contact.json'));
   for (const [file] of pages) {
     const html = read(file);
-    assert.match(html, /Dados protegidos neste preview/);
-    assert.match(html, /omite dados pessoais e cadastrais/);
-    assert.doesNotMatch(html, /mailto:|wa\.me\/|CPF\/CNPJ:|Endereço físico:/i);
+    assert.match(html, /Localização comercial: Curitiba\/PR/);
+    assert.doesNotMatch(html, /preview|versão pública de avaliação|será informado|serão incluídos/i);
+    assert.doesNotMatch(html, /mailto:|CPF\/CNPJ:|Endereço físico:|\b\d{5}-\d{3}\b|\b\d{3}\.\d{3}\.\d{3}-\d{2}\b/i);
+    const links = [...html.matchAll(/href="https:\/\/wa\.me\/(\d+)" target="_blank" rel="noopener noreferrer"/g)];
+    assert.ok(links.length >= 2, file);
+    for (const [,number] of links) assert.equal(number, whatsapp, file);
     assert.doesNotMatch(html, /\[[^\]]+A INFORMAR\]/i);
   }
 });

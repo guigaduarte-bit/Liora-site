@@ -1,5 +1,17 @@
 # Pagamentos e pedidos — implementação de 21/10/2026
 
+## Conferência de 26/11/2026
+
+- O painel de integrações do Mercado Pago abriu no navegador conectado. O acesso aos detalhes da aplicação exigiu uma validação adicional da conta por SMS; a configuração do webhook depende da conclusão dessa etapa. Nenhum segredo foi gerado ou substituído nessa tentativa.
+- A responsável informou que ainda não houve vendas online. O banco ativo confirmou zero pedidos, pagamentos e históricos por CPF; isso não prova a ausência de links antigos ainda pagáveis nos provedores.
+- Os 67 testes focados de cupons, campanha, registro de pedidos e segurança passaram. A suíte completa após a atualização cadastral passou com 373 testes. Esses testes usam respostas de pagamento simuladas.
+- `test/remote-coupons-smoke.sql` passou no Supabase dedicado e encerrou com `ROLLBACK`. A conferência posterior encontrou zero pedidos, pagamentos, históricos por CPF e e-mails. O indicador de histórico de produção permanece `ready=false`.
+- BF20 continua programado para 27 a 29/11/2026 no horário de Brasília. PRIMEIRACOMPRA depende do segredo autêntico do webhook, da chave dedicada de CPF e do registro de todos os novos pedidos antes de ativar o histórico.
+- Para liberar cupons completos, basta `LIORA_COUPONS_ENABLED=true` após os pré-requisitos. `LIORA_CHECKOUT_V2` pode permanecer `false`, preservando o Checkout Pro existente. Não usar uma chave inventada para substituir `MP_WEBHOOK_SECRET`.
+- Conferir os links antigos ainda pagáveis tanto no Mercado Pago quanto na InfinitePay. A validade do comprovante local não encerra um link no provedor; links InfinitePay sem `valid_until` não expiram automaticamente segundo sua documentação.
+
+As seções abaixo preservam o histórico da implementação e não substituem esta conferência mais recente.
+
 ## Estado real
 
 Código implementado e verificado com 221 testes locais. O teste de banco usa PostgreSQL em PGlite, aplica todas as migrações e executa consultas com os papéis `anon`, `authenticated` e `service_role`, incluindo os privilégios padrão observados no Supabase. As respostas dos processadores são simuladas. Não houve cobrança real, homologação bancária nem alteração de credenciais.

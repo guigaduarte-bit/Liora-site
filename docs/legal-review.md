@@ -2,6 +2,8 @@
 
 Data da revisão técnica: 14 de setembro de 2026.
 
+O histórico abaixo registra decisões e verificações de cada data. A seção **Cadastro público atualizado — 26/11/2026**, ao final, descreve a configuração pública atual autorizada.
+
 ## Origem e escopo
 
 As três páginas legais e a folha de estilo foram recuperadas da branch `origin/preview/legal-pages`, commit `22596bd3f8b7e737735756b0396a7acf83d4f335` (`Protege dados pessoais no preview jurídico`). Essa branch ainda não integrava a `main` usada como base do trabalho de SEO.
@@ -94,3 +96,21 @@ Nos produtos com `availabilityPending`, “Consultar disponibilidade” abre o W
 O link foi preparado em preview, sujeito à validação já solicitada antes da publicação em produção. A existência do link não comprova recebimento/resposta, cumprimento de prazos, procedimentos de privacidade ou a operação de outros canais comerciais.
 
 Verificação desta alteração: 192 testes aprovados; os sete links gerados apontam ao contato configurado, com nome e URL da peça. A execução isolada da visualização rápida e dos favoritos confirmou o link e a preservação do carrinho. Foco por teclado e links nativos foram revisados no código. A conferência visual, de toque e de navegação real ficou não verificada: o executável Chromium não estava disponível e o download retornou arquivo inválido. Nenhuma mensagem foi enviada e nenhuma conversa foi acessada.
+
+## Cadastro público atualizado — 26/11/2026
+
+A responsável solicitou concluir o cadastro e publicar externamente somente a cidade **Curitiba/PR**. A instrução autoriza a localização comercial em nível de cidade/UF, além do nome empresarial e CNPJ anteriormente aprovados. Não autoriza rua, número, CEP, endereço residencial, CPF ou e-mail pessoal na página pública.
+
+- `content/business.json` passa a registrar `publicLocation: "Curitiba/PR"`. O build usa a expressão **Localização comercial: Curitiba/PR**, sem apresentar cidade/UF como endereço físico completo.
+- O nome empresarial, CNPJ e localização aparecem no quadro de dados das três páginas jurídicas e no rodapé compartilhado.
+- O WhatsApp comercial já configurado em `content/contact.json` é o canal indicado para atendimento, trocas, cancelamentos e solicitações de privacidade. As páginas não apresentam uma caixa comercial de e-mail inexistente.
+- Os avisos antigos de versão pública de avaliação e de futuro preenchimento foram removidos. Os textos de consumo e as condições de compra, entrega, personalização e reembolso foram preservados.
+- A informação de atendimento aponta a um canal já publicado. Esta alteração não comprova testes de recebimento/resposta, procedimentos de logística reversa, retenção de dados, cumprimento de prazos ou conformidade jurídica integral.
+
+### Limite da revisão cadastral
+
+O texto oficial do [Decreto nº 7.962/2013, art. 2º, II](https://www.planalto.gov.br/ccivil_03/_ato2011-2014/2013/decreto/d7962.htm), consultado novamente em 26/11/2026, prevê endereço físico e eletrônico e informações de localização e contato. O [cadastro oficial da Presidência](https://legislacao.presidencia.gov.br/atos/?ano=2013&ato=61ccXTE5ENVpWT68f&numero=7962&tipo=DEC) informa que não consta revogação expressa. A indicação de cidade/UF, isoladamente, não constitui endereço físico completo; a decisão de publicar somente Curitiba/PR foi respeitada e não foi tratada como quitação dessa exigência. Qualquer solução adicional de endereço comercial publicável exige uma decisão própria da responsável, sem completar dados por inferência.
+
+### Verificação técnica
+
+Os dez testes focados de identidade e páginas jurídicas passaram, incluindo formatação/escape, ausência de CPF/CEP/e-mail pessoal, recusa de endereço detalhado no campo de localização e uso exclusivo do WhatsApp comercial configurado. Essa verificação técnica não substitui revisão jurídica nem teste de operação do atendimento.
