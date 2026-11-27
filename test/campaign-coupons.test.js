@@ -197,7 +197,7 @@ test('legacy BF20 payment confirmation checks the signed discounted total withou
 });
 
 test('server campaign dates reject new expired orders but confirm an existing BF20 payment after closing', async t => {
-  const start = Date.parse('2026-11-27T03:00:00Z'), end = Date.parse('2026-11-30T03:00:00Z');
+  const start = Date.parse('2026-11-26T03:00:00Z'), end = Date.parse('2026-11-30T03:00:00Z');
   let clock = start - 1, lastCreated;
   t.mock.method(Date, 'now', () => clock);
   for (const [time, error] of [[start - 1, 'COUPON_NOT_STARTED'], [start, null], [end - 1, null], [end, 'COUPON_EXPIRED']]) {
