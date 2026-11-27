@@ -62,8 +62,8 @@ function mockOrders(t) {
 }
 
 test('BF20 respects inclusive Brazilian start and exclusive midnight after November 29', () => {
-  assert.throws(() => resolveCoupon('BF20', Date.parse('2026-11-27T02:59:59.999Z')), { code: 'COUPON_NOT_STARTED' });
-  assert.equal(resolveCoupon(' bf20 ', Date.parse('2026-11-27T03:00:00Z')).percent, 20);
+  assert.throws(() => resolveCoupon('BF20', Date.parse('2026-11-26T02:59:59.999Z')), { code: 'COUPON_NOT_STARTED' });
+  assert.equal(resolveCoupon(' bf20 ', Date.parse('2026-11-26T03:00:00Z')).percent, 20);
   assert.equal(resolveCoupon('BF20', Date.parse('2026-11-30T02:59:59.999Z')).percent, 20);
   assert.throws(() => resolveCoupon('BF20', Date.parse('2026-11-30T03:00:00Z')), { code: 'COUPON_EXPIRED' });
 });
